@@ -4,8 +4,6 @@ description: "Each pull request to the stage branch has to be passed by types an
 runs:
   using: composite
   steps:
-    - name: Checkout
-      uses: actions/checkout@v4
     - name: Setup Node
       uses: actions/setup-node@v4
       with:
