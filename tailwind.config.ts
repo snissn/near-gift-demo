@@ -17,6 +17,15 @@ const config: Config = {
       fontFamily: {
         sans: ["CircularXXSub", ...defaultTheme.fontFamily.sans],
       },
+      fontSize: {
+        "3xl": [
+          "2rem",
+          {
+            lineHeight: "2.5rem",
+            letterSpacing: "0.02rem",
+          },
+        ],
+      },
       spacing: {
         "2px": "2px",
         15: "3.75rem",
