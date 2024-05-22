@@ -1,19 +1,21 @@
 name: "CI test"
 description: "Each pull request to the stage branch has to be passed by types and linter check"
 
+on: workflow_call
+
 runs:
   using: composite
-  runs-on: ubuntu-latest
   steps:
-    - name: Checkout
-        uses: actions/checkout@v4
-        - name: Setup Node
-          uses: actions/setup-node@v4
-          with:
-            node-version-file: package.json
-        - name: Install
-          run: yarn install --frozen-lockfile --non-interactive --prefer-offline
-        - name: Check types
-          run: yarn run typecheck
-        - name: Lint
-          run: yarn run lint
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: package.json
+    - name: Install
+      run: yarn install --frozen-lockfile --non-interactive --prefer-offline
+      shell: bash
+    - name: Check types
+      run: yarn run typecheck
+      shell: bash
+    - name: Lint
+      run: yarn run lint
+      shell: bash
