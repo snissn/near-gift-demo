@@ -11,6 +11,7 @@ concurrency:
 
 jobs:
   build:
+    runs-on: ubuntu-latest
     steps:
       - name: test
         uses: ./.github/actions/test
