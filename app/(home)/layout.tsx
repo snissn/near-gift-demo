@@ -4,12 +4,12 @@ import { Metadata } from "next"
 import Layout from "@/components/Layout"
 
 export const metadata: Metadata = {
-  title: "Swap",
-  description: "Swap",
+  title: "Home",
+  description: "Home",
 }
 
-const SwapLayout: React.FC<PropsWithChildren> = ({ children }) => {
+const HomeLayout: React.FC<PropsWithChildren> = ({ children }) => {
   return <Layout>{children}</Layout>
 }
 
-export default SwapLayout
+export default HomeLayout

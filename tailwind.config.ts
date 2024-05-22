@@ -21,36 +21,29 @@ const config: Config = {
         "2px": "2px",
         15: "3.75rem",
       },
+      maxWidth: {
+        "8xl": "95rem",
+      },
       colors: {
-        secondary: "#95B0B2",
+        secondary: "#808080",
         black: "#041417",
         gray: {
           ...colors.gray,
-          900: "#031417",
-          850: "#0E2A2F",
-          800: "#13383E",
-          700: "#144448",
-          600: "#1E4D52",
-          500: "#24545B",
-          400: "#3E737A",
-          300: "#799DA2",
-          200: "#4BA2A6",
+          600: "#8d8d8d",
+          500: "#bbb",
+          400: "#d9d9d9",
+          300: "#e4e4e4",
+          200: "#f1f1f1",
+          100: "#f0f0f0",
         },
         silver: {
-          300: "#3D5458",
-          200: "#9BAFB2",
+          200: "#8b8d98",
         },
-        green: {
-          100: "#38626A",
-        },
-        lime: {
-          500: "#1EDE1D",
+        blue: {
+          300: "#101d46",
         },
         primary: {
-          DEFAULT: "#5DEB5A",
-        },
-        yellow: {
-          300: "#FDFC47",
+          DEFAULT: "#1c1f24",
         },
       },
       scale: {
