@@ -46,7 +46,7 @@ const config: Config = {
           100: "#f0f0f0",
         },
         silver: {
-          200: "#8b8d98",
+          200: "rgba(139, 141, 152, 1)",
         },
         blue: {
           300: "#101d46",
