@@ -34,13 +34,13 @@ const config: Config = {
         "8xl": "95rem",
       },
       colors: {
-        secondary: "#808080",
+        secondary: "rgba(128, 128, 128, 1)",
         black: "#041417",
         gray: {
           ...colors.gray,
           600: "#8d8d8d",
           500: "#bbb",
-          400: "#d9d9d9",
+          400: "rgba(217, 217, 217, 1)",
           300: "#e4e4e4",
           200: "rgba(241, 241, 241, 1)",
           100: "#f0f0f0",
