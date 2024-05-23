@@ -1,7 +1,7 @@
 export enum Navigation {
   SWAP = "/swap",
   DEPOSIT = "/deposit",
-  SEND = "send",
+  WITHDRAW = "/withdraw",
 }
 
 export type NavigationLinks = {
@@ -12,5 +12,5 @@ export type NavigationLinks = {
 export const LINKS_HEADER: NavigationLinks[] = [
   { href: Navigation.SWAP, label: "Swap" },
   { href: Navigation.DEPOSIT, label: "Deposit" },
-  { href: Navigation.SEND, label: "Send" },
+  { href: Navigation.WITHDRAW, label: "Withdraw" },
 ]
