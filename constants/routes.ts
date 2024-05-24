@@ -1,7 +1,9 @@
 export enum Navigation {
+  HOME = "/",
   SWAP = "/swap",
   DEPOSIT = "/deposit",
   WITHDRAW = "/withdraw",
+  WALLET = "/wallet",
 }
 
 export type NavigationLinks = {
