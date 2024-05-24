@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import { Grid, Text, TextArea } from "@radix-ui/themes"
 
 import CardBalance from "@/app/wallet/CardBalance"
 import CardTokenList from "@/app/wallet/CardTokenList"
@@ -34,6 +35,14 @@ export default function Wallet() {
           <CardBalance label="Deposited balance" balance="903.56" />
           <CardTokenList list={otherTokenList} />
         </div>
+      </div>
+      <div className="w-full mx-auto max-w-5xl">
+        <Grid gap="1">
+          <Text as="div" weight="bold" size="2" mb="1">
+            Theme Mode Feedback
+          </Text>
+          <TextArea placeholder="Write your feedback…" />
+        </Grid>
       </div>
     </div>
   )
