@@ -21,7 +21,7 @@ export default function Wallet() {
       <div className="w-full mx-auto max-w-[768px] mt-[64px] mb-[90px]">
         <h1 className="mb-8">Wallet</h1>
       </div>
-      <div className="w-full mx-auto max-w-7xl grid grid-cols-2 gap-10">
+      <div className="w-full mx-auto max-w-7xl grid grid-cols-2 gap-10 mb-[90px]">
         <div className="flex flex-col gap-8">
           <CardBalance
             label="NEAR balance (available)"
