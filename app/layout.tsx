@@ -1,4 +1,5 @@
 import "../styles/global.scss"
+import { WalletSelectorProvider } from "@/providers/WalletSelectorProvider"
 
 export default function RootLayout({
   children,
