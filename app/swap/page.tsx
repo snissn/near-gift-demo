@@ -6,7 +6,7 @@ import Paper from "@/components/Paper"
 import { Form, FieldComboInput } from "@/components/Form"
 import Button from "@/components/Button"
 import Switch from "@/components/Switch"
-import { Network } from "@/components/Network/NetworkSwitch"
+import Accordion from "@/components/Accordion"
 
 type FormValues = {
   tokenIn: string
@@ -41,7 +41,10 @@ export default function Swap() {
           price="39.16"
           selected={{ name: "1INCH" }}
         />
-        <Button type="submit">Swap</Button>
+        <Accordion />
+        <Button type="submit" size="lg" fullWidth>
+          Swap
+        </Button>
       </Form>
     </Paper>
   )
