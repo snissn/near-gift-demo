@@ -1,4 +1,5 @@
 import { Path, FieldValues, UseFormRegister } from "react-hook-form"
+import clsx from "clsx"
 
 import { NetworkSwitch } from "@/components/Network"
 import { Network } from "@/components/Network/NetworkSwitch"
@@ -31,8 +32,15 @@ const FieldComboInput = <T extends FieldValues>({
   if (!register) {
     return null
   }
+  // TODO Error has to be propagated from parent Form
+  const error = false
   return (
-    <div className="relative flex justify-between items-center px-5 py-[2.375rem] w-full bg-white rounded-[0.625rem]">
+    <div
+      className={clsx(
+        "relative flex justify-between items-center px-5 py-[2.375rem] w-full bg-white rounded-[0.625rem]",
+        !price && !balance && !error && "pt-[2.375rem] pb-5"
+      )}
+    >
       {label && (
         <span className="absolute top-4 left-5 text-sm font-medium text-secondary">
           {label}
