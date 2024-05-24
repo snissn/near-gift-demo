@@ -1,6 +1,8 @@
 "use client"
 
+import React from "react"
 import { FieldValues } from "react-hook-form"
+import Image from "next/image"
 
 import Paper from "@/components/Paper"
 import { Form, FieldComboInput } from "@/components/Form"
@@ -41,7 +43,28 @@ export default function Swap() {
           price="39.16"
           selected={{ name: "1INCH" }}
         />
-        <Accordion />
+        <Accordion
+          leftHeaderElement={
+            <>
+              <span className="w-[20px] h-[20px] rounded-[4px] bg-gray-500"></span>
+              <span className="text-sm font-medium">Gas</span>
+            </>
+          }
+          rightHeaderElement={
+            <>
+              <Image
+                src="/static/icons/fire.svg"
+                width={12}
+                height={16}
+                alt="caret-down"
+              />
+              <span className="text-sm font-bold">Free</span>
+              <span className="text-sm font-medium text-gray-700 line-through">
+                $7.27
+              </span>
+            </>
+          }
+        />
         <Button type="submit" size="lg" fullWidth>
           Swap
         </Button>
