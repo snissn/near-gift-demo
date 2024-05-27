@@ -1,6 +1,11 @@
 import { Theme } from "@radix-ui/themes"
 import { ThemeProvider } from "next-themes"
+
+import { WalletSelectorProvider } from "@/providers/WalletSelectorProvider"
+
 import "@radix-ui/themes/styles.css"
+import "@near-wallet-selector/modal-ui/styles.css"
+import "@near-wallet-selector/account-export/styles.css"
 import "../styles/global.scss"
 
 export default function RootLayout({
@@ -13,9 +18,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ThemeProvider attribute="class">
-          <Theme>{children}</Theme>
-        </ThemeProvider>
+        <WalletSelectorProvider>
+          <ThemeProvider attribute="class">
+            <Theme>{children}</Theme>
+          </ThemeProvider>
+        </WalletSelectorProvider>
       </body>
     </html>
   )
