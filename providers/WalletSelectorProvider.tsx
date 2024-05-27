@@ -1,6 +1,10 @@
 "use client"
 
-import type { AccountState, WalletSelector } from "@near-wallet-selector/core"
+import type {
+  AccountState,
+  Wallet,
+  WalletSelector,
+} from "@near-wallet-selector/core"
 import { setupWalletSelector } from "@near-wallet-selector/core"
 import type { WalletSelectorModal } from "@near-wallet-selector/modal-ui"
 import { setupCoin98Wallet } from "@near-wallet-selector/coin98-wallet"
@@ -33,6 +37,7 @@ import {
   useMemo,
 } from "react"
 import { distinctUntilChanged, map } from "rxjs"
+import { WalletModuleFactory } from "@near-wallet-selector/core/src/lib/wallet/wallet.types"
 
 declare global {
   interface Window {
@@ -74,7 +79,7 @@ export const WalletSelectorProvider: React.FC<{
         setupMathWallet(),
         setupNightly(),
         setupMeteorWallet(),
-        setupNearSnap(),
+        // setupNearSnap(), // TODO Has to be resolved issue with 'fs' lib
         setupNarwallets(),
         setupWelldoneWallet(),
         setupHereWallet(),
@@ -96,7 +101,9 @@ export const WalletSelectorProvider: React.FC<{
           },
         }),
         setupNearMobileWallet(),
-        setupMintbaseWallet({ contractId: "guest-book.testnet" }),
+        setupMintbaseWallet({
+          contractId: "guest-book.testnet",
+        }) as WalletModuleFactory<Wallet>,
       ],
     })
     const _modal = setupModal(_selector, {
