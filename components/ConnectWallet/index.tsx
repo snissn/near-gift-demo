@@ -1,73 +1,16 @@
 "use client"
 
-import { useState, useCallback, useEffect } from "react"
-import { providers } from "near-api-js"
-import BN from "bn.js"
-import type { AccountView } from "near-api-js/lib/providers/provider"
+import { useState, useEffect } from "react"
 
 import { useWalletSelector } from "@/providers/WalletSelectorProvider"
-import type { Account, Message } from "@/types/interfaces"
-
-interface GetAccountBalanceProps {
-  provider: providers.Provider
-  accountId: string
-}
-
-const getAccountBalance = async ({
-  provider,
-  accountId,
-}: GetAccountBalanceProps) => {
-  try {
-    const { amount } = await provider.query<AccountView>({
-      request_type: "view_account",
-      finality: "final",
-      account_id: accountId,
-    })
-    const bn = new BN(amount)
-    return { hasBalance: !bn.isZero() }
-  } catch {
-    return { hasBalance: false }
-  }
-}
+import type { Account } from "@/types/interfaces"
+import { useGetAccount } from "@/hooks/useGetAccount"
 
 const ConnectWallet = () => {
   const { selector, modal, accounts, accountId } = useWalletSelector()
-  const [account, setAccount] = useState<Account | null>(null)
+  const { getAccount } = useGetAccount({ accountId, selector })
   const [loading, setLoading] = useState<boolean>(false)
-
-  const getAccount = useCallback(async (): Promise<Account | null> => {
-    if (!accountId) {
-      return null
-    }
-
-    const { network } = selector.options
-    const provider = new providers.JsonRpcProvider({ url: network.nodeUrl })
-
-    const { hasBalance } = await getAccountBalance({
-      provider,
-      accountId,
-    })
-
-    if (!hasBalance) {
-      window.alert(
-        `Account ID: ${accountId} has not been founded. Please send some NEAR into this account.`
-      )
-      const wallet = await selector.wallet()
-      await wallet.signOut()
-      return null
-    }
-
-    return provider
-      .query<AccountView>({
-        request_type: "view_account",
-        finality: "final",
-        account_id: accountId,
-      })
-      .then((data) => ({
-        ...data,
-        account_id: accountId,
-      }))
-  }, [accountId, selector])
+  const [account, setAccount] = useState<Account | null>(null)
 
   useEffect(() => {
     if (!accountId) {
