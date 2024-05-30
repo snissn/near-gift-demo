@@ -1,6 +1,7 @@
 import { ReactNode, ButtonHTMLAttributes } from "react"
 import { FieldValues, UseFormRegister } from "react-hook-form"
 import clsx from "clsx"
+import { Button, Text } from "@radix-ui/themes"
 
 interface Props<T extends FieldValues>
   extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -11,7 +12,7 @@ interface Props<T extends FieldValues>
   register?: UseFormRegister<T>
 }
 
-const Button = <T extends FieldValues>({
+const CustomButton = <T extends FieldValues>({
   children,
   variant = "primary",
   size = "base",
@@ -19,13 +20,14 @@ const Button = <T extends FieldValues>({
   register,
   ...rest
 }: Props<T>) => {
-  const buttonBaseStyle =
-    "inline-flex justify-center items-center whitespace-nowrap"
+  const buttonBaseStyle = "cursor-pointer"
 
   let buttonVariantStyle: string
+  let buttonColorStyle: string
   switch (variant) {
     case "primary":
-      buttonVariantStyle = ""
+      buttonVariantStyle = "classic"
+      buttonColorStyle = "orange"
       break
     case "secondary":
       buttonVariantStyle = ""
@@ -33,30 +35,38 @@ const Button = <T extends FieldValues>({
   }
 
   let buttonSizeStyle: string
+  let buttonTextSizeStyle: string
   switch (size) {
     case "sm":
       buttonSizeStyle = ""
+      buttonTextSizeStyle = "1"
       break
     case "base":
       buttonSizeStyle = ""
+      buttonTextSizeStyle = "2"
       break
     case "lg":
-      buttonSizeStyle = "p-[15px] bg-black-500 rounded-full text-white text-lg"
+      buttonSizeStyle = "h-[56px] rounded-[0.5rem]"
+      buttonTextSizeStyle = "6"
       break
   }
 
   const buttonStyle = clsx(
     buttonBaseStyle,
-    buttonVariantStyle,
     buttonSizeStyle,
     fullWidth && "w-full block"
   )
 
   return (
-    <button {...rest} className={buttonStyle}>
-      {children}
-    </button>
+    <Button
+      variant={buttonVariantStyle}
+      color={buttonColorStyle}
+      className={buttonStyle}
+      {...rest}
+    >
+      <Text size={buttonTextSizeStyle}>{children}</Text>
+    </Button>
   )
 }
 
-export default Button
+export default CustomButton

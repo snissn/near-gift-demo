@@ -8,7 +8,7 @@
 
 :root {
   --color: text-black;
-  --background: bg-white;
+  --background: rgba(28, 32, 36, 1);
 }
 
 body {
@@ -34,5 +34,7 @@ body {
 }
 
 h1 {
-  font-size: 2.1875rem; // 35px
+  font-size: 3rem; // 48px
+  font-weight: 700;
+  line-height: 48px;
 }

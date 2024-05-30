@@ -26,7 +26,10 @@ export default function Swap() {
     console.log("form set max")
   }
   return (
-    <Paper title="Swap">
+    <Paper
+      title="Swap"
+      description="Cross-chain swap across any network, any token."
+    >
       <Form<FormValues> onSubmit={handleSubmit}>
         <FieldComboInput<FormValues>
           fieldName="tokenIn"
