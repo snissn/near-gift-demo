@@ -1,15 +1,21 @@
 import { useCallback } from "react"
 import { providers } from "near-api-js"
 import type { AccountView } from "near-api-js/lib/providers/provider"
+import { WalletSelector } from "@near-wallet-selector/core"
 
 import { useAccountBalance } from "@/hooks/useAccountBalance"
 import { Account } from "@/types/interfaces"
 
-export const useGetAccount = ({ accountId, selector }) => {
+type Props = {
+  accountId: string | null
+  selector: WalletSelector | null
+}
+
+export const useGetAccount = ({ accountId, selector }: Props) => {
   const { getAccountBalance } = useAccountBalance()
 
   const getAccount = useCallback(async (): Promise<Account | null> => {
-    if (!accountId) {
+    if (!accountId || !selector) {
       return null
     }
 
