@@ -18,8 +18,8 @@ const Header = () => {
 
   return (
     <header className="relative border-b-[1px] border-gay-50 bg-gray z-10 dark:bg-black">
-      <div className="flex justify-between items-center p-3">
-        <div className=" w-full mx-auto max-w-5xl">
+      <div className="flex justify-between items-center py-3">
+        <div className="flex justify-center w-full max-w-5xl pl-3">
           <div className="w-full max-w-[552px]">
             <div className="absolute h-full top-0 left-4">
               <Logo />
@@ -34,7 +34,7 @@ const Header = () => {
             </div>
           </div>
         </div>
-        <div className="flex justify-between items-center gap-2.5">
+        <div className="flex justify-between items-center gap-2.5 pr-3">
           <ConnectWallet />
           <Settings />
         </div>
