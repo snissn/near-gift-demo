@@ -11,7 +11,7 @@ const Settings = () => {
   return (
     <button
       onClick={() => router.push(Navigation.WALLET)}
-      className="w-[35px] h-[35px] flex justify-center items-center bg-gray-200 rounded-full gap-1"
+      className="w-[32px] h-[32px] flex justify-center items-center bg-gray-200 rounded-full gap-1"
     >
       <span className={elementCircleStyle}></span>
       <span className={elementCircleStyle}></span>
