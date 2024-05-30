@@ -1,14 +1,12 @@
 import Link from "next/link"
+import Image from "next/image"
 
 import { Navigation } from "@/constants/routes"
 
 const Logo = () => {
   return (
-    <Link
-      href={Navigation.HOME}
-      className="px-3 py-1 bg-gray-200 rounded-lg uppercase font-bold text-xl"
-    >
-      Defuse
+    <Link href={Navigation.HOME} className="block w-[123px] h-[32px]">
+      <Image src="/static/icons/Logo.svg" alt="Defuse Logo" fill />
     </Link>
   )
 }

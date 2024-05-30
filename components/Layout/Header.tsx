@@ -17,14 +17,23 @@ const Header = () => {
   }
 
   return (
-    <header className="relative border-b-[1px] border-black">
-      <div className="w-full mx-auto max-w-7xl px-4 py-[1rem] flex items-center justify-between">
-        <Logo />
-        <div className="flex items-center gap-1">
-          <span>Dark Mode</span>
-          <Switch className="cursor-pointer" size="1" onClick={onChangeTheme} />
+    <header className="relative border-b-[1px] border-gay-50 bg-gray z-10 dark:bg-black">
+      <div className="flex justify-between items-center p-3">
+        <div className=" w-full mx-auto max-w-5xl">
+          <div className="w-full max-w-[552px]">
+            <div className="absolute h-full top-0 left-4">
+              <Logo />
+            </div>
+            <div className="inline-flex">
+              {/* TODO Enable Dark Mode flow */}
+              {/*<div className="flex items-center gap-1">*/}
+              {/*  <span>Dark Mode</span>*/}
+              {/*  <Switch className="cursor-pointer" size="1" onClick={onChangeTheme} />*/}
+              {/*</div>*/}
+              <Navbar />
+            </div>
+          </div>
         </div>
-        <Navbar />
         <div className="flex justify-between items-center gap-2.5">
           <ConnectWallet />
           <Settings />

@@ -66,11 +66,15 @@ const ConnectWallet = () => {
 
   return (
     <div className="flex gap-2">
-      <button onClick={handleSignOut}>Log out</button>
-      <button onClick={handleSwitchWallet}>Switch Wallet</button>
-      {accounts.length > 1 && (
-        <button onClick={handleSwitchAccount}>Switch Account</button>
-      )}
+      <button className="rounded-full bg-gray-200 text-black-400 text-sm px-3 py-1.5">
+        {accountId}
+      </button>
+      {/* TODO Update wallet flows after design complete */}
+      {/*<button onClick={handleSignOut}>Log out</button>*/}
+      {/*<button onClick={handleSwitchWallet}>Switch Wallet</button>*/}
+      {/*{accounts.length > 1 && (*/}
+      {/*  <button onClick={handleSwitchAccount}>Switch Account</button>*/}
+      {/*)}*/}
     </div>
   )
 }
