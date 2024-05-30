@@ -79,7 +79,7 @@ export const WalletSelectorProvider: React.FC<{
         setupMathWallet(),
         setupNightly(),
         setupMeteorWallet(),
-        // setupNearSnap(), // TODO Has to be resolved issue with 'fs' lib
+        setupNearSnap(),
         setupNarwallets(),
         setupWelldoneWallet(),
         setupHereWallet(),

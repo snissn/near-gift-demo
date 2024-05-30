@@ -9,7 +9,7 @@ import { LINKS_HEADER } from "@/constants/routes"
 const Navbar = () => {
   const pathname = usePathname()
   return (
-    <nav className="flex justify-between items-center gap-5">
+    <nav className="flex justify-between items-center gap-4">
       {LINKS_HEADER.map((route, i) => {
         const isCurrentPage = route.href === pathname
         return (
@@ -17,8 +17,8 @@ const Navbar = () => {
             href={route.href}
             key={i}
             className={clsx(
-              "px-3 py-1 rounded-full text-sm",
-              isCurrentPage && "bg-gray-200"
+              "px-3 py-1.5 rounded-full text-sm",
+              isCurrentPage && "bg-black-400 text-white"
             )}
           >
             {route.label}
