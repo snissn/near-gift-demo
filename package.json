@@ -13,6 +13,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@near-eth/client": "^1.11.1",
     "@near-wallet-selector/account-export": "^8.9.7",
     "@near-wallet-selector/bitget-wallet": "^8.9.7",
     "@near-wallet-selector/coin98-wallet": "^8.9.7",
@@ -37,14 +38,17 @@
     "@near-wallet-selector/xdefi": "^8.9.7",
     "@radix-ui/themes": "^3.0.5",
     "bn.js": "^5.2.1",
+    "borsh": "^2.0.0",
     "clsx": "^2.1.1",
-    "near-api-js": "^4.0.1",
+    "crypto-js": "^4.2.0",
+    "near-api-js": "^0.45.1",
     "next": "14.2.3",
     "next-themes": "^0.3.0",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.51.5",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "viem": "^2.13.2"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",

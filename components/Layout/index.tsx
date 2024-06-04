@@ -11,7 +11,9 @@ const Layout: React.FC<PropsWithChildren> = ({ children }) => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex flex-1">
-        <div className="flex flex-1 w-full max-w-5xl">{children}</div>
+        <div className="flex flex-1 w-full max-w-5xl bg-gray-50">
+          {children}
+        </div>
         <PageBackground />
       </main>
       <Footer />

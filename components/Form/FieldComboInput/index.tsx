@@ -15,6 +15,7 @@ interface Props<T extends FieldValues> {
   handleSetMax?: () => void
   selected: Network
   onSelect?: (network: Network) => void
+  className?: string
 }
 
 const FieldComboInput = <T extends FieldValues>({
@@ -28,6 +29,7 @@ const FieldComboInput = <T extends FieldValues>({
   handleSetMax,
   selected,
   onSelect,
+  className,
 }: Props<T>) => {
   if (!register) {
     return null
@@ -37,8 +39,10 @@ const FieldComboInput = <T extends FieldValues>({
   return (
     <div
       className={clsx(
-        "relative flex justify-between items-center px-5 py-[2.375rem] w-full bg-white rounded-[0.625rem]",
-        !price && !balance && !error && "pt-[2.375rem] pb-5"
+        "relative flex justify-between items-center px-5 py-[2.375rem] w-full bg-gray-50",
+        !label && "pt-5",
+        !price && !balance && !error && "pb-5",
+        className && className
       )}
     >
       {label && (
@@ -49,11 +53,13 @@ const FieldComboInput = <T extends FieldValues>({
       <input
         {...register(fieldName, { required })}
         placeholder={placeholder}
-        className="text-3xl font-medium placeholder-black border-transparent focus:border-transparent focus:ring-0"
+        className={clsx(
+          "bg-gray-50 text-3xl font-medium placeholder-black border-transparent focus:border-transparent focus:ring-0"
+        )}
       />
       {price && (
         <span className="absolute bottom-4 left-5 text-sm font-medium text-secondary">
-          ${price}
+          ~${price}
         </span>
       )}
       <NetworkSwitch selected={selected} handleSwitch={onSelect} />

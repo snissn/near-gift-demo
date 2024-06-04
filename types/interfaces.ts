@@ -1,4 +1,5 @@
 import type { AccountView } from "near-api-js/lib/providers/provider"
+import { BigNumber } from "@ethersproject/bignumber"
 
 export interface Message {
   premium: boolean
@@ -8,4 +9,17 @@ export interface Message {
 
 export type Account = AccountView & {
   account_id: string
+}
+
+export type TokenInfo = {
+  address: string
+  symbol: string
+  name: string
+  decimals: number
+  logoURI: string
+}
+
+export type Token = TokenInfo & {
+  balance?: BigNumber
+  custom?: boolean
 }

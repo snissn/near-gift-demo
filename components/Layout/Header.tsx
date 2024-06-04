@@ -21,7 +21,7 @@ const Header = () => {
       <div className="flex justify-between items-center py-3">
         <div className="flex justify-center w-full max-w-5xl pl-3">
           <div className="w-full max-w-[552px]">
-            <div className="absolute h-full top-0 left-4">
+            <div className="absolute h-full top-0 left-4 flex items-center">
               <Logo />
             </div>
             <div className="inline-flex">
