@@ -53,7 +53,7 @@ const config: Config = {
           400: "rgba(217, 217, 217, 1)",
           300: "rgba(228, 228, 228, 1)",
           200: "rgba(241, 241, 241, 1)",
-          100: "#f0f0f0",
+          100: "rgba(233, 232, 230, 1)",
           50: "rgba(249, 249, 248, 1)",
         },
         silver: {
@@ -65,6 +65,10 @@ const config: Config = {
         primary: {
           DEFAULT: "rgba(247, 107, 21, 1)",
         },
+      },
+      boxShadow: {
+        paper:
+          "0px 8px 40px 0px rgba(0, 0, 0, 0.05), 0px 12px 32px -16px rgba(32, 16, 0, 0.06);",
       },
       scale: {
         103: "1.03",

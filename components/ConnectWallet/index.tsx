@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { Popover } from "@radix-ui/themes"
 
 import { useWalletSelector } from "@/providers/WalletSelectorProvider"
 import type { Account } from "@/types/interfaces"
@@ -66,15 +67,22 @@ const ConnectWallet = () => {
 
   return (
     <div className="flex gap-2">
-      <button className="rounded-full bg-gray-200 text-black-400 text-sm px-3 py-1.5">
-        {accountId}
-      </button>
-      {/* TODO Update wallet flows after design complete */}
-      {/*<button onClick={handleSignOut}>Log out</button>*/}
-      {/*<button onClick={handleSwitchWallet}>Switch Wallet</button>*/}
-      {/*{accounts.length > 1 && (*/}
-      {/*  <button onClick={handleSwitchAccount}>Switch Account</button>*/}
-      {/*)}*/}
+      <Popover.Root>
+        <Popover.Trigger>
+          <button className="rounded-full bg-gray-200 text-black-400 text-sm px-3 py-1.5">
+            {accountId}
+          </button>
+        </Popover.Trigger>
+        <Popover.Content width="360px">
+          <div className="flex flex-col">
+            <button onClick={handleSignOut}>Log out</button>
+            <button onClick={handleSwitchWallet}>Switch Wallet</button>
+            {accounts.length > 1 && (
+              <button onClick={handleSwitchAccount}>Switch Account</button>
+            )}
+          </div>
+        </Popover.Content>
+      </Popover.Root>
     </div>
   )
 }

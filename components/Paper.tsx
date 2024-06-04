@@ -15,7 +15,9 @@ const Paper = ({ children, title, description }: Props) => {
             <span className="text-sm text-gray-600">{description}</span>
           )}
         </div>
-        <div className="bg-gray-200 rounded-[40px] p-10">{children}</div>
+        <div className="rounded-[1rem] p-5 shadow-paper bg-white">
+          {children}
+        </div>
       </div>
     </div>
   )

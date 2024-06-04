@@ -54,7 +54,7 @@ interface WalletSelectorContextValue {
 }
 
 import { Loading } from "@/components/Loading"
-import { CONTRACT_ID } from "@/constants/wallet"
+import { CONTRACTS_REGISTER } from "@/constants/contracts"
 
 export const WalletSelectorContext =
   createContext<WalletSelectorContextValue | null>(null)
@@ -107,7 +107,7 @@ export const WalletSelectorProvider: React.FC<{
       ],
     })
     const _modal = setupModal(_selector, {
-      contractId: CONTRACT_ID,
+      contractId: CONTRACTS_REGISTER.INTENT,
     })
     const state = _selector.store.getState()
     setAccounts(state.accounts)

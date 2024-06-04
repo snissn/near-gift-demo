@@ -1,10 +1,10 @@
 import { ReactNode, ButtonHTMLAttributes } from "react"
 import { FieldValues, UseFormRegister } from "react-hook-form"
 import clsx from "clsx"
-import { Button, Text } from "@radix-ui/themes"
+import { Button, Text, ButtonProps, TextProps } from "@radix-ui/themes"
 
 interface Props<T extends FieldValues>
-  extends ButtonHTMLAttributes<HTMLButtonElement> {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "color"> {
   children?: ReactNode
   variant?: "primary" | "secondary"
   size?: "sm" | "base" | "lg"
@@ -20,22 +20,23 @@ const CustomButton = <T extends FieldValues>({
   register,
   ...rest
 }: Props<T>) => {
-  const buttonBaseStyle = "cursor-pointer"
+  const buttonBaseStyle = "cursor-pointer whitespace-nowrap"
 
-  let buttonVariantStyle: string
-  let buttonColorStyle: string
+  let buttonVariantStyle: ButtonProps["variant"]
+  let buttonColorStyle: ButtonProps["color"]
   switch (variant) {
     case "primary":
       buttonVariantStyle = "classic"
       buttonColorStyle = "orange"
       break
     case "secondary":
-      buttonVariantStyle = ""
+      buttonVariantStyle = "outline"
+      buttonColorStyle = "gray"
       break
   }
 
   let buttonSizeStyle: string
-  let buttonTextSizeStyle: string
+  let buttonTextSizeStyle: TextProps["size"]
   switch (size) {
     case "sm":
       buttonSizeStyle = ""
@@ -60,8 +61,8 @@ const CustomButton = <T extends FieldValues>({
   return (
     <Button
       variant={buttonVariantStyle}
-      color={buttonColorStyle}
       className={buttonStyle}
+      color={buttonColorStyle}
       {...rest}
     >
       <Text size={buttonTextSizeStyle}>{children}</Text>
