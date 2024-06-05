@@ -36,7 +36,9 @@ const config: Config = {
         "8xl": "95rem",
       },
       colors: {
-        secondary: "rgba(128, 128, 128, 1)",
+        white: {
+          DEFAULT: "rgba(253, 253, 252, 1)",
+        },
         black: {
           DEFAULT: "#041417",
           500: "rgba(28, 32, 36, 1)",
@@ -65,6 +67,7 @@ const config: Config = {
         primary: {
           DEFAULT: "rgba(247, 107, 21, 1)",
         },
+        secondary: "rgba(128, 128, 128, 1)",
       },
       boxShadow: {
         paper:
@@ -77,7 +80,8 @@ const config: Config = {
         "4xl": "1.875rem",
       },
       backgroundImage: {
-        page: "url('/static/images/page.png')",
+        "page-light": "url('/static/images/bg-light.svg')",
+        "page-dark": "url('/static/images/bg-dark.svg')",
       },
     },
   },

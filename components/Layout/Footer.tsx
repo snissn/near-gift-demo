@@ -2,8 +2,8 @@ import Image from "next/image"
 
 const Footer = () => {
   return (
-    <footer className="w-full max-w-5xl py-6 bg-gray-50">
-      <div className="w-full max-w-[552px] flex justify-center items-center text-sm text-secondary gap-1.5">
+    <footer className="w-full flex justify-center items-center py-6">
+      <div className="flex justify-center items-center text-sm text-secondary gap-1.5 bg-white px-3 py-1.5 rounded-full">
         <span>Powered by</span>
         <Image
           src="/static/icons/Aurora.svg"

@@ -10,13 +10,9 @@ const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="flex flex-1">
-        <div className="flex flex-1 w-full max-w-5xl bg-gray-50">
-          {children}
-        </div>
-        <PageBackground />
-      </main>
+      <main className="flex flex-1">{children}</main>
       <Footer />
+      <PageBackground />
     </div>
   )
 }
