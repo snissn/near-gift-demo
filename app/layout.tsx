@@ -2,11 +2,13 @@ import { Theme } from "@radix-ui/themes"
 import { ThemeProvider } from "next-themes"
 
 import { WalletSelectorProvider } from "@/providers/WalletSelectorProvider"
+import { ModalStoreProvider } from "@/providers/ModalStoreProvider"
 
 import "@radix-ui/themes/styles.css"
 import "@near-wallet-selector/modal-ui/styles.css"
 import "@near-wallet-selector/account-export/styles.css"
 import "../styles/global.scss"
+import Modal from "@/components/Modal"
 
 export default function RootLayout({
   children,
@@ -20,7 +22,12 @@ export default function RootLayout({
       <body>
         <WalletSelectorProvider>
           <ThemeProvider attribute="class">
-            <Theme>{children}</Theme>
+            <Theme>
+              <ModalStoreProvider>
+                {children}
+                <Modal />
+              </ModalStoreProvider>
+            </Theme>
           </ThemeProvider>
         </WalletSelectorProvider>
       </body>

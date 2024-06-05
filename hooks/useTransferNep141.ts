@@ -2,8 +2,7 @@
 
 import { useState } from "react"
 import { parseUnits } from "viem"
-import BN from "bn.js"
-import { ErrorResponse } from "@walletconnect/jsonrpc-types"
+import { BigNumber } from "ethers"
 
 import { useWalletSelector } from "@/providers/WalletSelectorProvider"
 import { nearAccount, nep141Balance, storageBalance } from "@/utils/near"
@@ -45,7 +44,7 @@ const useTransferNep141 = () => {
       //   throw {
       //     message: `Not enough balance to send ${TOKENS[tokenContract].symbol}`,
       //   }
-      const bnSendTokenUserBalance = new BN(sendTokenUserBalance)
+      const bnSendTokenUserBalance = BigNumber.from(sendTokenUserBalance)
       // if (bnSendTokenUserBalance.isZero())
       //   throw {
       //     message: `Not enough balance to send ${TOKENS[tokenContract].symbol}`,
@@ -63,7 +62,7 @@ const useTransferNep141 = () => {
         TOKENS[tokenContract as unknown as keyof TokenEnum].decimals
       ).toString()
 
-      const bnSendAmount = new BN(unitsSendAmount)
+      const bnSendAmount = BigNumber.from(unitsSendAmount)
       if (bnSendAmount.isZero()) throw { message: "Can't send zero tokens" }
       if (bnSendAmount.gt(bnSendTokenUserBalance))
         throw { message: "Send amount greater than available amount" }
