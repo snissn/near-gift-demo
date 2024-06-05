@@ -2,7 +2,9 @@ import React from "react"
 
 const PageBackground = () => {
   return (
-    <div className="fixed left-[1040px] w-full h-full -z-[1] bg-repeat bg-left-top bg-page"></div>
+    <div className="fixed w-full h-full -z-[1] bg-gray-50">
+      <div className="w-full h-full bg-no-repeat bg-bottom bg-page-light dark:bg-page-dark"></div>
+    </div>
   )
 }
 
