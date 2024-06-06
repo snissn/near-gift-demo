@@ -17,7 +17,9 @@ const ModalDialog = ({ children }: PropsWithChildren) => {
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
-      <Dialog.Content maxWidth="512px">{children}</Dialog.Content>
+      <Dialog.Content maxWidth="512px" className="p-0">
+        {children}
+      </Dialog.Content>
     </Dialog.Root>
   )
 }

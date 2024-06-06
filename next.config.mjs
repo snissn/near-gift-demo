@@ -19,6 +19,16 @@ const nextConfig = {
     baseChainId: process.env.BASE_CHAIN_ID,
     environment: process.env.ENVIRONMENT,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "assets.coingecko.com",
+        port: "",
+        pathname: "/coins/images/**",
+      },
+    ],
+  },
 }
 
 export default nextConfig

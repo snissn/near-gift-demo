@@ -4,7 +4,9 @@ import { FieldValues } from "react-hook-form"
 import React from "react"
 
 import Paper from "@/components/Paper"
-import { FieldComboInput, Form, FieldTextInput } from "@/components/Form"
+import Form from "@/components/Form"
+import FieldComboInput from "@/components/Form/FieldComboInput"
+import FieldTextInput from "@/components/Form/FieldTextInput"
 import Button from "@/components/Button"
 
 type FormValues = {

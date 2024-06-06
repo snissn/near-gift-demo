@@ -10,7 +10,7 @@ type Props = {
   handleSelect?: () => void
 }
 
-const AssetsSelect = ({ selected, handleSelect }: Props) => {
+const SelectAssets = ({ selected, handleSelect }: Props) => {
   const handleAssetsSelect = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     handleSelect && handleSelect()
@@ -32,4 +32,4 @@ const AssetsSelect = ({ selected, handleSelect }: Props) => {
   )
 }
 
-export default AssetsSelect
+export default SelectAssets

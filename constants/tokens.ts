@@ -1,3 +1,5 @@
+import { NetworkToken } from "@/types/interfaces"
+
 enum TOKENS_MAINNET {
   NEAR = "",
   AURORA = "aurora.mainnet",
@@ -54,3 +56,119 @@ export const TOKENS: Token = {
     contract: SUPPORTED_TOKENS.USDt,
   },
 }
+
+export const LIST_NETWORKS_TOKENS: NetworkToken[] = [
+  {
+    networkName: "NEAR",
+    chainId: "1313161554",
+    address: "wrap.testnet",
+    coinsName: "Wrapped NEAR fungible token",
+    symbol: "wNEAR",
+    networkLogo: "/static/icons/network/near.svg",
+    coinLogo:
+      "https://assets.coingecko.com/coins/images/10365/standard/near.jpg?1696510367",
+    decimals: 24,
+  },
+  {
+    networkName: "NEAR",
+    chainId: "1313161554",
+    address: "aurora.fakes.testnet",
+    coinsName: "Aurora",
+    symbol: "AURORA",
+    networkLogo: "/static/icons/network/near.svg",
+    coinLogo:
+      "https://assets.coingecko.com/coins/images/20582/standard/aurora.jpeg?1696519989",
+    decimals: 18,
+  },
+  {
+    networkName: "NEAR",
+    chainId: "1313161554",
+    address: "usdt.fakes.testnet",
+    coinsName: "Tether USD",
+    symbol: "USDT.e",
+    networkLogo: "/static/icons/network/near.svg",
+    coinLogo:
+      "https://assets.coingecko.com/coins/images/325/standard/Tether.png?1696501661",
+    decimals: 6,
+  },
+  {
+    networkName: "NEAR",
+    chainId: "1313161554",
+    address: "usdc.fakes.testnet",
+    coinsName: "USD Coin",
+    symbol: "USDC",
+    networkLogo: "/static/icons/network/near.svg",
+    coinLogo:
+      "https://assets.coingecko.com/coins/images/6319/standard/usdc.png?1696506694",
+    decimals: 6,
+  },
+  {
+    networkName: "NEAR",
+    chainId: "1313161554",
+    address: "wbtc.fakes.testnet",
+    coinsName: "Wrapped BTC",
+    symbol: "WBTC",
+    networkLogo: "/static/icons/network/near.svg",
+    coinLogo:
+      "https://assets.coingecko.com/coins/images/7598/standard/wrapped_bitcoin_wbtc.png?1696507857",
+    decimals: 8,
+  },
+  {
+    networkName: "NEAR",
+    chainId: "1313161554",
+    address: "14b2bc0c-32bc-4ac0-8eab-416c700d7c3d.testnet",
+    coinsName: "Sweat",
+    symbol: "SWEAT",
+    networkLogo: "/static/icons/network/near.svg",
+    coinLogo:
+      "https://assets.coingecko.com/coins/images/25057/standard/fhD9Xs16_400x400.jpg?1696524208",
+    decimals: 18,
+  },
+  {
+    networkName: "NEAR",
+    chainId: "1313161554",
+    address: "ref.fakes.testnet",
+    coinsName: "Ref Finance Token",
+    symbol: "REF",
+    networkLogo: "/static/icons/network/near.svg",
+    coinLogo:
+      "https://assets.coingecko.com/coins/images/18279/standard/ref.png?1696517772",
+    decimals: 18,
+  },
+  {
+    networkName: "NEAR",
+    chainId: "1313161554",
+    address: "blackdragon.fakes.testnet",
+    coinsName: "Black Dragon",
+    symbol: "BLACKDRAGON",
+    networkLogo: "/static/icons/network/near.svg",
+    coinLogo:
+      "https://assets.coingecko.com/coins/images/35502/standard/Untitled-8.png?1709390396",
+    decimals: 16,
+  },
+  {
+    networkName: "NEAR",
+    chainId: "1313161554",
+    address: "deltalonk.testnet",
+    coinsName: "LONK fungible token",
+    symbol: "LONK",
+    networkLogo: "/static/icons/network/near.svg",
+    coinLogo:
+      "https://assets.coingecko.com/coins/images/36497/standard/Logo_Long_square.png?1717541650",
+    decimals: 8,
+  },
+  // ######################################################
+  // # NEAR MAINNET LIST                                  #
+  // ######################################################
+  {
+    networkName: "NEAR",
+    chainId: "1313161554",
+    address: "usm.tkn.near",
+    coinsName: "USMeme",
+    symbol: "USM",
+    networkLogo: "/static/icons/network/near.svg",
+    coinLogo:
+      "https://assets.coingecko.com/coins/images/38114/standard/usmeme.jpeg?1716536863",
+    decimals: 18,
+  },
+]
