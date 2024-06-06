@@ -42,6 +42,7 @@ const config: Config = {
         },
         black: {
           DEFAULT: "#041417",
+          600: "rgba(22, 22, 21, 1)",
           500: "rgba(28, 32, 36, 1)",
           400: "rgba(33, 32, 28, 1)",
         },
@@ -73,6 +74,8 @@ const config: Config = {
       boxShadow: {
         paper:
           "0px 8px 40px 0px rgba(0, 0, 0, 0.05), 0px 12px 32px -16px rgba(32, 16, 0, 0.06);",
+        widget:
+          "0px 12px 62px 0px rgba(0, 0, 0, 0.15), 0px 12px 32px -16px rgba(31, 24, 0, 0.13)",
       },
       scale: {
         103: "1.03",
