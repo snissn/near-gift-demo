@@ -10,6 +10,8 @@ import Switch from "@/components/Switch"
 import { useSwap } from "@/hooks/useSwap"
 import { TOKENS } from "@/constants/tokens"
 import { useWalletSelector } from "@/providers/WalletSelectorProvider"
+import { useModalStore } from "@/providers/ModalStoreProvider"
+import { ModalType } from "@/stores/modalStore"
 
 type FormValues = {
   tokenIn: string
@@ -18,6 +20,7 @@ type FormValues = {
 
 export default function Swap() {
   const { selector, accountId } = useWalletSelector()
+  const { setModalType } = useModalStore((state) => state)
   const { onChangeInputToken, onChangeOutputToken, callRequestIntent } =
     useSwap({ selector, accountId })
 
@@ -53,6 +56,10 @@ export default function Swap() {
     console.log("form set max")
   }
 
+  const handleSelect = () => {
+    setModalType(ModalType.MODAL_SELECT_ASSETS)
+  }
+
   return (
     <Paper
       title="Swap"
@@ -63,6 +70,7 @@ export default function Swap() {
           fieldName="tokenIn"
           price="63.83"
           balance="515.22"
+          handleSelect={handleSelect}
           handleSetMax={handleSetMax}
           selected={{ name: "AURORA" }}
           className="border rounded-t-xl"

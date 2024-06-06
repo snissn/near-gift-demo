@@ -2,7 +2,7 @@ import Image from "next/image"
 
 const Footer = () => {
   return (
-    <footer className="w-full flex justify-center items-center py-6">
+    <footer className="w-full flex justify-center items-center py-7">
       <div className="flex justify-center items-center text-sm text-secondary gap-1.5 bg-white px-3 py-1.5 rounded-full">
         <span>Powered by</span>
         <Image

@@ -1,8 +1,8 @@
 import { Path, FieldValues, UseFormRegister } from "react-hook-form"
 import clsx from "clsx"
 
-import { NetworkSwitch } from "@/components/Network"
-import { Network } from "@/components/Network/NetworkSwitch"
+import { AssetsSelect } from "@/components/Network"
+import { Network } from "@/components/Network/AssetsSelect"
 
 interface Props<T extends FieldValues> {
   fieldName: Path<T>
@@ -14,7 +14,7 @@ interface Props<T extends FieldValues> {
   balance?: string
   handleSetMax?: () => void
   selected: Network
-  onSelect?: (network: Network) => void
+  handleSelect?: () => void
   className?: string
 }
 
@@ -28,7 +28,7 @@ const FieldComboInput = <T extends FieldValues>({
   balance,
   handleSetMax,
   selected,
-  onSelect,
+  handleSelect,
   className,
 }: Props<T>) => {
   if (!register) {
@@ -54,7 +54,7 @@ const FieldComboInput = <T extends FieldValues>({
         {...register(fieldName, { required })}
         placeholder={placeholder}
         className={clsx(
-          "bg-gray-50 text-3xl font-medium placeholder-black border-transparent focus:border-transparent focus:ring-0"
+          "grow flex-1 bg-gray-50 max-w-[140px] md:max-w-fit text-3xl font-medium placeholder-black border-transparent focus:border-transparent focus:ring-0"
         )}
       />
       {price && (
@@ -62,7 +62,9 @@ const FieldComboInput = <T extends FieldValues>({
           ~${price}
         </span>
       )}
-      <NetworkSwitch selected={selected} handleSwitch={onSelect} />
+      <div className="grow flex-1 flex justify-end items-center">
+        <AssetsSelect selected={selected} handleSelect={handleSelect} />
+      </div>
       {balance && (
         <div className="absolute bottom-4 right-5 flex justify-center items-center gap-2">
           <span className="text-xs text-secondary">Balance: ${balance}</span>

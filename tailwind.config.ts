@@ -38,6 +38,7 @@ const config: Config = {
       colors: {
         white: {
           DEFAULT: "rgba(253, 253, 252, 1)",
+          200: "rgba(32, 16, 0, 0.06)",
         },
         black: {
           DEFAULT: "#041417",
@@ -82,6 +83,7 @@ const config: Config = {
       backgroundImage: {
         "page-light": "url('/static/images/bg-light.svg')",
         "page-dark": "url('/static/images/bg-dark.svg')",
+        "page-light--mobile": "url('/static/images/bg-light--mobile.svg')",
       },
     },
   },

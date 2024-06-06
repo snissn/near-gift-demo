@@ -1,4 +1,5 @@
 import Image from "next/image"
+import React from "react"
 
 export type Network = {
   name: string
@@ -6,13 +7,17 @@ export type Network = {
 
 type Props = {
   selected: Network
-  handleSwitch?: (network: Network) => void
+  handleSelect?: () => void
 }
 
-const NetworkSwitch = ({ selected, handleSwitch }: Props) => {
+const AssetsSelect = ({ selected, handleSelect }: Props) => {
+  const handleAssetsSelect = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    handleSelect && handleSelect()
+  }
   return (
     <button
-      onClick={() => handleSwitch && handleSwitch(selected)}
+      onClick={handleAssetsSelect}
       className="bg-gray-200 rounded-full flex justify-between items-center p-1.5 gap-2.5"
     >
       <span className="relative w-[28px] h-[28px] bg-gray-400 rounded-full"></span>
@@ -27,4 +32,4 @@ const NetworkSwitch = ({ selected, handleSwitch }: Props) => {
   )
 }
 
-export default NetworkSwitch
+export default AssetsSelect

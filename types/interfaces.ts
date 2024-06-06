@@ -1,5 +1,5 @@
 import type { AccountView } from "near-api-js/lib/providers/provider"
-import { BigNumber } from "@ethersproject/bignumber"
+import { BigNumber } from "ethers"
 
 export interface Message {
   premium: boolean
