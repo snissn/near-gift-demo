@@ -1,1 +1,1 @@
-export { default as NetworkSwitch } from "./NetworkSwitch"
+export { default as AssetsSelect } from "./AssetsSelect"

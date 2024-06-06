@@ -1,17 +1,26 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Popover } from "@radix-ui/themes"
+import { Popover, Switch } from "@radix-ui/themes"
+import { useTheme } from "next-themes"
 
 import { useWalletSelector } from "@/providers/WalletSelectorProvider"
 import type { Account } from "@/types/interfaces"
 import { useGetAccount } from "@/hooks/useGetAccount"
+import Themes from "@/types/themes"
 
 const ConnectWallet = () => {
   const { selector, modal, accounts, accountId } = useWalletSelector()
   const { getAccount } = useGetAccount({ accountId, selector })
   const [loading, setLoading] = useState<boolean>(false)
   const [account, setAccount] = useState<Account | null>(null)
+  const { theme, setTheme } = useTheme()
+
+  useEffect(() => setTheme(Themes.LIGHT), [])
+
+  const onChangeTheme = () => {
+    setTheme(theme === Themes.DARK ? Themes.LIGHT : Themes.DARK)
+  }
 
   useEffect(() => {
     if (!accountId) {
@@ -54,6 +63,9 @@ const ConnectWallet = () => {
     alert("Switched account to " + nextAccountId)
   }
 
+  const handleTradeHistory = () => console.log("handleTradeHistory")
+  const handleCopyAddress = () => console.log("handleCopyAddress")
+
   if (!account) {
     return (
       <button
@@ -73,13 +85,22 @@ const ConnectWallet = () => {
             {accountId}
           </button>
         </Popover.Trigger>
-        <Popover.Content width="360px">
-          <div className="flex flex-col">
-            <button onClick={handleSignOut}>Log out</button>
-            <button onClick={handleSwitchWallet}>Switch Wallet</button>
-            {accounts.length > 1 && (
-              <button onClick={handleSwitchAccount}>Switch Account</button>
-            )}
+        <Popover.Content className="mt-1">
+          <div className="flex flex-col items-start">
+            <div
+              onClick={onChangeTheme}
+              className="flex justify-between items-center gap-1"
+            >
+              <span>Dark Mode</span>
+              <Switch
+                className="cursor-pointer"
+                size="1"
+                onClick={onChangeTheme}
+              />
+            </div>
+            <button onClick={handleTradeHistory}>Trade history</button>
+            <button onClick={handleCopyAddress}>Copy address</button>
+            <button onClick={handleSignOut}>Disconnect wallet</button>
           </div>
         </Popover.Content>
       </Popover.Root>
