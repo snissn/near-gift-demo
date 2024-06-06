@@ -23,3 +23,13 @@ export type Token = TokenInfo & {
   balance?: BigNumber
   custom?: boolean
 }
+
+export interface NetworkToken extends Partial<TokenInfo> {
+  chainId?: string
+  coinLogo?: string
+  coinsName?: string
+  networkLogo?: string
+  networkName?: string
+  balance?: string
+  balanceToUds?: string
+}
