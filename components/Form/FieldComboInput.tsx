@@ -1,8 +1,7 @@
 import { Path, FieldValues, UseFormRegister } from "react-hook-form"
 import clsx from "clsx"
 
-import { AssetsSelect } from "@/components/Network"
-import { Network } from "@/components/Network/AssetsSelect"
+import AssetsSelect, { Network } from "@/components/Network/SelectAssets"
 
 interface Props<T extends FieldValues> {
   fieldName: Path<T>
