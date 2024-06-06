@@ -4,6 +4,7 @@ import Header from "@/components/Layout/Header"
 import Footer from "@/components/Layout/Footer"
 import PageBackground from "@/components/PageBackground"
 import NavbarMobile from "@/components/NavbarMobile"
+import History from "@/components/History"
 
 const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   // PREFETCH: Prefetch action could be done similarly to the prefetch action
@@ -15,6 +16,7 @@ const Layout: React.FC<PropsWithChildren> = ({ children }) => {
       <Footer />
       <NavbarMobile />
       <PageBackground />
+      <History />
     </div>
   )
 }

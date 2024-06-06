@@ -1,11 +1,11 @@
-import React, { PropsWithChildren, useCallback, useEffect } from "react"
+import { PropsWithChildren, useCallback, useEffect, useState } from "react"
 import { Dialog } from "@radix-ui/themes"
 
 import { useModalStore } from "@/providers/ModalStoreProvider"
 
 const ModalDialog = ({ children }: PropsWithChildren) => {
   const { onCloseModal } = useModalStore((state) => state)
-  const [open, setOpen] = React.useState(true)
+  const [open, setOpen] = useState(true)
 
   const handleCloseModal = useCallback(() => {
     if (!open) onCloseModal()
