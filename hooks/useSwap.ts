@@ -8,7 +8,7 @@ import { parseUnits } from "viem"
 
 import { CONTRACTS_REGISTER, MAX_GAS_TRANSACTION } from "@/constants/contracts"
 import { sha256 } from "@/actions/crypto"
-import { Token } from "@/types/interfaces"
+import { TokenInfo } from "@/types/interfaces"
 import { swapSchema } from "@/utils/schema"
 import useStorageDeposit from "@/hooks/useStorageDeposit"
 
@@ -21,18 +21,18 @@ type CallRequestIntentProps = {
 }
 
 export const useSwap = ({ accountId, selector }: Props) => {
-  const [inputToken, setInputToken] = useState<Token>()
-  const [outputToken, setOutputToken] = useState<Token>()
+  const [inputToken, setInputToken] = useState<TokenInfo>()
+  const [outputToken, setOutputToken] = useState<TokenInfo>()
   const { getStorageBalance, setStorageDeposit } = useStorageDeposit({
     accountId,
     selector,
   })
 
-  const onChangeInputToken = (token?: Token) => {
+  const onChangeInputToken = (token?: TokenInfo) => {
     setInputToken(token)
   }
 
-  const onChangeOutputToken = (token?: Token) => {
+  const onChangeOutputToken = (token?: TokenInfo) => {
     setOutputToken(token)
   }
 

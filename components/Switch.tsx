@@ -1,7 +1,8 @@
 import Image from "next/image"
+import React from "react"
 
 type Props = {
-  onClick: () => void
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void
 }
 
 const Switch = ({ onClick }: Props) => {

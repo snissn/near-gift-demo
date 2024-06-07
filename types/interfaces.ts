@@ -1,12 +1,6 @@
 import type { AccountView } from "near-api-js/lib/providers/provider"
 import { BigNumber } from "ethers"
 
-export interface Message {
-  premium: boolean
-  sender: string
-  text: string
-}
-
 export type Account = AccountView & {
   account_id: string
 }
@@ -16,20 +10,13 @@ export type TokenInfo = {
   symbol: string
   name: string
   decimals: number
-  logoURI: string
-}
-
-export type Token = TokenInfo & {
-  balance?: BigNumber
-  custom?: boolean
+  icon?: string
+  balance?: string | BigNumber
+  balanceToUds?: string
 }
 
 export interface NetworkToken extends Partial<TokenInfo> {
   chainId?: string
-  coinLogo?: string
-  coinsName?: string
-  networkLogo?: string
-  networkName?: string
-  balance?: string
-  balanceToUds?: string
+  chainIcon?: string
+  chainName?: string
 }
