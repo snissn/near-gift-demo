@@ -9,7 +9,7 @@ import FieldComboInput from "@/components/Form/FieldComboInput"
 import Button from "@/components/Button"
 import Switch from "@/components/Switch"
 import { useSwap } from "@/hooks/useSwap"
-import { TOKENS } from "@/constants/tokens"
+import { LIST_NETWORKS_TOKENS, TOKENS } from "@/constants/tokens"
 import { useWalletSelector } from "@/providers/WalletSelectorProvider"
 import { useModalStore } from "@/providers/ModalStoreProvider"
 import { ModalType } from "@/stores/modalStore"
@@ -21,8 +21,12 @@ type FormValues = {
 }
 
 export default function Swap() {
-  const [selectTokenIn, setSelectTokenIn] = useState<NetworkToken>()
-  const [selectTokenOut, setSelectTokenOut] = useState<NetworkToken>()
+  const [selectTokenIn, setSelectTokenIn] = useState<NetworkToken>(
+    LIST_NETWORKS_TOKENS[0]
+  )
+  const [selectTokenOut, setSelectTokenOut] = useState<NetworkToken>(
+    LIST_NETWORKS_TOKENS[2]
+  )
   const { selector, accountId } = useWalletSelector()
   const { setModalType } = useModalStore((state) => state)
   const { onChangeInputToken, onChangeOutputToken, callRequestIntent } =
@@ -51,10 +55,12 @@ export default function Swap() {
       inputAmount: values.tokenIn,
     })
   }
-  const handleSwitch = () => {
+  const handleSwitch = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
     console.log("form switch")
   }
-  const handleSetMax = () => {
+  const handleSetMax = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
     console.log("form set max")
   }
 
@@ -72,7 +78,7 @@ export default function Swap() {
           fieldName="tokenIn"
           price={selectTokenIn?.balanceToUds}
           balance={selectTokenIn?.balance}
-          selected={{ name: "AURORA" }}
+          selected={selectTokenIn}
           handleSelect={handleSelect}
           handleSetMax={handleSetMax}
           className="border rounded-t-xl"
@@ -80,8 +86,8 @@ export default function Swap() {
         <Switch onClick={handleSwitch} />
         <FieldComboInput<FormValues>
           fieldName="tokenOut"
-          price="39.16"
-          selected={{ name: "1INCH" }}
+          price={selectTokenOut?.balanceToUds}
+          selected={selectTokenOut}
           className="border rounded-b-xl mb-5"
         />
         <Button type="submit" size="lg" fullWidth>

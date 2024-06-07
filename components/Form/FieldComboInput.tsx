@@ -1,3 +1,4 @@
+import React from "react"
 import { Path, FieldValues, UseFormRegister } from "react-hook-form"
 import clsx from "clsx"
 import { BigNumber } from "ethers"
@@ -13,8 +14,8 @@ interface Props<T extends FieldValues> {
   label?: string
   price?: string
   balance?: string | BigNumber
-  handleSetMax?: () => void
-  selected: NetworkToken
+  handleSetMax?: (e: React.MouseEvent<HTMLButtonElement>) => void
+  selected?: NetworkToken
   handleSelect?: () => void
   className?: string
 }
