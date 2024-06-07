@@ -1,7 +1,9 @@
 import { Path, FieldValues, UseFormRegister } from "react-hook-form"
 import clsx from "clsx"
+import { BigNumber } from "ethers"
 
-import AssetsSelect, { Network } from "@/components/Network/SelectAssets"
+import AssetsSelect from "@/components/Network/SelectAssets"
+import { NetworkToken } from "@/types/interfaces"
 
 interface Props<T extends FieldValues> {
   fieldName: Path<T>
@@ -10,9 +12,9 @@ interface Props<T extends FieldValues> {
   placeholder?: string
   label?: string
   price?: string
-  balance?: string
+  balance?: string | BigNumber
   handleSetMax?: () => void
-  selected: Network
+  selected: NetworkToken
   handleSelect?: () => void
   className?: string
 }
@@ -66,7 +68,9 @@ const FieldComboInput = <T extends FieldValues>({
       </div>
       {balance && (
         <div className="absolute bottom-4 right-5 flex justify-center items-center gap-2">
-          <span className="text-xs text-secondary">Balance: ${balance}</span>
+          <span className="text-xs text-secondary">
+            Balance: ${balance.toString()}
+          </span>
           {handleSetMax && (
             <button className="text-xs uppercase" onClick={handleSetMax}>
               max

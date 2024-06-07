@@ -42,26 +42,23 @@ const AssetList = ({ title, assets, emptyState, className }: Props) => {
         </Text>
       </div>
       {assets.map(
-        (
-          { coinsName, networkName, symbol, balance, balanceToUds, ...rest },
-          i
-        ) => (
+        ({ name, chainName, symbol, balance, balanceToUds, ...rest }, i) => (
           <button
             key={i}
             className="flex justify-between items-center gap-3 p-2.5 rounded-md hover:bg-gray-950"
           >
             <AssetComboIcon
-              coinsName={coinsName as string}
-              networkName={networkName as string}
+              name={name as string}
+              chainName={chainName as string}
               {...rest}
             />
             <div className="grow flex flex-col">
               <div className="flex justify-between items-center">
                 <Text as="span" size="2" weight="medium">
-                  {coinsName}
+                  {name}
                 </Text>
                 <Text as="span" size="2" weight="medium">
-                  {balance ? balance : null}
+                  {balance ? balance.toString() : null}
                 </Text>
               </div>
               <div className="flex justify-between items-center text-gray-600">

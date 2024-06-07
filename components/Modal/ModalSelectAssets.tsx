@@ -19,10 +19,10 @@ const ModalSelectAssets = () => {
 
   const filterPattern = (asset: NetworkToken) =>
     asset
-      .coinsName!.toLocaleUpperCase()
+      .name!.toLocaleUpperCase()
       .includes(deferredQuery.toLocaleUpperCase()) ||
     asset
-      .networkName!.toLocaleUpperCase()
+      .chainName!.toLocaleUpperCase()
       .includes(deferredQuery.toLocaleUpperCase())
 
   return (

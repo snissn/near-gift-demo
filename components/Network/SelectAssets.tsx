@@ -1,12 +1,10 @@
 import Image from "next/image"
 import React from "react"
 
-export type Network = {
-  name: string
-}
+import { NetworkToken } from "@/types/interfaces"
 
 type Props = {
-  selected: Network
+  selected: NetworkToken
   handleSelect?: () => void
 }
 

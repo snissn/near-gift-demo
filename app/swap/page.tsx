@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useLayoutEffect } from "react"
+import React, { useLayoutEffect, useState } from "react"
 import { FieldValues } from "react-hook-form"
 
 import Paper from "@/components/Paper"
@@ -13,6 +13,7 @@ import { TOKENS } from "@/constants/tokens"
 import { useWalletSelector } from "@/providers/WalletSelectorProvider"
 import { useModalStore } from "@/providers/ModalStoreProvider"
 import { ModalType } from "@/stores/modalStore"
+import { NetworkToken } from "@/types/interfaces"
 
 type FormValues = {
   tokenIn: string
@@ -20,6 +21,8 @@ type FormValues = {
 }
 
 export default function Swap() {
+  const [selectTokenIn, setSelectTokenIn] = useState<NetworkToken>()
+  const [selectTokenOut, setSelectTokenOut] = useState<NetworkToken>()
   const { selector, accountId } = useWalletSelector()
   const { setModalType } = useModalStore((state) => state)
   const { onChangeInputToken, onChangeOutputToken, callRequestIntent } =
@@ -32,16 +35,14 @@ export default function Swap() {
       symbol: TOKENS.AURORA.symbol,
       name: "AURORA",
       decimals: TOKENS.AURORA.decimals,
-      logoURI:
-        "https://assets.coingecko.com/coins/images/20582/standard/aurora.jpeg?1696519989",
+      icon: "https://assets.coingecko.com/coins/images/20582/standard/aurora.jpeg?1696519989",
     })
     onChangeOutputToken({
       address: TOKENS.REF.contract,
       symbol: TOKENS.REF.symbol,
       name: "REF",
       decimals: TOKENS.REF.decimals,
-      logoURI:
-        "https://assets.coingecko.com/coins/images/10365/standard/near.jpg?1696510367",
+      icon: "https://assets.coingecko.com/coins/images/10365/standard/near.jpg?1696510367",
     })
   }, [])
 
@@ -69,11 +70,11 @@ export default function Swap() {
       <Form<FormValues> onSubmit={handleSubmit}>
         <FieldComboInput<FormValues>
           fieldName="tokenIn"
-          price="63.83"
-          balance="515.22"
+          price={selectTokenIn?.balanceToUds}
+          balance={selectTokenIn?.balance}
+          selected={{ name: "AURORA" }}
           handleSelect={handleSelect}
           handleSetMax={handleSetMax}
-          selected={{ name: "AURORA" }}
           className="border rounded-t-xl"
         />
         <Switch onClick={handleSwitch} />
