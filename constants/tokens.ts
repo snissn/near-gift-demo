@@ -61,11 +61,21 @@ export const LIST_NETWORKS_TOKENS: NetworkToken[] = [
   {
     chainName: "NEAR",
     chainId: "1313161554",
+    address: "",
+    name: "NEAR",
+    symbol: "NEAR",
+    chainIcon: "/static/icons/network/near.svg",
+    icon: "https://assets.coingecko.com/coins/images/10365/standard/near.jpg?1696510367",
+    decimals: 24,
+  },
+  {
+    chainName: "NEAR",
+    chainId: "1313161554",
     address: "wrap.testnet",
     name: "Wrapped NEAR fungible token",
     symbol: "wNEAR",
     chainIcon: "/static/icons/network/near.svg",
-    icon: "https://assets.coingecko.com/coins/images/10365/standard/near.jpg?1696510367",
+    icon: "https://assets.coingecko.com/coins/images/18280/standard/EX4mrWMW_400x400.jpg?1696517773",
     decimals: 24,
   },
   {

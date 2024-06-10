@@ -8,11 +8,12 @@ export enum ModalType {
 
 export type ModalState = {
   modalType: ModalType | null
+  payload?: unknown
 }
 
 export type ModalActions = {
   setModalType: (modalType: ModalType | null, payload?: unknown) => void
-  onCloseModal: () => void
+  onCloseModal: (payload?: unknown) => void
 }
 
 export type ModalStore = ModalState & ModalActions
@@ -22,13 +23,15 @@ export const initModalStore = (): ModalState => {
 }
 export const defaultInitState: ModalState = {
   modalType: null,
+  payload: undefined,
 }
 
 export const createModalStore = (initState: ModalState = defaultInitState) => {
   return createStore<ModalStore>()((set) => ({
     ...initState,
-    setModalType: (modalType: ModalType | null) =>
-      set({ modalType: modalType }),
-    onCloseModal: () => set({ modalType: null }),
+    // It is important to clear payload in case it doesn't use in order to avoid data collision
+    setModalType: (modalType: ModalType | null, payload?: unknown) =>
+      set({ modalType, payload: payload || undefined }),
+    onCloseModal: (payload?: unknown) => set({ modalType: null, payload }),
   }))
 }

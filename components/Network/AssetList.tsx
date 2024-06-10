@@ -10,6 +10,7 @@ type Props = {
   assets: NetworkToken[]
   emptyState?: ReactNode
   className?: string
+  handleSelectToken?: (token: NetworkToken) => void
 }
 
 const EmptyAssetList = ({ className }: Pick<Props, "className">) => {
@@ -30,7 +31,13 @@ const EmptyAssetList = ({ className }: Pick<Props, "className">) => {
   )
 }
 
-const AssetList = ({ title, assets, emptyState, className }: Props) => {
+const AssetList = ({
+  title,
+  assets,
+  emptyState,
+  className,
+  handleSelectToken,
+}: Props) => {
   if (!assets.length) {
     return emptyState || <EmptyAssetList className={className} />
   }
@@ -46,6 +53,7 @@ const AssetList = ({ title, assets, emptyState, className }: Props) => {
           <button
             key={i}
             className="flex justify-between items-center gap-3 p-2.5 rounded-md hover:bg-gray-950"
+            onClick={() => handleSelectToken && handleSelectToken(assets[i])}
           >
             <AssetComboIcon
               name={name as string}

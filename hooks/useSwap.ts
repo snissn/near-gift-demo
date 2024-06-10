@@ -1,8 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useId, useState } from "react"
 import { WalletSelector } from "@near-wallet-selector/core"
-import { serialize as serializeBorsh } from "near-api-js/lib/utils/serialize"
 import * as borsh from "borsh"
 import { parseUnits } from "viem"
 
@@ -21,6 +20,7 @@ type CallRequestIntentProps = {
 }
 
 export const useSwap = ({ accountId, selector }: Props) => {
+  const clientSwapId = useId()
   const [inputToken, setInputToken] = useState<TokenInfo>()
   const [outputToken, setOutputToken] = useState<TokenInfo>()
   const { getStorageBalance, setStorageDeposit } = useStorageDeposit({
@@ -49,15 +49,13 @@ export const useSwap = ({ accountId, selector }: Props) => {
       await setStorageDeposit(inputToken!.address, CONTRACTS_REGISTER.INTENT)
     }
 
-    const intent_account_id = await sha256("1")
+    const intent_account_id = await sha256(clientSwapId)
+    localStorage.setItem("temp_intent_id", intent_account_id)
+
     const unitsSendAmount = parseUnits(
       String(inputAmount),
       inputToken?.decimals as number
     ).toString()
-
-    // TODO Execute for Solver event
-    // const value = { ExecuteIntent: "1".toString() }
-    // const encoded = borsh.serialize(schema, value)
 
     // TODO Has to be estimated by Solver
     //      [optional] could be estimated with Coingecko Api

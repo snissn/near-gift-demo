@@ -1,5 +1,5 @@
-import Image from "next/image"
 import React from "react"
+import Image from "next/image"
 
 import { NetworkToken } from "@/types/interfaces"
 import AssetComboIcon from "@/components/Network/AssetComboIcon"
@@ -23,9 +23,9 @@ const SelectAssets = ({ selected, handleSelect }: Props) => {
   return (
     <button
       onClick={handleAssetsSelect}
-      className="max-w-[210px] bg-white shadow-select-token rounded-full flex justify-between items-center p-1 gap-2.5"
+      className="max-w-[148px] md:max-w-[210px] bg-white shadow-select-token rounded-full flex justify-between items-center p-1 gap-2.5"
     >
-      {selected ? (
+      {selected?.icon ? (
         <AssetComboIcon
           icon={selected?.icon as string}
           name={selected?.name as string}
