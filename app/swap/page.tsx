@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useLayoutEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { FieldValues } from "react-hook-form"
 
 import Paper from "@/components/Paper"
@@ -9,11 +9,12 @@ import FieldComboInput from "@/components/Form/FieldComboInput"
 import Button from "@/components/Button"
 import Switch from "@/components/Switch"
 import { useSwap } from "@/hooks/useSwap"
-import { LIST_NETWORKS_TOKENS, TOKENS } from "@/constants/tokens"
+import { LIST_NETWORKS_TOKENS } from "@/constants/tokens"
 import { useWalletSelector } from "@/providers/WalletSelectorProvider"
 import { useModalStore } from "@/providers/ModalStoreProvider"
 import { ModalType } from "@/stores/modalStore"
 import { NetworkToken } from "@/types/interfaces"
+import { ModalSelectAssetsPayload } from "@/components/Modal/ModalSelectAssets"
 
 type FormValues = {
   tokenIn: string
@@ -21,51 +22,83 @@ type FormValues = {
 }
 
 export default function Swap() {
-  const [selectTokenIn, setSelectTokenIn] = useState<NetworkToken>(
+  const [selectTokenIn, setSelectTokenIn] = useState<NetworkToken | undefined>(
     LIST_NETWORKS_TOKENS[0]
   )
-  const [selectTokenOut, setSelectTokenOut] = useState<NetworkToken>(
-    LIST_NETWORKS_TOKENS[2]
-  )
+  const [selectTokenOut, setSelectTokenOut] = useState<
+    NetworkToken | undefined
+  >(LIST_NETWORKS_TOKENS[1])
+
   const { selector, accountId } = useWalletSelector()
-  const { setModalType } = useModalStore((state) => state)
+  const { setModalType, payload } = useModalStore((state) => state)
   const { onChangeInputToken, onChangeOutputToken, callRequestIntent } =
     useSwap({ selector, accountId })
 
-  useLayoutEffect(() => {
-    // TODO Temporary mock selections of Input/Output Tokens
-    onChangeInputToken({
-      address: TOKENS.AURORA.contract,
-      symbol: TOKENS.AURORA.symbol,
-      name: "AURORA",
-      decimals: TOKENS.AURORA.decimals,
-      icon: "https://assets.coingecko.com/coins/images/20582/standard/aurora.jpeg?1696519989",
-    })
-    onChangeOutputToken({
-      address: TOKENS.REF.contract,
-      symbol: TOKENS.REF.symbol,
-      name: "REF",
-      decimals: TOKENS.REF.decimals,
-      icon: "https://assets.coingecko.com/coins/images/10365/standard/near.jpg?1696510367",
-    })
-  }, [])
+  const handleResetToken = (
+    token: NetworkToken,
+    checkToken: NetworkToken,
+    setSelectToken: (value?: NetworkToken) => void
+  ) => {
+    if (
+      token.address === checkToken?.address &&
+      token.chainId === checkToken?.chainId
+    ) {
+      setSelectToken(undefined)
+    }
+  }
+
+  useEffect(() => {
+    if (
+      (payload as ModalSelectAssetsPayload)?.modalType !==
+      ModalType.MODAL_SELECT_ASSETS
+    ) {
+      return
+    }
+    const { modalType, fieldName, token } = payload as ModalSelectAssetsPayload
+    if (modalType === ModalType.MODAL_SELECT_ASSETS && fieldName && token) {
+      switch (fieldName) {
+        case "tokenIn":
+          setSelectTokenIn(token)
+          onChangeInputToken(token)
+          handleResetToken(
+            token,
+            selectTokenOut as NetworkToken,
+            setSelectTokenOut
+          )
+          break
+        case "tokenOut":
+          setSelectTokenOut(token)
+          onChangeOutputToken(token)
+          handleResetToken(
+            token,
+            selectTokenIn as NetworkToken,
+            setSelectTokenIn
+          )
+          break
+      }
+    }
+  }, [payload, selectTokenIn, selectTokenOut])
 
   const handleSubmit = async (values: FieldValues) => {
     await callRequestIntent({
       inputAmount: values.tokenIn,
     })
   }
+
   const handleSwitch = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
-    console.log("form switch")
+    const tempCopy = Object.assign({}, selectTokenIn)
+    setSelectTokenIn(selectTokenOut)
+    setSelectTokenOut(tempCopy)
   }
+
   const handleSetMax = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     console.log("form set max")
   }
 
-  const handleSelect = () => {
-    setModalType(ModalType.MODAL_SELECT_ASSETS)
+  const handleSelect = (fieldName: string) => {
+    setModalType(ModalType.MODAL_SELECT_ASSETS, { fieldName })
   }
 
   return (
@@ -79,7 +112,7 @@ export default function Swap() {
           price={selectTokenIn?.balanceToUds}
           balance={selectTokenIn?.balance}
           selected={selectTokenIn}
-          handleSelect={handleSelect}
+          handleSelect={() => handleSelect("tokenIn")}
           handleSetMax={handleSetMax}
           className="border rounded-t-xl"
         />
@@ -88,6 +121,7 @@ export default function Swap() {
           fieldName="tokenOut"
           price={selectTokenOut?.balanceToUds}
           selected={selectTokenOut}
+          handleSelect={() => handleSelect("tokenOut")}
           className="border rounded-b-xl mb-5"
         />
         <Button type="submit" size="lg" fullWidth>

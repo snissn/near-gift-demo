@@ -2,6 +2,7 @@ import { NetworkToken } from "@/types/interfaces"
 
 enum TOKENS_MAINNET {
   NEAR = "",
+  wNEAR = "wrap",
   AURORA = "aurora.mainnet",
   REF = "ref.mainnet",
   USDt = "usdtt.mainnet",
@@ -9,6 +10,7 @@ enum TOKENS_MAINNET {
 
 enum TOKENS_TESTNET {
   NEAR = "",
+  wNEAR = "wrap.testnet",
   AURORA = "aurora.fakes.testnet",
   REF = "ref.fakes.testnet",
   USDt = "usdtt.fakes.testnet",
@@ -40,6 +42,11 @@ export const TOKENS: Token = {
     symbol: "NEAR",
     contract: SUPPORTED_TOKENS.NEAR,
   },
+  wNEAR: {
+    decimals: 24,
+    symbol: "wNEAR",
+    contract: SUPPORTED_TOKENS.wNEAR,
+  },
   AURORA: {
     decimals: 18,
     symbol: "AURORA",
@@ -61,11 +68,21 @@ export const LIST_NETWORKS_TOKENS: NetworkToken[] = [
   {
     chainName: "NEAR",
     chainId: "1313161554",
+    address: "",
+    name: "NEAR",
+    symbol: "NEAR",
+    chainIcon: "/static/icons/network/near.svg",
+    icon: "https://assets.coingecko.com/coins/images/10365/standard/near.jpg?1696510367",
+    decimals: 24,
+  },
+  {
+    chainName: "NEAR",
+    chainId: "1313161554",
     address: "wrap.testnet",
     name: "Wrapped NEAR fungible token",
     symbol: "wNEAR",
     chainIcon: "/static/icons/network/near.svg",
-    icon: "https://assets.coingecko.com/coins/images/10365/standard/near.jpg?1696510367",
+    icon: "https://assets.coingecko.com/coins/images/18280/standard/EX4mrWMW_400x400.jpg?1696517773",
     decimals: 24,
   },
   {

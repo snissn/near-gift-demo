@@ -1,16 +1,17 @@
 "use client"
 
-import { useState } from "react"
+import { useId, useState } from "react"
 import { WalletSelector } from "@near-wallet-selector/core"
-import { serialize as serializeBorsh } from "near-api-js/lib/utils/serialize"
 import * as borsh from "borsh"
 import { parseUnits } from "viem"
 
 import { CONTRACTS_REGISTER, MAX_GAS_TRANSACTION } from "@/constants/contracts"
 import { sha256 } from "@/actions/crypto"
-import { TokenInfo } from "@/types/interfaces"
+import { NetworkToken } from "@/types/interfaces"
 import { swapSchema } from "@/utils/schema"
 import useStorageDeposit from "@/hooks/useStorageDeposit"
+import useNearSwapNearToWNear from "@/hooks/useSwapNearToWNear"
+import { SUPPORTED_TOKENS } from "@/constants/tokens"
 
 type Props = {
   accountId: string | null
@@ -21,18 +22,23 @@ type CallRequestIntentProps = {
 }
 
 export const useSwap = ({ accountId, selector }: Props) => {
-  const [inputToken, setInputToken] = useState<TokenInfo>()
-  const [outputToken, setOutputToken] = useState<TokenInfo>()
+  const clientSwapId = useId()
+  const [inputToken, setInputToken] = useState<NetworkToken>()
+  const [outputToken, setOutputToken] = useState<NetworkToken>()
   const { getStorageBalance, setStorageDeposit } = useStorageDeposit({
     accountId,
     selector,
   })
+  const { callRequestNearDeposit } = useNearSwapNearToWNear({
+    accountId,
+    selector,
+  })
 
-  const onChangeInputToken = (token?: TokenInfo) => {
+  const onChangeInputToken = (token?: NetworkToken) => {
     setInputToken(token)
   }
 
-  const onChangeOutputToken = (token?: TokenInfo) => {
+  const onChangeOutputToken = (token?: NetworkToken) => {
     setOutputToken(token)
   }
 
@@ -41,23 +47,28 @@ export const useSwap = ({ accountId, selector }: Props) => {
     if (!inputToken?.address) console.log("Non valid contract address")
 
     const balance = await getStorageBalance(
-      inputToken!.address,
+      inputToken!.address as string,
       CONTRACTS_REGISTER.INTENT
     )
 
-    if (!Number(balance?.toString() || "0")) {
-      await setStorageDeposit(inputToken!.address, CONTRACTS_REGISTER.INTENT)
+    if (inputToken?.address && !Number(balance?.toString() || "0")) {
+      await setStorageDeposit(
+        inputToken!.address as string,
+        CONTRACTS_REGISTER.INTENT
+      )
     }
 
-    const intent_account_id = await sha256("1")
+    const intent_account_id = await sha256(clientSwapId)
+    localStorage.setItem("temp_intent_id", intent_account_id)
+
     const unitsSendAmount = parseUnits(
       String(inputAmount),
       inputToken?.decimals as number
     ).toString()
 
-    // TODO Execute for Solver event
-    // const value = { ExecuteIntent: "1".toString() }
-    // const encoded = borsh.serialize(schema, value)
+    if (!inputToken?.address) {
+      await callRequestNearDeposit(SUPPORTED_TOKENS.wNEAR, unitsSendAmount)
+    }
 
     // TODO Has to be estimated by Solver
     //      [optional] could be estimated with Coingecko Api
@@ -93,7 +104,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
     await wallet.signAndSendTransactions({
       transactions: [
         {
-          receiverId: inputToken!.address,
+          receiverId: inputToken!.address as string,
           actions: [
             {
               type: "FunctionCall",

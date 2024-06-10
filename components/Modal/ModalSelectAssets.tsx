@@ -8,10 +8,17 @@ import SearchBar from "@/components/SearchBar"
 import AssetList from "@/components/Network/AssetList"
 import { NetworkToken } from "@/types/interfaces"
 import { LIST_NETWORKS_TOKENS } from "@/constants/tokens"
+import { useModalStore } from "@/providers/ModalStoreProvider"
+import { ModalType } from "@/stores/modalStore"
 
-const assetsEmptyList: NetworkToken[] = []
+export type ModalSelectAssetsPayload = {
+  modalType?: ModalType.MODAL_SELECT_ASSETS
+  token?: NetworkToken
+  fieldName?: string
+}
 
 const ModalSelectAssets = () => {
+  const { onCloseModal, modalType, payload } = useModalStore((state) => state)
   const [searchValue, setSearchValue] = useState("")
   const deferredQuery = useDeferredValue(searchValue)
 
@@ -25,6 +32,16 @@ const ModalSelectAssets = () => {
       .chainName!.toLocaleUpperCase()
       .includes(deferredQuery.toLocaleUpperCase())
 
+  // TODO Add useGetTokenBalances and apply it to "Your tokens" tokens list
+
+  const handleSelectToken = (token: NetworkToken) => {
+    onCloseModal({
+      ...(payload as { fieldName: string }),
+      modalType,
+      token,
+    })
+  }
+
   return (
     <ModalDialog>
       <div className="flex flex-col min-h-[680px] max-h-[680px] h-full">
@@ -36,6 +53,7 @@ const ModalSelectAssets = () => {
             <AssetList
               assets={LIST_NETWORKS_TOKENS.slice(0, 5)}
               title="Your tokens"
+              handleSelectToken={handleSelectToken}
             />
           </div>
         )}
@@ -48,6 +66,7 @@ const ModalSelectAssets = () => {
             }
             title={deferredQuery ? "Search results" : "Popular tokens"}
             className="h-full"
+            handleSelectToken={handleSelectToken}
           />
           {deferredQuery && (
             <div className="flex justify-center items-center">
