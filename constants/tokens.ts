@@ -2,6 +2,7 @@ import { NetworkToken } from "@/types/interfaces"
 
 enum TOKENS_MAINNET {
   NEAR = "",
+  wNEAR = "wrap",
   AURORA = "aurora.mainnet",
   REF = "ref.mainnet",
   USDt = "usdtt.mainnet",
@@ -9,6 +10,7 @@ enum TOKENS_MAINNET {
 
 enum TOKENS_TESTNET {
   NEAR = "",
+  wNEAR = "wrap.testnet",
   AURORA = "aurora.fakes.testnet",
   REF = "ref.fakes.testnet",
   USDt = "usdtt.fakes.testnet",
@@ -39,6 +41,11 @@ export const TOKENS: Token = {
     decimals: 24,
     symbol: "NEAR",
     contract: SUPPORTED_TOKENS.NEAR,
+  },
+  wNEAR: {
+    decimals: 24,
+    symbol: "wNEAR",
+    contract: SUPPORTED_TOKENS.wNEAR,
   },
   AURORA: {
     decimals: 18,

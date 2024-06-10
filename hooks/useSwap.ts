@@ -10,6 +10,8 @@ import { sha256 } from "@/actions/crypto"
 import { NetworkToken } from "@/types/interfaces"
 import { swapSchema } from "@/utils/schema"
 import useStorageDeposit from "@/hooks/useStorageDeposit"
+import useNearSwapNearToWNear from "@/hooks/useSwapNearToWNear"
+import { SUPPORTED_TOKENS } from "@/constants/tokens"
 
 type Props = {
   accountId: string | null
@@ -24,6 +26,10 @@ export const useSwap = ({ accountId, selector }: Props) => {
   const [inputToken, setInputToken] = useState<NetworkToken>()
   const [outputToken, setOutputToken] = useState<NetworkToken>()
   const { getStorageBalance, setStorageDeposit } = useStorageDeposit({
+    accountId,
+    selector,
+  })
+  const { callRequestNearDeposit } = useNearSwapNearToWNear({
     accountId,
     selector,
   })
@@ -45,7 +51,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
       CONTRACTS_REGISTER.INTENT
     )
 
-    if (!Number(balance?.toString() || "0")) {
+    if (inputToken?.address && !Number(balance?.toString() || "0")) {
       await setStorageDeposit(
         inputToken!.address as string,
         CONTRACTS_REGISTER.INTENT
@@ -59,6 +65,10 @@ export const useSwap = ({ accountId, selector }: Props) => {
       String(inputAmount),
       inputToken?.decimals as number
     ).toString()
+
+    if (!inputToken?.address) {
+      await callRequestNearDeposit(SUPPORTED_TOKENS.wNEAR, unitsSendAmount)
+    }
 
     // TODO Has to be estimated by Solver
     //      [optional] could be estimated with Coingecko Api
