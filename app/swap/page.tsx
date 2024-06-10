@@ -14,6 +14,7 @@ import { useWalletSelector } from "@/providers/WalletSelectorProvider"
 import { useModalStore } from "@/providers/ModalStoreProvider"
 import { ModalType } from "@/stores/modalStore"
 import { NetworkToken } from "@/types/interfaces"
+import { ModalSelectAssetsPayload } from "@/components/Modal/ModalSelectAssets"
 
 type FormValues = {
   tokenIn: string
@@ -27,6 +28,7 @@ export default function Swap() {
   const [selectTokenOut, setSelectTokenOut] = useState<
     NetworkToken | undefined
   >(LIST_NETWORKS_TOKENS[1])
+
   const { selector, accountId } = useWalletSelector()
   const { setModalType, payload } = useModalStore((state) => state)
   const { onChangeInputToken, onChangeOutputToken, callRequestIntent } =
@@ -47,24 +49,35 @@ export default function Swap() {
 
   useEffect(() => {
     if (
-      payload?.modalType === ModalType.MODAL_SELECT_ASSETS &&
-      payload?.fieldName &&
-      payload?.token
+      (payload as ModalSelectAssetsPayload)?.modalType !==
+      ModalType.MODAL_SELECT_ASSETS
     ) {
-      switch (payload!.fieldName) {
+      return
+    }
+    const { modalType, fieldName, token } = payload as ModalSelectAssetsPayload
+    if (modalType === ModalType.MODAL_SELECT_ASSETS && fieldName && token) {
+      switch (fieldName) {
         case "tokenIn":
-          setSelectTokenIn(payload!.token)
-          onChangeInputToken(payload!.token)
-          handleResetToken(payload!.token, selectTokenOut, setSelectTokenOut)
+          setSelectTokenIn(token)
+          onChangeInputToken(token)
+          handleResetToken(
+            token,
+            selectTokenOut as NetworkToken,
+            setSelectTokenOut
+          )
           break
         case "tokenOut":
-          setSelectTokenOut(payload!.token)
-          onChangeOutputToken(payload!.token)
-          handleResetToken(payload!.token, selectTokenIn, setSelectTokenIn)
+          setSelectTokenOut(token)
+          onChangeOutputToken(token)
+          handleResetToken(
+            token,
+            selectTokenIn as NetworkToken,
+            setSelectTokenIn
+          )
           break
       }
     }
-  }, [payload?.modalType, payload?.payload, selectTokenIn, selectTokenOut])
+  }, [payload, selectTokenIn, selectTokenOut])
 
   const handleSubmit = async (values: FieldValues) => {
     await callRequestIntent({

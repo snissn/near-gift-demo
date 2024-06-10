@@ -34,9 +34,9 @@ const ModalSelectAssets = () => {
 
   // TODO Add useGetTokenBalances and apply it to "Your tokens" tokens list
 
-  const handleSelectToken = (token) => {
+  const handleSelectToken = (token: NetworkToken) => {
     onCloseModal({
-      ...payload,
+      ...(payload as { fieldName: string }),
       modalType,
       token,
     })

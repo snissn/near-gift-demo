@@ -7,7 +7,7 @@ import { parseUnits } from "viem"
 
 import { CONTRACTS_REGISTER, MAX_GAS_TRANSACTION } from "@/constants/contracts"
 import { sha256 } from "@/actions/crypto"
-import { TokenInfo } from "@/types/interfaces"
+import { NetworkToken } from "@/types/interfaces"
 import { swapSchema } from "@/utils/schema"
 import useStorageDeposit from "@/hooks/useStorageDeposit"
 
@@ -21,18 +21,18 @@ type CallRequestIntentProps = {
 
 export const useSwap = ({ accountId, selector }: Props) => {
   const clientSwapId = useId()
-  const [inputToken, setInputToken] = useState<TokenInfo>()
-  const [outputToken, setOutputToken] = useState<TokenInfo>()
+  const [inputToken, setInputToken] = useState<NetworkToken>()
+  const [outputToken, setOutputToken] = useState<NetworkToken>()
   const { getStorageBalance, setStorageDeposit } = useStorageDeposit({
     accountId,
     selector,
   })
 
-  const onChangeInputToken = (token?: TokenInfo) => {
+  const onChangeInputToken = (token?: NetworkToken) => {
     setInputToken(token)
   }
 
-  const onChangeOutputToken = (token?: TokenInfo) => {
+  const onChangeOutputToken = (token?: NetworkToken) => {
     setOutputToken(token)
   }
 
@@ -41,12 +41,15 @@ export const useSwap = ({ accountId, selector }: Props) => {
     if (!inputToken?.address) console.log("Non valid contract address")
 
     const balance = await getStorageBalance(
-      inputToken!.address,
+      inputToken!.address as string,
       CONTRACTS_REGISTER.INTENT
     )
 
     if (!Number(balance?.toString() || "0")) {
-      await setStorageDeposit(inputToken!.address, CONTRACTS_REGISTER.INTENT)
+      await setStorageDeposit(
+        inputToken!.address as string,
+        CONTRACTS_REGISTER.INTENT
+      )
     }
 
     const intent_account_id = await sha256(clientSwapId)
@@ -91,7 +94,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
     await wallet.signAndSendTransactions({
       transactions: [
         {
-          receiverId: inputToken!.address,
+          receiverId: inputToken!.address as string,
           actions: [
             {
               type: "FunctionCall",
