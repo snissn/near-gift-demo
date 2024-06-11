@@ -12,12 +12,12 @@ const nextConfig = {
     return config
   },
   env: {
-    auroraChainId: process.env.auroraChainId,
     nearChainId: process.env.NEAR_CAHIN_ID,
     nearNodeUrl: process.env.NEAR_NODE_URL,
     ethChainId: process.env.ETH_CHAIN_ID,
     baseChainId: process.env.BASE_CHAIN_ID,
     environment: process.env.ENVIRONMENT,
+    turnOffApps: process.env.NEXT_PUBLIC_TURN_OFF_APPS,
   },
   images: {
     remotePatterns: [
