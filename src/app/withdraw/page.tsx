@@ -45,8 +45,8 @@ export default function Withdraw() {
           placeholder="Enter wallet address"
         />
         <div className="h-[20px]"></div>
-        <Button type="submit" size="lg" fullWidth>
-          Send
+        <Button type="submit" size="lg" fullWidth disabled>
+          Coming soon
         </Button>
       </Form>
     </Paper>

@@ -65,8 +65,8 @@ export default function Deposit() {
             </>
           }
         />
-        <Button type="submit" size="lg" fullWidth>
-          Buy
+        <Button type="submit" size="lg" fullWidth disabled>
+          Coming soon
         </Button>
       </Form>
     </Paper>
