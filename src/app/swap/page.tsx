@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { FieldValues } from "react-hook-form"
+import { FieldValues, useForm } from "react-hook-form"
 
 import Paper from "@src/components/Paper"
 import Form from "@src/components/Form"
@@ -23,6 +23,8 @@ type FormValues = {
 }
 
 export default function Swap() {
+  const { handleSubmit, register } = useForm<FormValues>()
+
   const [selectTokenIn, setSelectTokenIn] = useState<NetworkToken | undefined>(
     LIST_NETWORKS_TOKENS[0]
   )
@@ -81,7 +83,7 @@ export default function Swap() {
     }
   }, [payload, selectTokenIn, selectTokenOut])
 
-  const handleSubmit = async (values: FieldValues) => {
+  const onSubmit = async (values: FieldValues) => {
     await callRequestIntent({
       inputAmount: values.tokenIn,
     })
@@ -108,7 +110,10 @@ export default function Swap() {
       title="Swap"
       description="Cross-chain swap across any network, any token."
     >
-      <Form<FormValues> onSubmit={handleSubmit}>
+      <Form<FormValues>
+        handleSubmit={handleSubmit(onSubmit)}
+        register={register}
+      >
         <FieldComboInput<FormValues>
           fieldName="tokenIn"
           price={selectTokenIn?.balanceToUds}
