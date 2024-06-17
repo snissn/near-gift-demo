@@ -1,16 +1,16 @@
 "use client"
 
-import { useState, useDeferredValue } from "react"
 import { Text } from "@radix-ui/themes"
 import Image from "next/image"
 
 import ModalDialog from "@src/components/Modal/ModalDialog"
 import { NetworkToken } from "@src/types/interfaces"
-import { LIST_NETWORKS_TOKENS } from "@src/constants/tokens"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { useSwap } from "@src/hooks/useSwap"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import Button from "@src/components/Button"
+import Button from "@src/components/Button/Button"
+import CardSwap from "@src/components/Card/CardSwap"
+import ButtonIcon from "@src/components/Button/ButtonIcon"
 
 export type ModalReviewSwapPayload = {
   tokenIn: number
@@ -54,6 +54,14 @@ const ModalReviewSwap = () => {
             />
           </button>
         </div>
+        <CardSwap
+          amountIn="300"
+          amountOut="7"
+          amountOutToUsd="58"
+          amountInToUsd="57"
+          selectTokenIn={modalPayload.selectedTokenIn}
+          selectTokenOut={modalPayload.selectedTokenOut}
+        />
         <div className="flex flex-col w-full mb-6 gap-3">
           <div className="flex justify-between items-center">
             <Text size="2" weight="medium" className="text-gray-600">
@@ -77,9 +85,17 @@ const ModalReviewSwap = () => {
             <Text size="2" weight="medium" className="text-gray-600">
               Rate
             </Text>
-            <Text size="2" weight="medium">
-              1 AURORA = 0.027952 NEAR
-            </Text>
+            <div className="flex justify-center items-center gap-2">
+              <ButtonIcon
+                className="max-w-[24px] max-h-[24px] rounded-[3px] pointer-events-none"
+                iconWidth={16}
+                iconHeight={16}
+                icon="/static/icons/width.svg"
+              />
+              <Text size="2" weight="medium">
+                1 AURORA = 0.027952 NEAR
+              </Text>
+            </div>
           </div>
         </div>
         <Button size="lg" fullWidth onChange={handleConfirmSwap}>

@@ -7,8 +7,8 @@ import { parseUnits } from "viem"
 import Paper from "@src/components/Paper"
 import Form from "@src/components/Form"
 import FieldComboInput from "@src/components/Form/FieldComboInput"
-import Button from "@src/components/Button"
-import Switch from "@src/components/Switch"
+import Button from "@src/components/Button/Button"
+import ButtonSwitch from "@src/components/Button/ButtonSwitch"
 import { useSwap } from "@src/hooks/useSwap"
 import { LIST_NETWORKS_TOKENS } from "@src/constants/tokens"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
@@ -248,15 +248,19 @@ export default function Swap() {
           selected={selectTokenIn as NetworkToken}
           handleSelect={() => handleSelect("tokenIn")}
           handleSetMax={handleSetMax}
-          className="border rounded-t-xl"
+          className="border rounded-t-xl max-w-[472px]"
+          required
         />
-        <Switch onClick={handleSwitch} />
+        <div className="relative w-full">
+          <ButtonSwitch onClick={handleSwitch} />
+        </div>
         <FieldComboInput<FormValues>
           fieldName="tokenOut"
           price={selectTokenOut?.balanceToUds as string}
           selected={selectTokenOut as NetworkToken}
           handleSelect={() => handleSelect("tokenOut")}
-          className="border rounded-b-xl mb-5"
+          className="border rounded-b-xl mb-5 max-w-[472px]"
+          required
         />
         <Button type="submit" size="lg" fullWidth isLoading={isFetching}>
           Swap
