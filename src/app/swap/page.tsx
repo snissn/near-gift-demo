@@ -9,9 +9,7 @@ import Form from "@src/components/Form"
 import FieldComboInput from "@src/components/Form/FieldComboInput"
 import Button from "@src/components/Button/Button"
 import ButtonSwitch from "@src/components/Button/ButtonSwitch"
-import { useSwap } from "@src/hooks/useSwap"
 import { LIST_NETWORKS_TOKENS } from "@src/constants/tokens"
-import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { ModalType } from "@src/stores/modalStore"
 import { NetworkToken } from "@src/types/interfaces"
@@ -20,6 +18,7 @@ import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
 import { DataEstimateRequest } from "@src/libs/de-sdk/types/interfaces"
 import { debounce } from "@src/utils/debounce"
 import { useModalSearchParams } from "@src/hooks/useModalSearchParams"
+import { useCombinedTransactionCollector } from "@src/hooks/useNearTransactionCollector"
 
 type FormValues = {
   tokenIn: string
@@ -46,14 +45,9 @@ export default function Swap() {
 
   const { handleSubmit, register, watch, setValue, getValues } =
     useForm<FormValues>()
-  const { selector, accountId } = useWalletSelector()
   const { setModalType, payload, onCloseModal } = useModalStore(
     (state) => state
   )
-  const { onChangeInputToken, onChangeOutputToken } = useSwap({
-    selector,
-    accountId,
-  })
   const { getSwapEstimateBot, isFetching } = useSwapEstimateBot()
   const isProgrammaticUpdate = useRef(false)
   useModalSearchParams()
@@ -194,7 +188,6 @@ export default function Swap() {
       switch (fieldName) {
         case "tokenIn":
           setSelectTokenIn(token)
-          onChangeInputToken(token)
           const isSelectTokenOutReset = handleResetToken(
             token,
             selectTokenOut as NetworkToken,
@@ -213,7 +206,6 @@ export default function Swap() {
           break
         case "tokenOut":
           setSelectTokenOut(token)
-          onChangeOutputToken(token)
           const isSelectTokenInReset = handleResetToken(
             token,
             selectTokenIn as NetworkToken,

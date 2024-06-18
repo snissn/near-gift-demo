@@ -21,13 +21,14 @@ type Props = {
   selector: WalletSelector | null
 }
 type CallRequestIntentProps = {
-  inputAmount: number
+  inputAmount: string
+  outputAmount: string
+  inputToken: NetworkToken
+  outputToken: NetworkToken
 }
 
 export const useSwap = ({ accountId, selector }: Props) => {
   const clientSwapId = useId()
-  const [inputToken, setInputToken] = useState<NetworkToken>()
-  const [outputToken, setOutputToken] = useState<NetworkToken>()
   const [transactionQueue, setTransactionQueue] = useState(1)
   const { getStorageBalance, setStorageDeposit } = useStorageDeposit({
     accountId,
@@ -38,15 +39,12 @@ export const useSwap = ({ accountId, selector }: Props) => {
     selector,
   })
 
-  const onChangeInputToken = (token?: NetworkToken) => {
-    setInputToken(token)
-  }
-
-  const onChangeOutputToken = (token?: NetworkToken) => {
-    setOutputToken(token)
-  }
-
-  const callRequestIntent = async ({ inputAmount }: CallRequestIntentProps) => {
+  const callRequestCreateIntent = async ({
+    inputAmount,
+    outputAmount,
+    inputToken,
+    outputToken,
+  }: CallRequestIntentProps) => {
     if (!accountId) console.log("Non valid recipient address")
     if (!inputToken?.address) console.log("Non valid contract address")
 
@@ -56,6 +54,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
     )
 
     if (inputToken?.address && !Number(balance?.toString() || "0")) {
+      setTransactionQueue(transactionQueue + 1)
       await setStorageDeposit(
         inputToken!.address as string,
         CONTRACTS_REGISTER.INTENT
@@ -66,17 +65,21 @@ export const useSwap = ({ accountId, selector }: Props) => {
     localStorage.setItem("temp_intent_id", intent_account_id)
 
     const unitsSendAmount = parseUnits(
-      String(inputAmount),
+      inputAmount,
       inputToken?.decimals as number
     ).toString()
+    const estimateUnitsBackAmount = parseUnits(
+      outputAmount,
+      outputToken?.decimals as number
+    ).toString()
 
-    if (!inputToken?.address) {
-      await callRequestNearDeposit(SUPPORTED_TOKENS.wNEAR, unitsSendAmount)
-    }
+    const getBlock = 123_456 // Current block + 10
+    const referral = "referral.near" // Some referral account
 
-    // TODO Has to be estimated by Solver
-    //      [optional] could be estimated with Coingecko Api
-    const estimateUnitsBackAmount = unitsSendAmount
+    // TODO If wNear user amount less than amountIn and Near user amount cover left part then do deposit
+    // if (!inputToken?.address) {
+    //   await callRequestNearDeposit(SUPPORTED_TOKENS.wNEAR, unitsSendAmount)
+    // }
 
     const msg = {
       CreateIntent: {
@@ -92,10 +95,10 @@ export const useSwap = ({ accountId, selector }: Props) => {
             amount: estimateUnitsBackAmount,
           },
           expiration: {
-            Block: 123_456,
+            Block: getBlock,
           },
           referral: {
-            Some: "referral.near",
+            Some: referral,
           },
         },
       },
@@ -131,9 +134,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
   }
 
   return {
-    onChangeInputToken,
-    onChangeOutputToken,
-    callRequestIntent,
+    callRequestCreateIntent,
     transactionQueue,
   }
 }

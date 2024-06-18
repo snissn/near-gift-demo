@@ -10,7 +10,7 @@ import { NetworkToken } from "@src/types/interfaces"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { useSwap } from "@src/hooks/useSwap"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import { useCreateQueryString } from "@src/hooks/useCreateQueryString"
+import { useCreateQueryString } from "@src/hooks/useQuery"
 import { ModalReviewSwapPayload } from "@src/components/Modal/ModalReviewSwap"
 
 export type ModalConfirmSwapPayload = {

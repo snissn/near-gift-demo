@@ -25,7 +25,7 @@ export type ModalReviewSwapPayload = {
 
 const ModalReviewSwap = () => {
   const { selector, accountId } = useWalletSelector()
-  const { callRequestIntent, transactionQueue } = useSwap({
+  const { callRequestCreateIntent, transactionQueue } = useSwap({
     selector,
     accountId,
   })
@@ -44,8 +44,11 @@ const ModalReviewSwap = () => {
 
   const handleConfirmSwap = async () => {
     setModalType(ModalType.MODAL_CONFIRM_SWAP, payload)
-    await callRequestIntent({
-      inputAmount: Number(modalPayload.tokenIn),
+    await callRequestCreateIntent({
+      inputAmount: modalPayload.tokenIn,
+      outputAmount: modalPayload.tokenOut,
+      inputToken: modalPayload.selectedTokenIn,
+      outputToken: modalPayload.selectedTokenOut,
     })
   }
 
