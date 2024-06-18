@@ -28,6 +28,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
   const clientSwapId = useId()
   const [inputToken, setInputToken] = useState<NetworkToken>()
   const [outputToken, setOutputToken] = useState<NetworkToken>()
+  const [transactionQueue, setTransactionQueue] = useState(1)
   const { getStorageBalance, setStorageDeposit } = useStorageDeposit({
     accountId,
     selector,
@@ -133,5 +134,6 @@ export const useSwap = ({ accountId, selector }: Props) => {
     onChangeInputToken,
     onChangeOutputToken,
     callRequestIntent,
+    transactionQueue,
   }
 }

@@ -19,6 +19,7 @@ import { ModalSelectAssetsPayload } from "@src/components/Modal/ModalSelectAsset
 import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
 import { DataEstimateRequest } from "@src/libs/de-sdk/types/interfaces"
 import { debounce } from "@src/utils/debounce"
+import { useModalSearchParams } from "@src/hooks/useModalSearchParams"
 
 type FormValues = {
   tokenIn: string
@@ -55,6 +56,7 @@ export default function Swap() {
   })
   const { getSwapEstimateBot, isFetching } = useSwapEstimateBot()
   const isProgrammaticUpdate = useRef(false)
+  useModalSearchParams()
 
   const handleResetToken = (
     token: NetworkToken,
@@ -74,6 +76,7 @@ export default function Swap() {
   const onSubmit = async (values: FieldValues) => {
     setModalType(ModalType.MODAL_REVIEW_SWAP, {
       tokenIn: values.tokenIn,
+      tokenOut: values.tokenOut,
       selectedTokenIn: selectTokenIn,
       selectedTokenOut: selectTokenOut,
     })
