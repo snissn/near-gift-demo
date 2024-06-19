@@ -18,7 +18,6 @@ import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
 import { DataEstimateRequest } from "@src/libs/de-sdk/types/interfaces"
 import { debounce } from "@src/utils/debounce"
 import { useModalSearchParams } from "@src/hooks/useModalSearchParams"
-import { useCombinedTransactionCollector } from "@src/hooks/useNearTransactionCollector"
 
 type FormValues = {
   tokenIn: string
@@ -257,7 +256,8 @@ export default function Swap() {
           className="border rounded-b-xl mb-5 max-w-[472px]"
           required
         />
-        <Button type="submit" size="lg" fullWidth isLoading={isFetching}>
+        {/* Rollback isLoading */}
+        <Button type="submit" size="lg" fullWidth>
           Swap
         </Button>
       </Form>

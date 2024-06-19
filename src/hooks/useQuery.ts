@@ -1,12 +1,12 @@
 "use client"
 
 import { useCallback } from "react"
-import { useSearchParams } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
-import {
-  CollectorHook,
-  EventJson,
-} from "@src/hooks/useNearTransactionCollector"
+import { CollectorHook } from "@src/hooks/useHistoryCollector"
+import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import { getTransactionDetails } from "@src/api/transaction"
+import { HistoryData } from "@src/stores/historyStore"
 
 export const useCreateQueryString = () => {
   const searchParams = useSearchParams()
@@ -28,19 +28,52 @@ export const useCreateQueryString = () => {
 
 // This hook collects transactions based on query parameters from the URL
 export const useQueryCollector = (): CollectorHook => {
+  const router = useRouter()
+  const pathname = usePathname()
   const searchParams = useSearchParams()
+  const { accountId } = useWalletSelector()
 
-  const getTransactions = useCallback(async (): Promise<EventJson[]> => {
-    const errorMessage = searchParams.get("errorMessage")
-    const transactionHashes = searchParams.get("transactionHashes")
-    const errorCode = searchParams.get("errorCode")
-    console.log(errorMessage, "errorMessage")
-    console.log(transactionHashes, "transactionHashes")
-    console.log(errorCode, "errorCode")
+  const cleanupQuery = (keys: string[]) => {
+    const params = new URLSearchParams(searchParams.toString())
+    keys.forEach((key) => params.delete(key))
+    router.replace(pathname + "?" + params)
+  }
 
-    // TODO Fetch details from transactionHashes
-    //      and format to history widget
-    return []
+  const getTransactions = useCallback(async (): Promise<HistoryData[]> => {
+    try {
+      const transactionHashes = searchParams.get("transactionHashes")
+      const errorMessage = searchParams.get("errorMessage")
+      const errorCode = searchParams.get("errorCode")
+
+      if (transactionHashes) {
+        const data = await getTransactionDetails(
+          transactionHashes as string,
+          accountId as string
+        )
+        cleanupQuery(["transactionHashes", "errorMessage", "errorCode"])
+        return [
+          {
+            status: data?.result?.final_execution_status as string,
+            hash: transactionHashes,
+            logs: data?.result?.receipts_outcome[0].outcome?.logs as string[],
+          },
+        ]
+      }
+
+      // TODO Add failure events
+      // if (errorCode || errorMessage) {
+      //   return {
+      //     status: (errorMessage as string) || (errorCode as string),
+      //     hash: transactionHashes,
+      //     logs: [],
+      //   }
+      // }
+      cleanupQuery(["transactionHashes", "errorMessage", "errorCode"])
+      return []
+    } catch (e) {
+      console.log("useQueryCollector: ", e)
+      return []
+    }
   }, [searchParams])
 
   return {

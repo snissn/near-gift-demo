@@ -62,7 +62,6 @@ export const useSwap = ({ accountId, selector }: Props) => {
     }
 
     const intent_account_id = await sha256(clientSwapId)
-    localStorage.setItem("temp_intent_id", intent_account_id)
 
     const unitsSendAmount = parseUnits(
       inputAmount,
