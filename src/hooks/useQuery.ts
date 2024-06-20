@@ -41,6 +41,7 @@ export const useQueryCollector = (): CollectorHook => {
 
   const getTransactions = useCallback(async (): Promise<HistoryData[]> => {
     try {
+      const defuseClientId = searchParams.get("defuseClientId")
       const transactionHashes = searchParams.get("transactionHashes")
       const errorMessage = searchParams.get("errorMessage")
       const errorCode = searchParams.get("errorCode")
@@ -53,6 +54,7 @@ export const useQueryCollector = (): CollectorHook => {
         cleanupQuery(["transactionHashes", "errorMessage", "errorCode"])
         return [
           {
+            defuseClientId: defuseClientId as string,
             status: data?.result?.final_execution_status as string,
             hash: transactionHashes,
             logs: data?.result?.receipts_outcome[0].outcome?.logs as string[],

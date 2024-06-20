@@ -11,8 +11,6 @@ import Button from "@src/components/Button/Button"
 import CardSwap from "@src/components/Card/CardSwap"
 import ButtonIcon from "@src/components/Button/ButtonIcon"
 import { ModalType } from "@src/stores/modalStore"
-import { useSwap } from "@src/hooks/useSwap"
-import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { useTimer } from "@src/hooks/useTimer"
 import { useTimeFormatMinutes } from "@src/hooks/useTimeFormat"
 
@@ -24,11 +22,6 @@ export type ModalReviewSwapPayload = {
 }
 
 const ModalReviewSwap = () => {
-  const { selector, accountId } = useWalletSelector()
-  const { callRequestCreateIntent, transactionQueue } = useSwap({
-    selector,
-    accountId,
-  })
   const { onCloseModal, setModalType, payload } = useModalStore(
     (state) => state
   )
@@ -44,12 +37,6 @@ const ModalReviewSwap = () => {
 
   const handleConfirmSwap = async () => {
     setModalType(ModalType.MODAL_CONFIRM_SWAP, payload)
-    await callRequestCreateIntent({
-      inputAmount: modalPayload.tokenIn,
-      outputAmount: modalPayload.tokenOut,
-      inputToken: modalPayload.selectedTokenIn,
-      outputToken: modalPayload.selectedTokenOut,
-    })
   }
 
   return (

@@ -1,6 +1,5 @@
 "use client"
 
-import { useId, useState } from "react"
 import { WalletSelector } from "@near-wallet-selector/core"
 import * as borsh from "borsh"
 import { parseUnits } from "viem"
@@ -14,22 +13,21 @@ import { NetworkToken } from "@src/types/interfaces"
 import { swapSchema } from "@src/utils/schema"
 import useStorageDeposit from "@src/hooks/useStorageDeposit"
 import useNearSwapNearToWNear from "@src/hooks/useSwapNearToWNear"
-import { SUPPORTED_TOKENS } from "@src/constants/tokens"
+import { LIST_NATIVE_TOKENS, SUPPORTED_TOKENS } from "@src/constants/tokens"
 
 type Props = {
   accountId: string | null
   selector: WalletSelector | null
 }
-type CallRequestIntentProps = {
-  inputAmount: string
-  outputAmount: string
-  inputToken: NetworkToken
-  outputToken: NetworkToken
+export type CallRequestIntentProps = {
+  tokenIn: string
+  tokenOut: string
+  selectedTokenIn: NetworkToken
+  selectedTokenOut: NetworkToken
+  defuseClientId?: string
 }
 
 export const useSwap = ({ accountId, selector }: Props) => {
-  const clientSwapId = useId()
-  const [transactionQueue, setTransactionQueue] = useState(1)
   const { getStorageBalance, setStorageDeposit } = useStorageDeposit({
     accountId,
     selector,
@@ -39,44 +37,83 @@ export const useSwap = ({ accountId, selector }: Props) => {
     selector,
   })
 
-  const callRequestCreateIntent = async ({
-    inputAmount,
-    outputAmount,
-    inputToken,
-    outputToken,
-  }: CallRequestIntentProps) => {
-    if (!accountId) console.log("Non valid recipient address")
-    if (!inputToken?.address) console.log("Non valid contract address")
+  const validateInputs = (inputs: CallRequestIntentProps) => {
+    if (accountId) {
+      console.log("Non valid recipient address")
+      return
+    }
+    if (inputs!.selectedTokenIn?.address) {
+      console.log("Non valid contract address")
+      return
+    }
+    if (inputs?.defuseClientId) {
+      console.log("Non valid defuseClientId")
+      return
+    }
+  }
+
+  const getEstimateQueueTransactions = async (
+    inputs: CallRequestIntentProps
+  ) => {
+    let queue = 1
+    validateInputs(inputs)
+    const { tokenIn, tokenOut, selectedTokenIn, selectedTokenOut } = inputs
+    const isExistSwapRoute = LIST_NATIVE_TOKENS.findIndex(
+      (token) => token.swapRoute === selectedTokenIn.address
+    )
+    if (isExistSwapRoute !== -1) {
+      // TODO compare tokenIn > selectedTokenIn.address balance then get balance of Native, and then queue++
+      queue++
+    }
 
     const balance = await getStorageBalance(
-      inputToken!.address as string,
+      selectedTokenIn!.address as string,
+      CONTRACTS_REGISTER.INTENT
+    )
+    if (selectedTokenIn?.address && !Number(balance?.toString() || "0")) {
+      queue++
+    }
+    return queue
+  }
+
+  const callRequestCreateIntent = async (inputs: CallRequestIntentProps) => {
+    validateInputs(inputs)
+    const {
+      tokenIn,
+      tokenOut,
+      selectedTokenIn,
+      selectedTokenOut,
+      defuseClientId,
+    } = inputs
+
+    const balance = await getStorageBalance(
+      selectedTokenIn!.address as string,
       CONTRACTS_REGISTER.INTENT
     )
 
-    if (inputToken?.address && !Number(balance?.toString() || "0")) {
-      setTransactionQueue(transactionQueue + 1)
+    if (selectedTokenIn?.address && !Number(balance?.toString() || "0")) {
       await setStorageDeposit(
-        inputToken!.address as string,
+        selectedTokenIn!.address as string,
         CONTRACTS_REGISTER.INTENT
       )
     }
 
-    const intent_account_id = await sha256(clientSwapId)
+    const intent_account_id = await sha256(defuseClientId as string)
 
     const unitsSendAmount = parseUnits(
-      inputAmount,
-      inputToken?.decimals as number
+      tokenIn,
+      selectedTokenIn?.decimals as number
     ).toString()
     const estimateUnitsBackAmount = parseUnits(
-      outputAmount,
-      outputToken?.decimals as number
+      tokenOut,
+      selectedTokenOut?.decimals as number
     ).toString()
 
     const getBlock = 123_456 // Current block + 10
     const referral = "referral.near" // Some referral account
 
     // TODO If wNear user amount less than amountIn and Near user amount cover left part then do deposit
-    // if (!inputToken?.address) {
+    // if (!selectedTokenIn?.address) {
     //   await callRequestNearDeposit(SUPPORTED_TOKENS.wNEAR, unitsSendAmount)
     // }
 
@@ -86,11 +123,11 @@ export const useSwap = ({ accountId, selector }: Props) => {
         IntentStruct: {
           initiator: accountId,
           send: {
-            token_id: inputToken!.address,
+            token_id: selectedTokenIn!.address,
             amount: unitsSendAmount,
           },
           receive: {
-            token_id: outputToken!.address,
+            token_id: selectedTokenOut!.address,
             amount: estimateUnitsBackAmount,
           },
           expiration: {
@@ -110,7 +147,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
     await wallet.signAndSendTransactions({
       transactions: [
         {
-          receiverId: inputToken!.address as string,
+          receiverId: selectedTokenIn!.address as string,
           actions: [
             {
               type: "FunctionCall",
@@ -133,7 +170,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
   }
 
   return {
+    getEstimateQueueTransactions,
     callRequestCreateIntent,
-    transactionQueue,
   }
 }

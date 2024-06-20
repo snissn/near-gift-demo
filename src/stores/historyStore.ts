@@ -3,6 +3,7 @@
 import { createStore } from "zustand/vanilla"
 
 export type HistoryData = {
+  defuseClientId: string
   status: string
   hash: string
   logs: string[]
