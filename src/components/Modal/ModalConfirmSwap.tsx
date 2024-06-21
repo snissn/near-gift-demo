@@ -3,10 +3,10 @@
 import React, { useEffect, useState, useId } from "react"
 import { Text } from "@radix-ui/themes"
 import Image from "next/image"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { parseUnits } from "viem"
 
 import ModalDialog from "@src/components/Modal/ModalDialog"
-import { NetworkToken } from "@src/types/interfaces"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { CallRequestIntentProps, useSwap } from "@src/hooks/useSwap"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
@@ -14,6 +14,8 @@ import { useCreateQueryString } from "@src/hooks/useQuery"
 import { ModalReviewSwapPayload } from "@src/components/Modal/ModalReviewSwap"
 import { ModalType } from "@src/stores/modalStore"
 import { sha256 } from "@src/actions/crypto"
+import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
+import { usePublishIntentSolver0 } from "@src/api/hooks/Intent/usePublishIntentSolver0"
 
 export interface ModalConfirmSwapPayload extends CallRequestIntentProps {}
 
@@ -33,6 +35,9 @@ const ModalConfirmSwap = () => {
   const { createQueryString } = useCreateQueryString()
   const { onCloseModal, modalType, payload } = useModalStore((state) => state)
   const modalPayload = payload as ModalReviewSwapPayload
+  const { data: historyData, isFetched } = useHistoryStore((state) => state)
+  const searchParams = useSearchParams()
+  const { mutate } = usePublishIntentSolver0()
 
   const getSwapFromLocal = (): ModalConfirmSwapPayload | null => {
     const getConfirmSwapFromLocal = localStorage.getItem(CONFIRM_SWAP_LOCAL_KEY)
@@ -77,9 +82,43 @@ const ModalConfirmSwap = () => {
 
   const handleValidateNextQueueTransaction = (
     inputs: ModalConfirmSwapPayload
-  ) => {
+  ): boolean => {
     // Stop cycle if the last transaction is caught by defuseClientId in history
     console.log("handleValidateNextQueueTransaction: ", inputs)
+    if (modalPayload) {
+      return true
+    }
+
+    historyData.forEach((value, key) => {
+      if (key === inputs.defuseClientId) {
+        const isNextQueueDone = value.logs.includes(
+          "Memo: Execute intent: NEP-141 to NEP-141"
+        )
+        if (isNextQueueDone) {
+          onCloseModal()
+          const params = new URLSearchParams(searchParams.toString())
+          params.delete("modalType")
+          router.replace(pathname + "?" + params)
+          mutate({
+            hash: value.hash,
+            defuseAssetIdIn: inputs.selectedTokenIn.defuse_asset_id,
+            accountId: accountId as string,
+            defuseClientId: key,
+            defuseAssetIdOut: inputs.selectedTokenOut.defuse_asset_id,
+            unitsAmountIn: parseUnits(
+              inputs.tokenIn,
+              inputs.selectedTokenIn?.decimals as number
+            ).toString(),
+            unitsAmountOut: parseUnits(
+              inputs.tokenOut,
+              inputs.selectedTokenOut?.decimals as number
+            ).toString(),
+          })
+          return true
+        }
+      }
+    })
+    return false
   }
 
   const handleTrackSwap = async () => {
@@ -97,7 +136,8 @@ const ModalConfirmSwap = () => {
           defuseClientId: data.defuseClientId,
         }
 
-        handleValidateNextQueueTransaction(inputs)
+        const isNextQueueExist = handleValidateNextQueueTransaction(inputs)
+        if (!isNextQueueExist) return
 
         setSwapToLocal(inputs)
         handleBatchCreateSwapQuery({
@@ -119,7 +159,8 @@ const ModalConfirmSwap = () => {
       defuseClientId: newDefuseClientId,
     }
 
-    handleValidateNextQueueTransaction(inputs)
+    const isNextQueueExist = handleValidateNextQueueTransaction(inputs)
+    if (!isNextQueueExist) return
 
     setSwapToLocal(inputs)
     handleBatchCreateSwapQuery({
@@ -129,8 +170,10 @@ const ModalConfirmSwap = () => {
   }
 
   useEffect(() => {
-    handleTrackSwap()
-  }, [])
+    if (isFetched) {
+      handleTrackSwap()
+    }
+  }, [historyData, isFetched])
 
   return (
     <ModalDialog>

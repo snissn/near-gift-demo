@@ -26,6 +26,13 @@ export const useCreateQueryString = () => {
   }
 }
 
+enum UseQueryCollectorKeys {
+  DEFUSE_CLIENT_ID = "defuseClientId",
+  TRANSACTION_HASHS = "transactionHashes",
+  ERROR_MESSAGE = "errorMessage",
+  ERROR_CODE = "errorCode",
+}
+
 // This hook collects transactions based on query parameters from the URL
 export const useQueryCollector = (): CollectorHook => {
   const router = useRouter()
@@ -41,23 +48,37 @@ export const useQueryCollector = (): CollectorHook => {
 
   const getTransactions = useCallback(async (): Promise<HistoryData[]> => {
     try {
-      const defuseClientId = searchParams.get("defuseClientId")
-      const transactionHashes = searchParams.get("transactionHashes")
-      const errorMessage = searchParams.get("errorMessage")
-      const errorCode = searchParams.get("errorCode")
+      const defuseClientId = searchParams.get(
+        UseQueryCollectorKeys.DEFUSE_CLIENT_ID
+      )
+      const transactionHashes = searchParams.get(
+        UseQueryCollectorKeys.TRANSACTION_HASHS
+      )
+      const errorMessage = searchParams.get(UseQueryCollectorKeys.ERROR_MESSAGE)
+      const errorCode = searchParams.get(UseQueryCollectorKeys.ERROR_CODE)
 
       if (transactionHashes) {
         const data = await getTransactionDetails(
           transactionHashes as string,
           accountId as string
         )
-        cleanupQuery(["transactionHashes", "errorMessage", "errorCode"])
+        cleanupQuery([
+          UseQueryCollectorKeys.DEFUSE_CLIENT_ID,
+          UseQueryCollectorKeys.TRANSACTION_HASHS,
+          UseQueryCollectorKeys.ERROR_MESSAGE,
+          UseQueryCollectorKeys.ERROR_CODE,
+        ])
         return [
           {
             defuseClientId: defuseClientId as string,
             status: data?.result?.final_execution_status as string,
             hash: transactionHashes,
             logs: data?.result?.receipts_outcome[0].outcome?.logs as string[],
+            details: {
+              failure:
+                data?.result?.receipts_outcome[1].outcome?.status?.Failure
+                  ?.ActionError?.kind?.FunctionCallError?.ExecutionError,
+            },
           },
         ]
       }

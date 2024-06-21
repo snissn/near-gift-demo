@@ -70,6 +70,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
       selectedTokenIn!.address as string,
       CONTRACTS_REGISTER.INTENT
     )
+    console.log("useSwap getEstimateQueueTransactions: ", balance)
     if (selectedTokenIn?.address && !Number(balance?.toString() || "0")) {
       queue++
     }
@@ -109,7 +110,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
       selectedTokenOut?.decimals as number
     ).toString()
 
-    const getBlock = 123_456 // Current block + 10
+    const getBlock = 121_700_000 // Current block + 10
     const referral = "referral.near" // Some referral account
 
     // TODO If wNear user amount less than amountIn and Near user amount cover left part then do deposit

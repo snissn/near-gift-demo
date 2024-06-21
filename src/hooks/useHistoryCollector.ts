@@ -39,13 +39,14 @@ export const useHistoryCollector = (collectorHooks: CollectorHook[]) => {
       )
       const getTransactionHistories = allTransactions.flat()
       const getHistoryFromLocal = localStorage.getItem(NEAR_COLLECTOR_KEY)
-      let getHistoryFromStore = Array.from(data)
+      let getHistoryFromStore: HistoryData[] = []
+      data.forEach((value) => getHistoryFromStore.push(value))
 
       // Do merge as we suppose that this is initial fetch
       if (!getHistoryFromStore.length && getHistoryFromLocal) {
         const parsedData: { data: HistoryData[] } =
           JSON.parse(getHistoryFromLocal)
-        if (Array.isArray(parsedData)) {
+        if (Array.isArray(parsedData.data)) {
           getHistoryFromStore = [
             ...getHistoryFromStore,
             ...(parsedData.data as HistoryData[]),

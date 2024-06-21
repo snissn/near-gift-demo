@@ -228,6 +228,18 @@ const listNetworksTokensMainnet = [
     icon: "https://assets.coingecko.com/coins/images/7598/standard/wrapped_bitcoin_wbtc.png",
     decimals: 18,
   },
+  {
+    defuse_asset_id: "near:mainnet:token.v2.ref-finance.near",
+    blockchain: "near",
+    chainId: "mainnet",
+    address: "token.v2.ref-finance.near",
+    chainName: "NEAR",
+    name: "Ref Finance Token",
+    symbol: "REF",
+    chainIcon: "/static/icons/network/near.svg",
+    icon: "https://assets.coingecko.com/coins/images/18279/standard/ref.png?1696517772",
+    decimals: 18,
+  },
 ]
 
 export const LIST_NETWORKS_TOKENS: NetworkToken[] =

@@ -7,11 +7,15 @@ export type HistoryData = {
   status: string
   hash: string
   logs: string[]
+  details?: {
+    failure?: string
+  }
 }
 
 export type HistoryState = {
   active: boolean
-  data: Set<HistoryData>
+  data: Map<string, HistoryData>
+  isFetched: boolean
 }
 
 export type HistoryActions = {
@@ -24,11 +28,12 @@ export type HistoryActions = {
 export type HistoryStore = HistoryState & HistoryActions
 
 export const initHistoryStore = (): HistoryState => {
-  return { active: false, data: new Set() }
+  return { active: false, data: new Map(), isFetched: false }
 }
 export const defaultInitState: HistoryState = {
   active: false,
-  data: new Set(),
+  data: new Map(),
+  isFetched: false,
 }
 
 export const createHistoryStore = (
@@ -39,6 +44,11 @@ export const createHistoryStore = (
     openWidget: () => set({ active: true }),
     closeWidget: () => set({ active: false }),
     toggleWidget: () => set((state) => ({ active: !state.active })),
-    updateHistory: (data: HistoryData[]) => set({ data: new Set(data) }),
+    updateHistory: (data: HistoryData[]) =>
+      set((state) => {
+        const updatedData = new Map(state.data)
+        data.forEach((item) => updatedData.set(item.defuseClientId, item))
+        return { data: updatedData, isFetched: true }
+      }),
   }))
 }
