@@ -69,7 +69,7 @@ const ConnectWallet = () => {
   const handleTradeHistory = () => console.log("handleTradeHistory")
   const handleCopyAddress = () => console.log("handleCopyAddress")
 
-  if (!account) {
+  if (!account || TURN_OFF_APPS) {
     return (
       <button
         onClick={handleSignIn}
