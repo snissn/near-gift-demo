@@ -9,6 +9,8 @@ import InvestorLogo from "@src/app/(home)/InvestorLogo"
 import Vision from "@src/app/(home)/Vision"
 import Evolution from "@src/app/(home)/Evolution"
 import Button from "@src/components/Button/Button"
+import Infrastructure from "@src/app/(home)/Infrastructure"
+import Interested from "@src/app/(home)/Interested"
 
 const TURN_OFF_APPS = process?.env?.turnOffApps === "true" ?? true
 
@@ -17,7 +19,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col flex-1 justify-start item-center">
-      {/*<Banner />*/}
+      <Banner />
       <div className="w-full mx-auto flex flex-col items-center gap-6 pt-10 md:pt-0 z-10 my-[72px] md:mt-[148px] md:mb-[156px]">
         <h1 className="text-3xl md:text-6xl text-center font-bold md:text-nowrap">
           Welcome to Defuse
@@ -34,11 +36,13 @@ export default function Home() {
           Coming soon
         </Button>
       </div>
-      {/*<PaperHome>*/}
-      {/*  <InvestorLogo />*/}
-      {/*  <Vision />*/}
-      {/*  <Evolution />*/}
-      {/*</PaperHome>*/}
+      <PaperHome>
+        <InvestorLogo />
+        <Vision />
+        <Evolution />
+        <Infrastructure />
+        <Interested />
+      </PaperHome>
     </div>
   )
 }

@@ -2,7 +2,7 @@
 
 import React from "react"
 import Image from "next/image"
-import { Text } from "@radix-ui/themes"
+import { Spinner, Text } from "@radix-ui/themes"
 import Link from "next/link"
 
 import { HistoryData } from "@src/stores/historyStore"
@@ -14,13 +14,7 @@ const WidgetCard = ({ hash, logs }: HistoryData) => {
   return (
     <div className="max-w-[260px] flex flex-col m-5 p-3 card-history bg-white rounded-[8px] border overflow-hidden">
       <div className="flex justify-between items-center mb-3">
-        <Image
-          className="animate-spin"
-          src="/static/icons/Spinner.svg"
-          width={28}
-          height={28}
-          alt="Spinner"
-        />
+        <Spinner size="1" />
         <Image
           src="/static/icons/close.svg"
           width={16}
