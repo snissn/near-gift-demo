@@ -6,11 +6,7 @@ import Section from "@src/app/(home)/Section"
 
 const ButtonFAQ = ({ children }: PropsWithChildren) => {
   return (
-    <Button
-      variant="base"
-      size="lg"
-      className="h-[74px] md:h-[76px] w-full flex justify-between items-center bg-gray-950 px-6 md:px-8 py-6 rounded-2xl"
-    >
+    <Button className="h-[74px] md:h-[76px] w-full flex justify-between items-center bg-gray-950 px-6 md:px-8 py-6 rounded-2xl">
       <Text className="leading-6 text-base md:text-xl text-black-400 font-bold">
         {children}
       </Text>

@@ -1,6 +1,4 @@
-import { Text } from "@radix-ui/themes"
-
-import Button from "@src/components/Button/Button"
+import { Button, Text } from "@radix-ui/themes"
 
 const Interested = () => {
   return (
@@ -18,13 +16,17 @@ const Interested = () => {
       </Text>
       <div className="w-full md:max-w-[558px] flex flex-wrap justify-center items-center gap-2.5 md:gap-5 px-[24px] md:px-[51px]">
         <div className="flex-1 md:min-w-[170px] w-full">
-          <Button variant="solid" color="orange" size="lg" fullWidth>
-            <Text size="4">Contact us</Text>
+          <Button variant="solid" color="orange" size="4" className="w-full">
+            <Text size="4" weight="medium">
+              Contact us
+            </Text>
           </Button>
         </div>
         <div className="flex-1 md:min-w-[170px] w-full">
-          <Button variant="secondary" color="orange" size="lg" fullWidth>
-            <Text size="4">Subscribe to updates</Text>
+          <Button color="orange" size="4" variant="outline" className="w-full">
+            <Text size="4" weight="medium" className="text-nowrap">
+              Subscribe to updates
+            </Text>
           </Button>
         </div>
       </div>

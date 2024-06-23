@@ -36,7 +36,7 @@ const CustomButton = <T extends FieldValues>({
       break
     case "base":
       buttonVariantStyle = "solid"
-      buttonColorStyle = ""
+      buttonColorStyle = "gray"
       break
   }
 
