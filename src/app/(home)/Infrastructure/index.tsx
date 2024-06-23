@@ -2,10 +2,23 @@
 
 import { Text } from "@radix-ui/themes"
 import Image from "next/image"
-import { useEffect, useRef, useState } from "react"
+import { PropsWithChildren, useEffect, useRef, useState } from "react"
 
 import Section from "@src/app/(home)/Section"
 import useResize from "@src/hooks/useResize"
+
+const CardTopic = ({ children, id }: { id: number } & PropsWithChildren) => {
+  return (
+    <div className="flex justify-center gap-2.5 md:flex-col">
+      <div className="flex justify-center items-center w-[32px] h-[32px] md:w-[40px] md:h-[40px] rounded-full bg-primary text-white">
+        <Text size="6">{id}</Text>
+      </div>
+      <Text size="5" weight="bold">
+        {children}
+      </Text>
+    </div>
+  )
+}
 
 const Infrastructure = () => {
   const divRef = useRef<HTMLDivElement>(null)
@@ -45,12 +58,7 @@ const Infrastructure = () => {
         <div className="flex flex-col md:flex-row md:flex-wrap gap-5 mb-[96px] md:mb-[128px]">
           <div className="w-full text-center md:text-left md:w-1/3 min-w-[280px] flex-1">
             <div className="flex flex-col gap-3">
-              <div className="flex justify-center items-center w-[40px] h-[40px] rounded-full bg-primary text-white">
-                <Text size="6">1</Text>
-              </div>
-              <Text size="5" weight="bold">
-                User Intent
-              </Text>
+              <CardTopic id={1}>User Intent</CardTopic>
               <Text size="2" weight="medium" className="text-gray-600">
                 Users start by expressing their intent to perform a specific
                 financial operation, such as trading a token or lending assets.
@@ -59,12 +67,7 @@ const Infrastructure = () => {
           </div>
           <div className="w-full text-center md:text-left md:w-1/3 min-w-[280px] flex-1">
             <div className="flex flex-col gap-3">
-              <div className="flex justify-center items-center w-[40px] h-[40px] rounded-full bg-primary text-white">
-                <Text size="6">2</Text>
-              </div>
-              <Text size="5" weight="bold">
-                Solver Participation
-              </Text>
+              <CardTopic id={2}>Solver Participation</CardTopic>
               <Text size="2" weight="medium" className="text-gray-600">
                 Active market participants, known as solvers, monitor these
                 intents and express their willingness to fulfill them. Solvers
@@ -75,12 +78,7 @@ const Infrastructure = () => {
           </div>
           <div className="w-full text-center md:text-left md:w-1/3 min-w-[280px] flex-1">
             <div className="flex flex-col gap-3">
-              <div className="flex justify-center items-center w-[40px] h-[40px] rounded-full bg-primary text-white">
-                <Text size="6">3</Text>
-              </div>
-              <Text size="5" weight="bold">
-                Transaction Fulfillment
-              </Text>
+              <CardTopic id={3}>Transaction Fulfillment</CardTopic>
               <Text size="2" weight="medium" className="text-gray-600">
                 Once a solver matches the user’s intent, the transaction is
                 executed. This may involve additional steps, such as user

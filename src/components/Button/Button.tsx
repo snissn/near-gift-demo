@@ -36,7 +36,7 @@ const CustomButton = <T extends FieldValues>({
       break
     case "base":
       buttonVariantStyle = "solid"
-      buttonColorStyle = "orange"
+      buttonColorStyle = ""
       break
   }
 
@@ -48,7 +48,7 @@ const CustomButton = <T extends FieldValues>({
       buttonTextSizeStyle = "1"
       break
     case "base":
-      buttonSizeStyle = ""
+      buttonSizeStyle = "bg-gray-950"
       buttonTextSizeStyle = "2"
       break
     case "lg":
