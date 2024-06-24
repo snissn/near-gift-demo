@@ -7,6 +7,19 @@ import { CollectorHook } from "@src/hooks/useHistoryCollector"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { getTransactionDetails } from "@src/api/transaction"
 import { HistoryData } from "@src/stores/historyStore"
+import { NetworkToken } from "@src/types/interfaces"
+import {
+  CONFIRM_SWAP_LOCAL_KEY,
+  NEAR_COLLECTOR_KEY,
+} from "@src/constants/contracts"
+import { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
+
+interface HistoryFromLocal {
+  tokenIn?: string
+  tokenOut?: string
+  selectedTokenIn?: NetworkToken
+  selectedTokenOut?: NetworkToken
+}
 
 export const useCreateQueryString = () => {
   const searchParams = useSearchParams()
@@ -55,6 +68,23 @@ export const useQueryCollector = (): CollectorHook => {
     ])
   }
 
+  const getTryToExtractDataFromLocal = (clientId: string): HistoryFromLocal => {
+    const getConfirmSwapFromLocal = localStorage.getItem(CONFIRM_SWAP_LOCAL_KEY)
+    if (!getConfirmSwapFromLocal) return {}
+    const parsedData: { data: ModalConfirmSwapPayload } = JSON.parse(
+      getConfirmSwapFromLocal
+    )
+    if (parsedData.data.clientId !== clientId) {
+      return {}
+    }
+    return {
+      tokenIn: parsedData.data.tokenIn,
+      tokenOut: parsedData.data.tokenOut,
+      selectedTokenIn: parsedData.data.selectedTokenIn,
+      selectedTokenOut: parsedData.data.selectedTokenOut,
+    }
+  }
+
   const getTransactions = useCallback(async (): Promise<HistoryData[]> => {
     try {
       const clientId = searchParams.get(UseQueryCollectorKeys.CLIENT_ID)
@@ -79,6 +109,7 @@ export const useQueryCollector = (): CollectorHook => {
             details: {
               method_name: "",
               logs: data?.result?.receipts_outcome[0].outcome?.logs as string[],
+              ...getTryToExtractDataFromLocal(clientId as string),
             },
           },
         ]

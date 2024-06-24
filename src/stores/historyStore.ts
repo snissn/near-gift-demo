@@ -2,6 +2,8 @@
 
 import { createStore } from "zustand/vanilla"
 
+import { NetworkToken } from "@src/types/interfaces"
+
 export type HistoryData = {
   clientId: string
   hash: string
@@ -9,6 +11,11 @@ export type HistoryData = {
   details?: {
     method_name: string
     logs: string[]
+    tokenIn?: string
+    tokenOut?: string
+    selectedTokenIn?: NetworkToken
+    selectedTokenOut?: NetworkToken
+    isClosed?: false
   }
 }
 

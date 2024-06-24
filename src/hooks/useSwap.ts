@@ -121,7 +121,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
       clientId,
       estimateQueue,
     } = inputs
-
+    debugger
     if (
       estimateQueue!.queueTransactionsTrack.includes(
         QueueTransactions.SWAP_FROM_NATIVE

@@ -20,12 +20,9 @@ import { ModalType } from "@src/stores/modalStore"
 import { sha256 } from "@src/actions/crypto"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { usePublishIntentSolver0 } from "@src/api/hooks/Intent/usePublishIntentSolver0"
-import { useGetTokensBalance } from "@src/hooks/useGetTokensBalance"
-import { useCombinedTokensListAdapter } from "@src/hooks/useTokensListAdapter"
-import { QueueTransactions } from "@src/types/interfaces"
-export interface ModalConfirmSwapPayload extends CallRequestIntentProps {}
+import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
 
-const CONFIRM_SWAP_LOCAL_KEY = "__d_confirm_swap"
+export interface ModalConfirmSwapPayload extends CallRequestIntentProps {}
 
 const ModalConfirmSwap = () => {
   const [transactionQueue, setTransactionQueue] = useState(0)
@@ -39,28 +36,10 @@ const ModalConfirmSwap = () => {
   const router = useRouter()
   const pathname = usePathname()
   const { createQueryString } = useCreateQueryString()
-  const { onCloseModal, modalType, payload } = useModalStore((state) => state)
+  const { onCloseModal, payload } = useModalStore((state) => state)
   const modalPayload = payload as ModalReviewSwapPayload
   const { data: historyData, isFetched } = useHistoryStore((state) => state)
-  const searchParams = useSearchParams()
   const { mutate } = usePublishIntentSolver0()
-  const { data } = useGetTokensBalance([
-    {
-      defuse_asset_id: "near:mainnet:aurora",
-      blockchain: "near",
-      chainId: "mainnet",
-      address: "aurora",
-      chainName: "NEAR",
-      name: "ETH",
-      symbol: "ETH",
-      chainIcon: "/static/icons/network/near.svg",
-      icon: "https://assets.coingecko.com/coins/images/279/standard/ethereum.png",
-      decimals: 18,
-    },
-  ])
-  console.log("data>>>", data)
-  const { data: dataList } = useCombinedTokensListAdapter()
-  console.log("dataList>>>", dataList)
 
   const getSwapFromLocal = (): ModalConfirmSwapPayload | null => {
     const getConfirmSwapFromLocal = localStorage.getItem(CONFIRM_SWAP_LOCAL_KEY)

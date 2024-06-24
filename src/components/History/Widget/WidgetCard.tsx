@@ -12,7 +12,7 @@ const NEAR_EXPLORER = process?.env?.nearExplorer ?? ""
 
 const WidgetCard = ({ hash, details }: HistoryData) => {
   return (
-    <div className="max-w-[260px] flex flex-col m-5 p-3 card-history bg-white rounded-[8px] border overflow-hidden">
+    <div className="max-w-full md:max-w-[260px] min-h-[152px] flex flex-col m-5 p-3 card-history bg-white rounded-[8px] border overflow-hidden">
       <div className="flex justify-between items-center mb-3">
         <Spinner size="1" />
         <Image
