@@ -23,7 +23,7 @@ const WidgetCard = ({ hash, details }: HistoryData) => {
         />
       </div>
       <Text size="1" weight="bold" className="mb-1">
-        {details?.logs.length && details?.logs[0].substring(0, 37)}...
+        {details?.logs?.length && details?.logs[0].substring(0, 37)}...
       </Text>
       <Text size="1" className="mb-3">
         Estimated time left: 2 mins

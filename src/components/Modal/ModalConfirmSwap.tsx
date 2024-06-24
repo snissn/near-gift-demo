@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState, useId } from "react"
+import React, { useEffect, useId, useState } from "react"
 import { Text } from "@radix-ui/themes"
 import Image from "next/image"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
@@ -8,7 +8,11 @@ import { parseUnits } from "viem"
 
 import ModalDialog from "@src/components/Modal/ModalDialog"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
-import { CallRequestIntentProps, useSwap } from "@src/hooks/useSwap"
+import {
+  CallRequestIntentProps,
+  EstimateQueueTransactions,
+  useSwap,
+} from "@src/hooks/useSwap"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { useCreateQueryString } from "@src/hooks/useQuery"
 import { ModalReviewSwapPayload } from "@src/components/Modal/ModalReviewSwap"
@@ -18,7 +22,7 @@ import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { usePublishIntentSolver0 } from "@src/api/hooks/Intent/usePublishIntentSolver0"
 import { useGetTokensBalance } from "@src/hooks/useGetTokensBalance"
 import { useCombinedTokensListAdapter } from "@src/hooks/useTokensListAdapter"
-
+import { QueueTransactions } from "@src/types/interfaces"
 export interface ModalConfirmSwapPayload extends CallRequestIntentProps {}
 
 const CONFIRM_SWAP_LOCAL_KEY = "__d_confirm_swap"
@@ -85,55 +89,46 @@ const ModalConfirmSwap = () => {
     router.replace(pathname + "?" + buildSwapQuery)
   }
 
-  const handleEstimateQueueTransactions = async () => {
-    const queueTransactions = await getEstimateQueueTransactions({
-      tokenIn: modalPayload.tokenIn,
-      tokenOut: modalPayload.tokenOut,
-      selectedTokenIn: modalPayload.selectedTokenIn,
-      selectedTokenOut: modalPayload.selectedTokenOut,
-    })
-    setTransactionQueue(queueTransactions)
+  const handleEstimateQueueTransactions = async (
+    clientId: string
+  ): Promise<EstimateQueueTransactions> => {
+    const { queueInTrack, queueTransactionsTrack } =
+      await getEstimateQueueTransactions({
+        tokenIn: modalPayload.tokenIn,
+        tokenOut: modalPayload.tokenOut,
+        selectedTokenIn: modalPayload.selectedTokenIn,
+        selectedTokenOut: modalPayload.selectedTokenOut,
+        clientId,
+      })
+    setTransactionQueue(queueInTrack)
+    return {
+      queueInTrack,
+      queueTransactionsTrack,
+    }
   }
 
-  const handleValidateNextQueueTransaction = (
+  const handlePublishIntentToSolver = (
     inputs: ModalConfirmSwapPayload
-  ): boolean => {
-    // Stop cycle if the last transaction is caught by clientId in history
-    console.log("handleValidateNextQueueTransaction: ", inputs)
-    if (modalPayload) {
-      return true
-    }
-
+  ): void => {
     historyData.forEach((value, key) => {
       if (key === inputs.clientId) {
-        const isNextQueueDone = value.details?.logs?.includes(
-          "Memo: Execute intent: NEP-141 to NEP-141"
-        )
-        if (isNextQueueDone) {
-          onCloseModal()
-          const params = new URLSearchParams(searchParams.toString())
-          params.delete("modalType")
-          router.replace(pathname + "?" + params)
-          mutate({
-            hash: value.hash,
-            defuseAssetIdIn: inputs.selectedTokenIn.defuse_asset_id,
-            accountId: accountId as string,
-            clientId: key,
-            defuseAssetIdOut: inputs.selectedTokenOut.defuse_asset_id,
-            unitsAmountIn: parseUnits(
-              inputs.tokenIn,
-              inputs.selectedTokenIn?.decimals as number
-            ).toString(),
-            unitsAmountOut: parseUnits(
-              inputs.tokenOut,
-              inputs.selectedTokenOut?.decimals as number
-            ).toString(),
-          })
-          return true
-        }
+        mutate({
+          hash: value.hash,
+          defuseAssetIdIn: inputs.selectedTokenIn.defuse_asset_id,
+          accountId: accountId as string,
+          clientId: inputs.clientId,
+          defuseAssetIdOut: inputs.selectedTokenOut.defuse_asset_id,
+          unitsAmountIn: parseUnits(
+            inputs.tokenIn,
+            inputs.selectedTokenIn?.decimals as number
+          ).toString(),
+          unitsAmountOut: parseUnits(
+            inputs.tokenOut,
+            inputs.selectedTokenOut?.decimals as number
+          ).toString(),
+        })
       }
     })
-    return false
   }
 
   const handleTrackSwap = async () => {
@@ -143,16 +138,30 @@ const ModalConfirmSwap = () => {
       if (data) {
         setDataFromLocal(data)
 
+        // Update estimateQueue
+        const updateEstimateQueue = data.estimateQueue
+        updateEstimateQueue &&
+          updateEstimateQueue?.queueTransactionsTrack?.length &&
+          data.estimateQueue!.queueTransactionsTrack.shift()
+        updateEstimateQueue &&
+          updateEstimateQueue?.queueInTrack > 0 &&
+          data.estimateQueue!.queueInTrack--
+
         const inputs = {
           tokenIn: data!.tokenIn,
           tokenOut: data!.tokenOut,
           selectedTokenIn: data!.selectedTokenIn,
           selectedTokenOut: data!.selectedTokenOut,
           clientId: data.clientId,
+          estimateQueue: updateEstimateQueue,
         }
 
-        const isNextQueueExist = handleValidateNextQueueTransaction(inputs)
-        if (!isNextQueueExist) return
+        if (!updateEstimateQueue?.queueTransactionsTrack?.length) {
+          onCloseModal()
+          router.replace(pathname)
+          handlePublishIntentToSolver(inputs)
+          return
+        }
 
         setSwapToLocal(inputs)
         handleBatchCreateSwapQuery({
@@ -164,7 +173,7 @@ const ModalConfirmSwap = () => {
     }
 
     const newClientId = await sha256(clientId as string)
-    await handleEstimateQueueTransactions()
+    const estimateQueue = await handleEstimateQueueTransactions(newClientId)
 
     const inputs = {
       tokenIn: modalPayload.tokenIn,
@@ -172,10 +181,8 @@ const ModalConfirmSwap = () => {
       selectedTokenIn: modalPayload.selectedTokenIn,
       selectedTokenOut: modalPayload.selectedTokenOut,
       clientId: newClientId,
+      estimateQueue,
     }
-
-    const isNextQueueExist = handleValidateNextQueueTransaction(inputs)
-    if (!isNextQueueExist) return
 
     setSwapToLocal(inputs)
     handleBatchCreateSwapQuery({
