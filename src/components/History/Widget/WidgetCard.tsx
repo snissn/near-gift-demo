@@ -10,7 +10,7 @@ import Button from "@src/components/Button/Button"
 
 const NEAR_EXPLORER = process?.env?.nearExplorer ?? ""
 
-const WidgetCard = ({ hash, logs }: HistoryData) => {
+const WidgetCard = ({ hash, details }: HistoryData) => {
   return (
     <div className="max-w-[260px] flex flex-col m-5 p-3 card-history bg-white rounded-[8px] border overflow-hidden">
       <div className="flex justify-between items-center mb-3">
@@ -23,7 +23,7 @@ const WidgetCard = ({ hash, logs }: HistoryData) => {
         />
       </div>
       <Text size="1" weight="bold" className="mb-1">
-        {logs.length && logs[0].substring(0, 37)}...
+        {details?.logs.length && details?.logs[0].substring(0, 37)}...
       </Text>
       <Text size="1" className="mb-3">
         Estimated time left: 2 mins

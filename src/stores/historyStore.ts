@@ -3,12 +3,12 @@
 import { createStore } from "zustand/vanilla"
 
 export type HistoryData = {
-  defuseClientId: string
-  status: string
+  clientId: string
   hash: string
-  logs: string[]
+  timestamp: number
   details?: {
-    failure?: string
+    method_name: string
+    logs: string[]
   }
 }
 
@@ -47,7 +47,7 @@ export const createHistoryStore = (
     updateHistory: (data: HistoryData[]) =>
       set((state) => {
         const updatedData = new Map(state.data)
-        data.forEach((item) => updatedData.set(item.defuseClientId, item))
+        data.forEach((item) => updatedData.set(item.clientId, item))
         return { data: updatedData, isFetched: true }
       }),
   }))

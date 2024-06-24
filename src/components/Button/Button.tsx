@@ -1,7 +1,7 @@
 import { ReactNode, ButtonHTMLAttributes } from "react"
 import { FieldValues, UseFormRegister } from "react-hook-form"
 import clsx from "clsx"
-import { Button, Text, ButtonProps, TextProps } from "@radix-ui/themes"
+import { Button, Text, ButtonProps, TextProps, Spinner } from "@radix-ui/themes"
 
 interface Props<T extends FieldValues>
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "color"> {
@@ -18,7 +18,7 @@ const CustomButton = <T extends FieldValues>({
   size = "base",
   fullWidth,
   disabled,
-  isLoading,
+  isLoading = false,
   ...rest
 }: Props<T>) => {
   const buttonBaseStyle = "cursor-pointer whitespace-nowrap"
@@ -72,7 +72,10 @@ const CustomButton = <T extends FieldValues>({
       disabled={disabled || isLoading}
       {...rest}
     >
-      <Text size={buttonTextSizeStyle}>{children}</Text>
+      <div className="flex justify-center items-center gap-2">
+        <Spinner loading={isLoading as boolean} />
+        <Text size={buttonTextSizeStyle}>{children}</Text>
+      </div>
     </Button>
   )
 }

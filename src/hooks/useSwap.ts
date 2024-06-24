@@ -13,7 +13,7 @@ import { NetworkToken } from "@src/types/interfaces"
 import { swapSchema } from "@src/utils/schema"
 import useStorageDeposit from "@src/hooks/useStorageDeposit"
 import useNearSwapNearToWNear from "@src/hooks/useSwapNearToWNear"
-import { LIST_NATIVE_TOKENS, SUPPORTED_TOKENS } from "@src/constants/tokens"
+import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
 
 type Props = {
   accountId: string | null
@@ -24,7 +24,7 @@ export type CallRequestIntentProps = {
   tokenOut: string
   selectedTokenIn: NetworkToken
   selectedTokenOut: NetworkToken
-  defuseClientId?: string
+  clientId?: string
 }
 
 export const useSwap = ({ accountId, selector }: Props) => {
@@ -46,8 +46,8 @@ export const useSwap = ({ accountId, selector }: Props) => {
       console.log("Non valid contract address")
       return
     }
-    if (inputs?.defuseClientId) {
-      console.log("Non valid defuseClientId")
+    if (inputs?.clientId) {
+      console.log("Non valid clientId")
       return
     }
   }
@@ -66,12 +66,13 @@ export const useSwap = ({ accountId, selector }: Props) => {
       queue++
     }
 
+    // Estimate if user did storage before in order to transfer tokens for swap
     const balance = await getStorageBalance(
-      selectedTokenIn!.address as string,
-      CONTRACTS_REGISTER.INTENT
+      selectedTokenOut!.address as string,
+      accountId as string
     )
     console.log("useSwap getEstimateQueueTransactions: ", balance)
-    if (selectedTokenIn?.address && !Number(balance?.toString() || "0")) {
+    if (!Number(balance?.toString() || "0")) {
       queue++
     }
     return queue
@@ -79,27 +80,21 @@ export const useSwap = ({ accountId, selector }: Props) => {
 
   const callRequestCreateIntent = async (inputs: CallRequestIntentProps) => {
     validateInputs(inputs)
-    const {
-      tokenIn,
-      tokenOut,
-      selectedTokenIn,
-      selectedTokenOut,
-      defuseClientId,
-    } = inputs
+    const { tokenIn, tokenOut, selectedTokenIn, selectedTokenOut, clientId } =
+      inputs
 
     const balance = await getStorageBalance(
-      selectedTokenIn!.address as string,
-      CONTRACTS_REGISTER.INTENT
+      selectedTokenOut!.address as string,
+      accountId as string
     )
-
-    if (selectedTokenIn?.address && !Number(balance?.toString() || "0")) {
+    if (selectedTokenOut?.address && !Number(balance?.toString() || "0")) {
       await setStorageDeposit(
-        selectedTokenIn!.address as string,
-        CONTRACTS_REGISTER.INTENT
+        selectedTokenOut!.address as string,
+        accountId as string
       )
     }
 
-    const intent_account_id = await sha256(defuseClientId as string)
+    const intent_account_id = await sha256(clientId as string)
 
     const unitsSendAmount = parseUnits(
       tokenIn,

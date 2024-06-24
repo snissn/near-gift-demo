@@ -16,6 +16,8 @@ import { ModalType } from "@src/stores/modalStore"
 import { sha256 } from "@src/actions/crypto"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { usePublishIntentSolver0 } from "@src/api/hooks/Intent/usePublishIntentSolver0"
+import { useGetTokensBalance } from "@src/hooks/useGetTokensBalance"
+import { useCombinedTokensListAdapter } from "@src/hooks/useTokensListAdapter"
 
 export interface ModalConfirmSwapPayload extends CallRequestIntentProps {}
 
@@ -38,6 +40,23 @@ const ModalConfirmSwap = () => {
   const { data: historyData, isFetched } = useHistoryStore((state) => state)
   const searchParams = useSearchParams()
   const { mutate } = usePublishIntentSolver0()
+  const { data } = useGetTokensBalance([
+    {
+      defuse_asset_id: "near:mainnet:aurora",
+      blockchain: "near",
+      chainId: "mainnet",
+      address: "aurora",
+      chainName: "NEAR",
+      name: "ETH",
+      symbol: "ETH",
+      chainIcon: "/static/icons/network/near.svg",
+      icon: "https://assets.coingecko.com/coins/images/279/standard/ethereum.png",
+      decimals: 18,
+    },
+  ])
+  console.log("data>>>", data)
+  const { data: dataList } = useCombinedTokensListAdapter()
+  console.log("dataList>>>", dataList)
 
   const getSwapFromLocal = (): ModalConfirmSwapPayload | null => {
     const getConfirmSwapFromLocal = localStorage.getItem(CONFIRM_SWAP_LOCAL_KEY)
@@ -56,14 +75,10 @@ const ModalConfirmSwap = () => {
     )
   }
 
-  const handleBatchCreateSwapQuery = ({
-    defuseClientId,
-  }: {
-    defuseClientId: string
-  }) => {
+  const handleBatchCreateSwapQuery = ({ clientId }: { clientId: string }) => {
     const buildSwapQuery = [
       ["modalType", ModalType.MODAL_CONFIRM_SWAP],
-      ["defuseClientId", defuseClientId],
+      ["clientId", clientId],
     ]
       .map(([key, value]) => createQueryString(key, value))
       .join("&")
@@ -83,16 +98,15 @@ const ModalConfirmSwap = () => {
   const handleValidateNextQueueTransaction = (
     inputs: ModalConfirmSwapPayload
   ): boolean => {
-    // Stop cycle if the last transaction is caught by defuseClientId in history
+    // Stop cycle if the last transaction is caught by clientId in history
     console.log("handleValidateNextQueueTransaction: ", inputs)
     if (modalPayload) {
       return true
     }
 
     historyData.forEach((value, key) => {
-      debugger
-      if (key === inputs.defuseClientId) {
-        const isNextQueueDone = value.logs.includes(
+      if (key === inputs.clientId) {
+        const isNextQueueDone = value.details?.logs?.includes(
           "Memo: Execute intent: NEP-141 to NEP-141"
         )
         if (isNextQueueDone) {
@@ -104,7 +118,7 @@ const ModalConfirmSwap = () => {
             hash: value.hash,
             defuseAssetIdIn: inputs.selectedTokenIn.defuse_asset_id,
             accountId: accountId as string,
-            defuseClientId: key,
+            clientId: key,
             defuseAssetIdOut: inputs.selectedTokenOut.defuse_asset_id,
             unitsAmountIn: parseUnits(
               inputs.tokenIn,
@@ -134,7 +148,7 @@ const ModalConfirmSwap = () => {
           tokenOut: data!.tokenOut,
           selectedTokenIn: data!.selectedTokenIn,
           selectedTokenOut: data!.selectedTokenOut,
-          defuseClientId: data.defuseClientId,
+          clientId: data.clientId,
         }
 
         const isNextQueueExist = handleValidateNextQueueTransaction(inputs)
@@ -142,14 +156,14 @@ const ModalConfirmSwap = () => {
 
         setSwapToLocal(inputs)
         handleBatchCreateSwapQuery({
-          defuseClientId: data.defuseClientId as string,
+          clientId: data.clientId as string,
         })
         await callRequestCreateIntent(inputs)
       }
       return
     }
 
-    const newDefuseClientId = await sha256(clientId as string)
+    const newClientId = await sha256(clientId as string)
     await handleEstimateQueueTransactions()
 
     const inputs = {
@@ -157,7 +171,7 @@ const ModalConfirmSwap = () => {
       tokenOut: modalPayload.tokenOut,
       selectedTokenIn: modalPayload.selectedTokenIn,
       selectedTokenOut: modalPayload.selectedTokenOut,
-      defuseClientId: newDefuseClientId,
+      clientId: newClientId,
     }
 
     const isNextQueueExist = handleValidateNextQueueTransaction(inputs)
@@ -165,7 +179,7 @@ const ModalConfirmSwap = () => {
 
     setSwapToLocal(inputs)
     handleBatchCreateSwapQuery({
-      defuseClientId: newDefuseClientId,
+      clientId: newClientId,
     })
     await callRequestCreateIntent(inputs)
   }
