@@ -176,7 +176,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
       accountId as string
     )) as Result<NearTX>
     const { isFailure } = await getTransactionScan(result)
-    debugger
+
     if (isFailure) {
       return {
         value: estimateQueue,
