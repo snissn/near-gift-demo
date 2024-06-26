@@ -241,7 +241,6 @@ export default function Swap() {
           balance={selectTokenIn?.balance as string}
           selected={selectTokenIn as NetworkToken}
           handleSelect={() => handleSelect("tokenIn")}
-          handleSetMax={handleSetMax}
           className="border rounded-t-xl md:max-w-[472px]"
           required
         />
