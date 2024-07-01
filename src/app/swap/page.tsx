@@ -2,8 +2,9 @@
 
 import React, { useEffect, useRef, useState } from "react"
 import { FieldValues, useForm } from "react-hook-form"
-import { parseUnits } from "viem"
+import { formatUnits, parseUnits } from "viem"
 import { CheckedState } from "@radix-ui/react-checkbox"
+import { BigNumber } from "ethers"
 
 import Paper from "@src/components/Paper"
 import Form from "@src/components/Form"
@@ -19,6 +20,7 @@ import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
 import { DataEstimateRequest } from "@src/libs/de-sdk/types/interfaces"
 import { debounce } from "@src/utils/debounce"
 import { useModalSearchParams } from "@src/hooks/useModalSearchParams"
+import { useAccountBalance } from "@src/hooks/useAccountBalance"
 
 type FormValues = {
   tokenIn: string
@@ -41,6 +43,8 @@ export default function Swap() {
   const [withNativeSupport, setWithNativeSupport] = useState<boolean>(false)
   const [nativeSupportChecked, setNativeSupportChecked] =
     useState<CheckedState>(false)
+  const { getAccountBalance } = useAccountBalance()
+  const [nativeBalance, setNativeBalance] = useState("0")
 
   const {
     handleSubmit,
@@ -169,8 +173,17 @@ export default function Swap() {
         nativeToken.routes?.includes(selectTokenIn?.defuse_asset_id as string)
       )
       if (!getNativeTokenToSwap) {
+        setNativeBalance("0")
         return setWithNativeSupport(false)
       }
+      ;(async () => {
+        const { balance } = await getAccountBalance()
+        const formattedAmountOut = formatUnits(
+          BigInt(balance),
+          selectTokenIn.decimals as number
+        )
+        setNativeBalance(formattedAmountOut)
+      })()
       setWithNativeSupport(true)
     }
   }, [selectTokenIn?.defuse_asset_id])
@@ -255,7 +268,13 @@ export default function Swap() {
         <FieldComboInput<FormValues>
           fieldName="tokenIn"
           price={selectTokenIn?.balanceToUds as string}
-          balance={selectTokenIn?.balance as string}
+          balance={
+            nativeSupportChecked
+              ? (
+                  Number(selectTokenIn?.balance) + Number(nativeBalance)
+                ).toString()
+              : (selectTokenIn?.balance as string)
+          }
           selected={selectTokenIn as NetworkToken}
           handleSelect={() => handleSelect("tokenIn")}
           className="border rounded-t-xl md:max-w-[472px]"
