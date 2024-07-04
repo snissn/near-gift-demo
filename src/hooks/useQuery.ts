@@ -5,8 +5,28 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 import { CollectorHook } from "@src/hooks/useHistoryCollector"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import { getTransactionDetails } from "@src/api/transaction"
+import {
+  getNearBlockById,
+  getNearTransactionDetails,
+} from "@src/api/transaction"
 import { HistoryData } from "@src/stores/historyStore"
+import { NearBlock, NearTX, NetworkToken, Result } from "@src/types/interfaces"
+import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
+import { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
+
+interface HistoryFromLocal {
+  tokenIn?: string
+  tokenOut?: string
+  selectedTokenIn?: NetworkToken
+  selectedTokenOut?: NetworkToken
+}
+
+export enum UseQueryCollectorKeys {
+  CLIENT_ID = "clientId",
+  TRANSACTION_HASHS = "transactionHashes",
+  ERROR_MESSAGE = "errorMessage",
+  ERROR_CODE = "errorCode",
+}
 
 export const useCreateQueryString = () => {
   const searchParams = useSearchParams()
@@ -26,13 +46,6 @@ export const useCreateQueryString = () => {
   }
 }
 
-enum UseQueryCollectorKeys {
-  DEFUSE_CLIENT_ID = "defuseClientId",
-  TRANSACTION_HASHS = "transactionHashes",
-  ERROR_MESSAGE = "errorMessage",
-  ERROR_CODE = "errorCode",
-}
-
 // This hook collects transactions based on query parameters from the URL
 export const useQueryCollector = (): CollectorHook => {
   const router = useRouter()
@@ -46,11 +59,35 @@ export const useQueryCollector = (): CollectorHook => {
     router.replace(pathname + "?" + params)
   }
 
+  const handleCleanupQuery = () => {
+    cleanupQuery([
+      UseQueryCollectorKeys.CLIENT_ID,
+      UseQueryCollectorKeys.TRANSACTION_HASHS,
+      UseQueryCollectorKeys.ERROR_MESSAGE,
+      UseQueryCollectorKeys.ERROR_CODE,
+    ])
+  }
+
+  const getTryToExtractDataFromLocal = (clientId: string): HistoryFromLocal => {
+    const getConfirmSwapFromLocal = localStorage.getItem(CONFIRM_SWAP_LOCAL_KEY)
+    if (!getConfirmSwapFromLocal) return {}
+    const parsedData: { data: ModalConfirmSwapPayload } = JSON.parse(
+      getConfirmSwapFromLocal
+    )
+    if (parsedData.data.clientId !== clientId) {
+      return {}
+    }
+    return {
+      tokenIn: parsedData.data.tokenIn,
+      tokenOut: parsedData.data.tokenOut,
+      selectedTokenIn: parsedData.data.selectedTokenIn,
+      selectedTokenOut: parsedData.data.selectedTokenOut,
+    }
+  }
+
   const getTransactions = useCallback(async (): Promise<HistoryData[]> => {
     try {
-      const defuseClientId = searchParams.get(
-        UseQueryCollectorKeys.DEFUSE_CLIENT_ID
-      )
+      const clientId = searchParams.get(UseQueryCollectorKeys.CLIENT_ID)
       const transactionHashes = searchParams.get(
         UseQueryCollectorKeys.TRANSACTION_HASHS
       )
@@ -58,26 +95,30 @@ export const useQueryCollector = (): CollectorHook => {
       const errorCode = searchParams.get(UseQueryCollectorKeys.ERROR_CODE)
 
       if (transactionHashes) {
-        const data = await getTransactionDetails(
+        const { result } = (await getNearTransactionDetails(
           transactionHashes as string,
           accountId as string
-        )
-        cleanupQuery([
-          UseQueryCollectorKeys.DEFUSE_CLIENT_ID,
-          UseQueryCollectorKeys.TRANSACTION_HASHS,
-          UseQueryCollectorKeys.ERROR_MESSAGE,
-          UseQueryCollectorKeys.ERROR_CODE,
-        ])
+        )) as Result<NearTX>
+
+        let getNearBlockData = 0
+        if (result.receipts_outcome.length) {
+          const { result: resultBlock } = (await getNearBlockById(
+            result.receipts_outcome[0].block_hash
+          )) as NearBlock
+          getNearBlockData = resultBlock.header.timestamp
+        }
+
+        handleCleanupQuery()
+
         return [
           {
-            defuseClientId: defuseClientId as string,
-            status: data?.result?.final_execution_status as string,
-            hash: transactionHashes,
-            logs: data?.result?.receipts_outcome[0].outcome?.logs as string[],
+            clientId: clientId as string,
+            hash: transactionHashes as string,
+            timestamp: getNearBlockData ?? 0,
             details: {
-              failure:
-                data?.result?.receipts_outcome[1].outcome?.status?.Failure
-                  ?.ActionError?.kind?.FunctionCallError?.ExecutionError,
+              receipts_outcome: result?.receipts_outcome,
+              transaction: result?.transaction,
+              ...getTryToExtractDataFromLocal(clientId as string),
             },
           },
         ]
@@ -91,7 +132,8 @@ export const useQueryCollector = (): CollectorHook => {
       //     logs: [],
       //   }
       // }
-      cleanupQuery(["transactionHashes", "errorMessage", "errorCode"])
+
+      handleCleanupQuery()
       return []
     } catch (e) {
       console.log("useQueryCollector: ", e)

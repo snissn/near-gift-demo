@@ -4,6 +4,7 @@ import React, { PropsWithChildren } from "react"
 import { usePathname } from "next/navigation"
 
 import { withHistory } from "@src/hocs/withHistory"
+import { withTokensBalance } from "@src/hocs/withTokensBalance"
 import Header from "@src/components/Layout/Header"
 import Footer from "@src/components/Layout/Footer"
 import PageBackground from "@src/components/PageBackground"
@@ -18,7 +19,7 @@ const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   // PREFETCH: Prefetch action could be done similarly to the prefetch action
   //           in _app.ts within the pages Router.
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen dark:bg-black-400">
       <Header />
       <main className="flex md:flex-1">{children}</main>
       <Footer />
@@ -29,4 +30,4 @@ const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   )
 }
 
-export default withHistory(Layout)
+export default withTokensBalance(withHistory(Layout))

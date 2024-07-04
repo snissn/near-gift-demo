@@ -2,69 +2,6 @@ import { NetworkToken, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 
 const environment = process.env.environment || "production"
 
-enum TOKENS_MAINNET {
-  NEAR = "",
-  wNEAR = "wrap",
-  AURORA = "aurora.mainnet",
-  REF = "ref.mainnet",
-  USDt = "usdtt.mainnet",
-}
-
-enum TOKENS_TESTNET {
-  NEAR = "",
-  wNEAR = "wrap.testnet",
-  AURORA = "aurora.fakes.testnet",
-  REF = "ref.fakes.testnet",
-  USDt = "usdtt.fakes.testnet",
-}
-
-export const SUPPORTED_TOKENS: typeof TOKENS_MAINNET | typeof TOKENS_TESTNET =
-  environment === "development" ? TOKENS_TESTNET : TOKENS_MAINNET
-
-export type TokenEnum = typeof TOKENS_MAINNET | typeof TOKENS_TESTNET
-
-export type TOKEN = {
-  decimals: number
-  symbol: string
-  contract: TokenEnum
-}
-
-export type Token = {
-  [key in keyof TokenEnum]: {
-    decimals: number
-    symbol: string
-    contract: TokenEnum[key]
-  }
-}
-
-export const TOKENS: Token = {
-  NEAR: {
-    decimals: 24,
-    symbol: "NEAR",
-    contract: SUPPORTED_TOKENS.NEAR,
-  },
-  wNEAR: {
-    decimals: 24,
-    symbol: "wNEAR",
-    contract: SUPPORTED_TOKENS.wNEAR,
-  },
-  AURORA: {
-    decimals: 18,
-    symbol: "AURORA",
-    contract: SUPPORTED_TOKENS.AURORA,
-  },
-  REF: {
-    decimals: 18,
-    symbol: "REF",
-    contract: SUPPORTED_TOKENS.REF,
-  },
-  USDt: {
-    decimals: 6,
-    symbol: "USDt",
-    contract: SUPPORTED_TOKENS.USDt,
-  },
-}
-
 const listNetworksTokensTestnet = [
   {
     defuse_asset_id: "near:testnet:wrap.testnet",
@@ -187,7 +124,7 @@ const listNetworksTokensMainnet = [
     name: "Wrapped NEAR fungible token",
     symbol: "wNEAR",
     chainIcon: "/static/icons/network/near.svg",
-    icon: "https://assets.coingecko.com/coins/images/18280/standard/EX4mrWMW_400x400.jpg?1696517773",
+    icon: "https://assets.coingecko.com/coins/images/10365/standard/near.jpg",
     decimals: 24,
   },
   {
@@ -271,7 +208,7 @@ const listNativeTokensTestnet = [
     chainIcon: "/static/icons/network/near.svg",
     icon: "https://assets.coingecko.com/coins/images/10365/standard/near.jpg?1696510367",
     decimals: 24,
-    swapRoute: "wrap.testnet",
+    routes: ["wrap.testnet"],
   },
 ]
 const listNativeTokensMainnet = [
@@ -286,7 +223,7 @@ const listNativeTokensMainnet = [
     chainIcon: "/static/icons/network/near.svg",
     icon: "https://assets.coingecko.com/coins/images/10365/standard/near.jpg?1696510367",
     decimals: 24,
-    swapRoute: "wrap.near",
+    routes: ["near:mainnet:wrap.near"],
   },
 ]
 

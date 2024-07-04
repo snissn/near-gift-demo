@@ -3,7 +3,9 @@ import { CodeResult } from "near-api-js/lib/providers/provider"
 import { setNearProvider, getNearProvider } from "@near-eth/client"
 import { BigNumber } from "ethers"
 
-const NEAR_NODE_URL = process.env.nearNodeUrl || "https://rpc.testnet.near.org"
+const NEAR_NODE_URL =
+  (process?.env?.nearNodeAuroraRpc || process.env.nearNodeUrl) ??
+  "https://rpc.testnet.near.org"
 
 export async function storageBalance(contractId: string, accountId: string) {
   try {
@@ -69,6 +71,32 @@ export async function nep141Balance(
     return JSON.parse(Buffer.from(storageBalance.result).toString())
   } catch (e) {
     console.error("Failed to check storage balance")
+    return null
+  }
+}
+
+export async function intentStatus(
+  contractId: string,
+  intentId: string
+): Promise<string | null> {
+  try {
+    setNearProvider(new providers.JsonRpcProvider({ url: NEAR_NODE_URL }))
+
+    const nearProvider = getNearProvider()
+    const result = await nearProvider.query<CodeResult>({
+      request_type: "call_function",
+      account_id: contractId,
+      method_name: "get_intent",
+      args_base64: Buffer.from(JSON.stringify({ id: intentId })).toString(
+        "base64"
+      ),
+      finality: "optimistic",
+    })
+    console.log(`get_intent ${contractId} for ${intentId} status is ${result}`)
+    const intent = JSON.parse(Buffer.from(result.result).toString())
+    return intent
+  } catch (e) {
+    console.error("Failed to get intent status")
     return null
   }
 }

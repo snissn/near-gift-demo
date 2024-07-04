@@ -1,9 +1,10 @@
 import axios from "axios"
 import { v4 } from "uuid"
 
-const NEAR_NODE_URL = process?.env?.nearNodeUrl ?? ""
+const NEAR_NODE_URL =
+  (process?.env?.nearNodeAuroraRpc || process?.env?.nearNodeUrl) ?? ""
 
-export const getTransactionDetails = (
+export const getNearTransactionDetails = (
   transactionHash: string,
   accountId: string
 ) =>
@@ -16,6 +17,30 @@ export const getTransactionDetails = (
         tx_hash: transactionHash,
         sender_account_id: accountId,
         wait_until: "EXECUTED",
+      },
+    })
+    .then((resp) => resp.data)
+
+export const getNearFinalBlock = () =>
+  axios
+    .post(NEAR_NODE_URL, {
+      id: v4(),
+      jsonrpc: "2.0",
+      method: "block",
+      params: {
+        finality: "final",
+      },
+    })
+    .then((resp) => resp.data)
+
+export const getNearBlockById = (block_hash?: string) =>
+  axios
+    .post(NEAR_NODE_URL, {
+      id: v4(),
+      jsonrpc: "2.0",
+      method: "block",
+      params: {
+        block_id: block_hash,
       },
     })
     .then((resp) => resp.data)

@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 import { useQueryCollector } from "@src/hooks/useQuery"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
-import { HistoryData } from "@src/stores/historyStore"
-
-const NEAR_COLLECTOR_KEY = "__d_history_collector"
+import { HistoryData, HistoryStatus } from "@src/stores/historyStore"
+import { NEAR_COLLECTOR_KEY } from "@src/constants/contracts"
+import { useHistoryLatest } from "@src/hooks/useHistoryLatest"
 
 export interface CollectorHook {
   getTransactions: () => Promise<HistoryData[]>
@@ -18,18 +18,7 @@ export const useHistoryCollector = (collectorHooks: CollectorHook[]) => {
   const [isFetching, setIsFetching] = useState(false)
   const [isError, setIsError] = useState(false)
   const { data, updateHistory } = useHistoryStore((state) => state)
-
-  useEffect(() => {
-    if (!data.size) {
-      return
-    }
-    const getHistoryFromStore: HistoryData[] = []
-    data.forEach((value) => getHistoryFromStore.push(value))
-    localStorage.setItem(
-      NEAR_COLLECTOR_KEY,
-      JSON.stringify({ data: getHistoryFromStore })
-    )
-  }, [data])
+  const { runHistoryUpdate } = useHistoryLatest()
 
   const runTransactionCollector = async () => {
     try {
@@ -56,6 +45,15 @@ export const useHistoryCollector = (collectorHooks: CollectorHook[]) => {
       const history = [...getHistoryFromStore, ...getTransactionHistories]
       console.log("Data before store to the history: ", history)
       updateHistory(history)
+
+      const isHistoryNotComplete = history.some(
+        (history) =>
+          !history!.errorMessage?.length &&
+          history.status !== HistoryStatus.COMPLETED &&
+          history.status !== HistoryStatus.ROLLED_BACK &&
+          history.status !== HistoryStatus.EXPIRED
+      )
+      if (isHistoryNotComplete) runHistoryUpdate(history)
 
       setIsFetching(false)
     } catch (e) {
