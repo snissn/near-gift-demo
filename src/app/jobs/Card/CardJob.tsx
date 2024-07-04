@@ -18,11 +18,7 @@ const CardJob = ({ team, position, link, applicationLink }: JobsDetails) => {
       )}
     >
       <div className="w-full h-[24px] flex justify-end">
-        <span
-          href={link}
-          target="_blank"
-          className="lg:translate-y-0 lg:top-5 right-5"
-        >
+        <span className="lg:translate-y-0 lg:top-5 right-5">
           <Image
             src="/static/icons/arrow-top-right.svg"
             width={16}
