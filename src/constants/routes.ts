@@ -4,16 +4,18 @@ export enum Navigation {
   DEPOSIT = "/deposit",
   WITHDRAW = "/withdraw",
   WALLET = "/wallet",
+  JOBS = "/jobs",
 }
 
 export type NavigationLinks = {
   action?: () => void
   href?: Navigation
   label: string
+  comingSoon?: true
 }
 
 export const LINKS_HEADER: NavigationLinks[] = [
   { href: Navigation.SWAP, label: "Swap" },
-  { href: Navigation.DEPOSIT, label: "Deposit" },
-  { href: Navigation.WITHDRAW, label: "Withdraw" },
+  { href: Navigation.DEPOSIT, label: "Deposit", comingSoon: true },
+  { href: Navigation.WITHDRAW, label: "Withdraw", comingSoon: true },
 ]

@@ -2,23 +2,67 @@
 
 import { createStore } from "zustand/vanilla"
 
+import { NearTX, NetworkToken, RecoverDetails } from "@src/types/interfaces"
+import { NEAR_COLLECTOR_KEY } from "@src/constants/contracts"
+
+export enum HistoryStatus {
+  AVAILABLE = "Available",
+  PROCESSING = "Processing",
+  COMPLETED = "Completed",
+  ROLLED_BACK = "RolledBack",
+  EXPIRED = "Expired",
+  FAILED = "Failed", // Internal status
+}
+
+export type HistoryData = {
+  clientId: string
+  hash: string
+  timestamp: number
+  status?: HistoryStatus
+  errorMessage?: string
+  isClosed?: boolean
+  details?: {
+    tokenIn?: string
+    tokenOut?: string
+    selectedTokenIn?: NetworkToken
+    selectedTokenOut?: NetworkToken
+    recoverDetails?: RecoverDetails
+  } & Partial<NearTX>
+}
+
 export type HistoryState = {
   active: boolean
+  data: Map<string, HistoryData>
+  isFetched: boolean
 }
 
 export type HistoryActions = {
   openWidget: () => void
   closeWidget: () => void
   toggleWidget: () => void
+  updateHistory: (data: HistoryData[]) => void
+  closeHistoryItem: (hash: HistoryData["hash"]) => void
 }
 
 export type HistoryStore = HistoryState & HistoryActions
 
 export const initHistoryStore = (): HistoryState => {
-  return { active: false }
+  return { active: false, data: new Map(), isFetched: false }
 }
+
 export const defaultInitState: HistoryState = {
   active: false,
+  data: new Map(),
+  isFetched: false,
+}
+
+const helperHistoryLocalStore = (data: HistoryState["data"]): void => {
+  const getHistoryFromStore: HistoryData[] = []
+  data.forEach((value) => getHistoryFromStore.push(value))
+  localStorage.setItem(
+    NEAR_COLLECTOR_KEY,
+    JSON.stringify({ data: getHistoryFromStore })
+  )
 }
 
 export const createHistoryStore = (
@@ -29,5 +73,23 @@ export const createHistoryStore = (
     openWidget: () => set({ active: true }),
     closeWidget: () => set({ active: false }),
     toggleWidget: () => set((state) => ({ active: !state.active })),
+    updateHistory: (data: HistoryData[]) =>
+      set((state) => {
+        const updatedData = new Map(state.data)
+        data.forEach((item) => updatedData.set(item.hash, item))
+        helperHistoryLocalStore(updatedData as HistoryState["data"])
+        return { data: updatedData, isFetched: true }
+      }),
+    closeHistoryItem: (hash: HistoryData["hash"]) =>
+      set((state) => {
+        const currentData = state.data
+        const getItem = currentData.get(hash)
+        currentData.set(hash, {
+          ...getItem,
+          isClosed: true,
+        } as HistoryData)
+        helperHistoryLocalStore(currentData)
+        return { data: currentData }
+      }),
   }))
 }

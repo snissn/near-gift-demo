@@ -1,0 +1,13 @@
+export interface Token {
+  defuse_asset_id: string
+  decimals: number
+  asset_name: string
+  metadata_link: string
+  routes_to: string[]
+}
+
+export interface Result<T> {
+  result: T
+}
+
+export type SupportedTokens = Result<{ tokens: Token[] }>

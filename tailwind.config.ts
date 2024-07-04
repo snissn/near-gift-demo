@@ -45,10 +45,12 @@ const config: Config = {
       colors: {
         white: {
           DEFAULT: "rgba(253, 253, 252, 1)",
+          900: "rgba(226, 225, 222, 1)",
           200: "rgba(32, 16, 0, 0.06)",
         },
         black: {
           DEFAULT: "#041417",
+          700: "rgba(24, 25, 26, 1)",
           600: "rgba(22, 22, 21, 1)",
           500: "rgba(28, 32, 36, 1)",
           400: "rgba(33, 32, 28, 1)",
@@ -82,8 +84,13 @@ const config: Config = {
           400: "rgba(204, 78, 0, 0.77)",
           100: "rgba(255, 156, 0, 0.16)",
         },
+        green: {
+          100: "rgba(0, 164, 51, 0.1)",
+          DEFAULT: "rgba(0, 113, 63, 0.87)",
+        },
         primary: {
           DEFAULT: "rgba(247, 107, 21, 1)",
+          100: "rgba(239, 95, 0, 1)",
         },
         secondary: "rgba(128, 128, 128, 1)",
       },
@@ -97,6 +104,8 @@ const config: Config = {
         "home-paper": "0px -28px 40px 0px rgba(0, 0, 0, 0.08)",
         "card-multi":
           "0px 12px 32px -16px rgba(31, 24, 0, 0.13), 0px 12px 60px 0px rgba(0, 0, 0, 0.15)",
+        "card-history":
+          "0px 16px 36px -20px rgba(25, 20, 0, 0.21), 0px 16px 64px 0px rgba(37, 37, 0, 0.03), 0px 12px 60px 0px rgba(0, 0, 0, 0.15)",
       },
       scale: {
         103: "1.03",
