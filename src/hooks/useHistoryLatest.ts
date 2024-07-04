@@ -156,15 +156,6 @@ export const useHistoryLatest = () => {
           return historyData
         }
 
-        if (
-          historyData?.details?.transaction?.actions[0].FunctionCall
-            .method_name !== "ft_transfer_call" &&
-          historyData.status
-        ) {
-          historyCompletion.push(true)
-          return historyData
-        }
-
         const getIntentStatus = (await intentStatus(
           CONTRACTS_REGISTER.INTENT,
           historyData.clientId
