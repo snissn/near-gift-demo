@@ -18,5 +18,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: test
+      - name: Secrets
+        uses: ./.github/actions/secrets
+
+      - name: Test
         uses: ./.github/actions/test
