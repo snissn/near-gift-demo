@@ -24,6 +24,8 @@ import { useAccountBalance } from "@src/hooks/useAccountBalance"
 import { useCalculateTokenToUsd } from "@src/hooks/useCalculateTokenToUsd"
 import { useTokensStore } from "@src/providers/TokensStoreProvider"
 import { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
+import { useEvaluateSwapEstimation } from "@src/hooks/useEvaluateSwapEstimation"
+import BlockEvaluatePrice from "@src/components/Block/BlockEvaluatePrice"
 
 type FormValues = {
   tokenIn: string
@@ -61,6 +63,8 @@ export default function Swap() {
     calculateTokenToUsd: calculateTokenToUsdTokenOut,
   } = useCalculateTokenToUsd()
   const { data, isFetched, isLoading } = useTokensStore((state) => state)
+  const { data: evaluateSwapEstimation, getEvaluateSwapEstimate } =
+    useEvaluateSwapEstimation()
 
   const {
     handleSubmit,
@@ -143,18 +147,20 @@ export default function Swap() {
 
   const debouncedGetSwapEstimateBot = debounce(
     async (data: DataEstimateRequest) => {
-      const estimatedAmountOut = await getSwapEstimateBot(data)
+      const { bestOut, allEstimates } = await getSwapEstimateBot(data)
+      getEvaluateSwapEstimate("tokenOut", data, allEstimates, bestOut)
       isProgrammaticUpdate.current = true
-      setValue("tokenOut", estimatedAmountOut)
+      setValue("tokenOut", bestOut ?? "0")
     },
     ESTIMATE_BOT_AWAIT_250_MS
   )
 
   const debouncedGetSwapEstimateBotReverse = debounce(
     async (data: DataEstimateRequest) => {
-      const estimatedAmountIn = await getSwapEstimateBot(data)
+      const { bestOut, allEstimates } = await getSwapEstimateBot(data)
+      getEvaluateSwapEstimate("tokenIn", data, allEstimates, bestOut)
       isProgrammaticUpdate.current = true
-      setValue("tokenIn", estimatedAmountIn)
+      setValue("tokenIn", bestOut ?? "0")
     },
     ESTIMATE_BOT_AWAIT_250_MS
   )
@@ -385,6 +391,12 @@ export default function Swap() {
         <FieldComboInput<FormValues>
           fieldName="tokenOut"
           price={priceToUsdTokenOut}
+          label={
+            <BlockEvaluatePrice
+              priceEvaluation={evaluateSwapEstimation?.priceEvaluation}
+              priceResults={evaluateSwapEstimation?.priceResults}
+            />
+          }
           balance={selectTokenOut?.balance?.toString()}
           selected={selectTokenOut as NetworkToken}
           handleSelect={() => handleSelect("tokenOut", selectTokenIn)}
