@@ -20,6 +20,9 @@ jobs:
 
       - name: Secrets
         uses: ./.github/actions/secrets
+        with:
+          coingecko_api_key: ${{ secrets.COINGECKO_API_KEY }}
+          near_node_url: ${{ secrets.NEAR_NODE_URL }}
 
       - name: Test
         uses: ./.github/actions/test
