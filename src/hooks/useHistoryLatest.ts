@@ -147,8 +147,9 @@ export const useHistoryLatest = () => {
               argsJson = Buffer.from(getHashedArgs ?? "", "base64").toString(
                 "utf-8"
               )
-              const logMsg =
-                historyData.details?.receipts_outcome[0]!.outcome!.logs[0]
+              const logMsg = historyData.details?.receipts_outcome
+                ? historyData.details?.receipts_outcome[0]!.outcome!.logs[0]
+                : undefined
               Object.assign(historyData, {
                 status: HistoryStatus.COMPLETED,
                 details: {
