@@ -1,10 +1,14 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import { formatUnits } from "viem"
 
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { nep141Balance } from "@src/utils/near"
-import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
+import { NetworkTokenWithSwapRoute, TokenBalance } from "@src/types/interfaces"
+import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
+import { useGetCoingeckoExchangesList } from "@src/api/hooks/exchanges/useGetCoingeckoExchangesList"
+import { CoingeckoExchanges } from "@src/types/coingecko"
 
 export const useGetTokensBalance = (
   tokensList: NetworkTokenWithSwapRoute[]
@@ -13,22 +17,65 @@ export const useGetTokensBalance = (
   const [isError, setIsError] = useState(false)
   const [data, setData] = useState<NetworkTokenWithSwapRoute[]>([])
   const { accountId } = useWalletSelector()
+  const { activePreview } = useHistoryStore((state) => state)
+  const { data: exchangesList, isFetched } = useGetCoingeckoExchangesList()
 
   const getTokensBalance = useCallback(async () => {
     try {
       setIsFetching(true)
       const dataWithBalances = await Promise.all(
         tokensList.map(async (token) => {
+          // Not proceed with fetching balances if token is not belong to near chain
+          // Use different Promise map
           if (token.chainName?.toLocaleLowerCase() !== "near") {
             return token
           }
-          const balance: string | null = await nep141Balance(
-            accountId as string,
-            token.address as string
-          )
+
+          const tokenBalance: TokenBalance = {}
+
+          let balance: number | undefined = undefined
+          if (accountId && token?.address) {
+            const getBalance = await nep141Balance(
+              accountId as string,
+              token.address as string
+            )
+            if (getBalance) {
+              balance = Number(
+                formatUnits(
+                  BigInt(getBalance as string),
+                  token.decimals as number
+                )
+              )
+              Object.assign(tokenBalance, { balance })
+            }
+          }
+
+          const getCoinIndex = (
+            exchangesList as CoingeckoExchanges
+          )?.tickers?.findIndex((coin) => {
+            const defuseAssetId = token?.defuse_asset_id?.split(":")
+            if (defuseAssetId.length === 3) {
+              return coin.base.toLowerCase() === defuseAssetId[2].toLowerCase()
+            }
+          })
+
+          if (getCoinIndex !== -1) {
+            const convertedLastUsd = (exchangesList as CoingeckoExchanges)
+              .tickers[getCoinIndex].converted_last.usd
+            Object.assign(tokenBalance, {
+              convertedLast: { usd: convertedLastUsd },
+            })
+            if (balance) {
+              const balanceToUsd = balance * convertedLastUsd
+              Object.assign(tokenBalance, {
+                balanceToUsd,
+              })
+            }
+          }
+
           return {
             ...token,
-            balance: balance ?? "0",
+            ...tokenBalance,
           }
         })
       )
@@ -40,11 +87,13 @@ export const useGetTokensBalance = (
       setIsError(true)
       setIsFetching(false)
     }
-  }, [tokensList])
+  }, [tokensList, exchangesList])
 
   useEffect(() => {
-    getTokensBalance()
-  }, [tokensList])
+    if (tokensList || activePreview || isFetched) {
+      getTokensBalance()
+    }
+  }, [tokensList, activePreview, isFetched])
 
   return {
     data,

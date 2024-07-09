@@ -13,14 +13,24 @@ export type Account = AccountView & {
   account_id: string
 }
 
-export type TokenInfo = {
+export enum TokenConvertEnum {
+  USD = "usd",
+}
+
+export type TokenBalance = {
+  balance?: number
+  balanceToUsd?: number
+  convertedLast?: {
+    [key in TokenConvertEnum]: number
+  }
+}
+
+export interface TokenInfo extends TokenBalance {
   address: string
   symbol: string
   name: string
   decimals: number
   icon?: string
-  balance?: string | BigNumber
-  balanceToUds?: string
 }
 
 export interface NetworkToken extends Partial<TokenInfo>, DefuseBaseIds {
@@ -146,6 +156,7 @@ export interface RecoverDetails {
   receive: TransferToken
   expiration: ExpirationEnum
   referral: string
+  msg?: string
 }
 
 export type JobsDetails = {

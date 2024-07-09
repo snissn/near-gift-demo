@@ -58,7 +58,7 @@ const AssetList = ({
         </Text>
       </div>
       {assets.map(
-        ({ name, chainName, symbol, balance, balanceToUds, ...rest }, i) => (
+        ({ name, chainName, symbol, balance, balanceToUsd, ...rest }, i) => (
           <button
             key={i}
             className="flex justify-between items-center gap-3 p-2.5 rounded-md hover:bg-gray-950"
@@ -75,10 +75,10 @@ const AssetList = ({
                   {name}
                 </Text>
                 <Text as="span" size="2" weight="medium">
-                  {typeof balance === "string" && parseFloat(balance)
-                    ? balance === "0.00001"
-                      ? `< ${balance}`
-                      : balance
+                  {balance
+                    ? balance < 0.00001
+                      ? "< 0.00001"
+                      : balance.toFixed(7)
                     : null}
                 </Text>
               </div>
@@ -87,7 +87,7 @@ const AssetList = ({
                   {symbol ? symbol : null}
                 </Text>
                 <Text as="span" size="2">
-                  {balanceToUds ? `$${balanceToUds}` : null}
+                  {balanceToUsd ? `$${balanceToUsd.toFixed(7)}` : null}
                 </Text>
               </div>
             </div>

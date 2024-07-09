@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react"
 import Image from "next/image"
 import { Spinner, Text } from "@radix-ui/themes"
 import Link from "next/link"
+import { formatUnits } from "viem"
 
 import { HistoryData, HistoryStatus } from "@src/stores/historyStore"
 import Button from "@src/components/Button/Button"
@@ -17,10 +18,16 @@ import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { useNetworkTokens } from "@src/hooks/useNetworkTokens"
 import { useSwap } from "@src/hooks/useSwap"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
 
 const NEAR_EXPLORER = process?.env?.nearExplorer ?? ""
 const PLACEHOLDER = "XX"
 const WAIT_MORE_2MIN = 120000
+
+type Props = {
+  onCloseHistory?: () => void
+  withCloseHistory?: boolean
+}
 
 const WidgetCard = ({
   clientId,
@@ -28,7 +35,9 @@ const WidgetCard = ({
   details,
   timestamp,
   status,
-}: HistoryData) => {
+  onCloseHistory,
+  withCloseHistory,
+}: HistoryData & Props) => {
   const [title, setTitle] = useState("")
   const [subTitle, setSubTitle] = useState("")
   const { closeHistoryItem } = useHistoryStore((state) => state)
@@ -53,6 +62,12 @@ const WidgetCard = ({
             const tokensData = getTokensDataByIds([
               details?.recoverDetails?.send.token_id ?? "",
             ])
+            if (!tokensData.length && !details?.tokenIn) {
+              return {
+                title: `Rolled back!`,
+                subTitle: `Swap rolled request is completed.`,
+              }
+            }
             const tokenIn = tokensData.length
               ? tokenBalanceToFormatUnits({
                   balance: details?.recoverDetails?.send.amount as string,
@@ -105,6 +120,28 @@ const WidgetCard = ({
           title: `Storage deposit on ${details?.transaction?.receiver_id ?? PLACEHOLDER} by ${details?.transaction?.signer_id ?? PLACEHOLDER}`,
         }
 
+      case QueueTransactions.SWAP_FROM_NATIVE:
+        let title = "Wrapped complete!"
+        let subTitle = ""
+        const extractMsg = details?.recoverDetails?.msg?.split(" ")
+        if (extractMsg?.length && extractMsg.length >= 3) {
+          const [action, amount, tokenIn] = extractMsg
+          const tokenNearNative = LIST_NATIVE_TOKENS.find(
+            (token) => token.defuse_asset_id === "near:mainnet:0x1"
+          )
+          const formattedAmount = smallBalanceToFormat(
+            formatUnits(BigInt(amount), tokenNearNative!.decimals as number) ??
+              ""
+          )
+          title = `${action} complete!`
+          subTitle = `Wrapped ${formattedAmount} ${tokenIn} to ${formattedAmount} w${tokenIn}`
+        }
+
+        return {
+          title,
+          subTitle,
+        }
+
       default:
         return { title: "Unknown" }
     }
@@ -123,9 +160,17 @@ const WidgetCard = ({
       // No matter is IN or OUT as QueueTransactions.STORAGE_DEPOSIT_TOKEN_OUT
       return QueueTransactions.STORAGE_DEPOSIT_TOKEN_IN
     }
+    if (transaction.actions[0].FunctionCall.method_name === "near_deposit") {
+      return QueueTransactions.SWAP_FROM_NATIVE
+    }
   }
 
-  const handleCloseHistory = () => closeHistoryItem(hash)
+  const handleCloseHistory = () => {
+    if (onCloseHistory) {
+      return onCloseHistory && onCloseHistory()
+    }
+    closeHistoryItem(hash)
+  }
 
   const handleRollbackIntent = async () => {
     await callRequestRollbackIntent({ id: clientId })
@@ -175,14 +220,17 @@ const WidgetCard = ({
           status !== HistoryStatus.ROLLED_BACK &&
           details?.transaction?.actions[0].FunctionCall.method_name !==
             "storage_deposit" && <Spinner size="3" />}
-        <button onClick={handleCloseHistory}>
-          <Image
-            src="/static/icons/close.svg"
-            width={16}
-            height={16}
-            alt="Close"
-          />
-        </button>
+
+        {withCloseHistory && (
+          <button onClick={handleCloseHistory}>
+            <Image
+              src="/static/icons/close.svg"
+              width={16}
+              height={16}
+              alt="Close"
+            />
+          </button>
+        )}
       </div>
       <Text size="1" weight="bold" className="mb-1">
         {title.length > 37 ? title.substring(0, 37) + "..." : title}

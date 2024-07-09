@@ -21,6 +21,7 @@ import { swapSchema } from "@src/utils/schema"
 
 const SCHEDULER_3_MIN = 180000
 const SCHEDULER_30_SEC = 30000
+const SCHEDULER_5_SEC = 5000
 
 export const useHistoryLatest = () => {
   const { accountId } = useWalletSelector()
@@ -74,14 +75,10 @@ export const useHistoryLatest = () => {
         }
 
         // Try to recover clientId and "Swap" data in case it was lost
-        if (
-          (!historyData.clientId || !historyData.details?.tokenIn) &&
-          historyData.details?.transaction
-        ) {
-          const getMethodName =
-            historyData.details.transaction.actions.length &&
-            historyData.details.transaction.actions[0].FunctionCall.method_name
-
+        const getMethodName =
+          historyData.details?.transaction?.actions.length &&
+          historyData.details?.transaction?.actions[0].FunctionCall.method_name
+        if (getMethodName && historyData.details?.transaction) {
           let getHashedArgs = ""
           let argsJson = ""
           let args: unknown
@@ -144,6 +141,26 @@ export const useHistoryLatest = () => {
                 status: HistoryStatus.ROLLED_BACK,
               })
               break
+
+            case "near_deposit":
+              getHashedArgs =
+                historyData.details.transaction.actions[0].FunctionCall.args
+              argsJson = Buffer.from(getHashedArgs ?? "", "base64").toString(
+                "utf-8"
+              )
+              const logMsg = historyData.details?.receipts_outcome
+                ? historyData.details?.receipts_outcome[0]!.outcome!.logs[0]
+                : undefined
+              Object.assign(historyData, {
+                status: HistoryStatus.COMPLETED,
+                details: {
+                  ...historyData.details,
+                  recoverDetails: {
+                    msg: logMsg,
+                  },
+                },
+              })
+              break
           }
         }
 
@@ -153,15 +170,6 @@ export const useHistoryLatest = () => {
         if (isFailure) {
           historyCompletion.push(true)
           Object.assign(historyData, { status: HistoryStatus.FAILED })
-          return historyData
-        }
-
-        if (
-          historyData?.details?.transaction?.actions[0].FunctionCall
-            .method_name !== "ft_transfer_call" &&
-          historyData.status
-        ) {
-          historyCompletion.push(true)
           return historyData
         }
 
@@ -194,7 +202,7 @@ export const useHistoryLatest = () => {
         cycle: isMonitoringComplete.cycle++,
       })
       runHistoryMonitoring(result)
-    }, SCHEDULER_30_SEC)
+    }, SCHEDULER_5_SEC)
   }
 
   const runHistoryUpdate = (data: HistoryData[]): void => {

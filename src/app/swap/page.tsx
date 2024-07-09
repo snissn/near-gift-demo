@@ -11,6 +11,7 @@ import FieldComboInput from "@src/components/Form/FieldComboInput"
 import Button from "@src/components/Button/Button"
 import ButtonSwitch from "@src/components/Button/ButtonSwitch"
 import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
+import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { ModalType } from "@src/stores/modalStore"
 import { NetworkToken } from "@src/types/interfaces"
@@ -20,6 +21,13 @@ import { DataEstimateRequest } from "@src/libs/de-sdk/types/interfaces"
 import { debounce } from "@src/utils/debounce"
 import { useModalSearchParams } from "@src/hooks/useModalSearchParams"
 import { useAccountBalance } from "@src/hooks/useAccountBalance"
+import { useCalculateTokenToUsd } from "@src/hooks/useCalculateTokenToUsd"
+import { useTokensStore } from "@src/providers/TokensStoreProvider"
+import { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
+import { useEvaluateSwapEstimation } from "@src/hooks/useEvaluateSwapEstimation"
+import BlockEvaluatePrice from "@src/components/Block/BlockEvaluatePrice"
+import { useConnectWallet } from "@src/hooks/useConnectWallet"
+import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 
 type FormValues = {
   tokenIn: string
@@ -36,14 +44,31 @@ type EstimateSwap = {
   selectTokenOut: SelectToken
 }
 
+const ESTIMATE_BOT_AWAIT_250_MS = 250
+
 export default function Swap() {
   const [selectTokenIn, setSelectTokenIn] = useState<SelectToken>()
   const [selectTokenOut, setSelectTokenOut] = useState<SelectToken>()
+  const [errorSelectTokenIn, setErrorSelectTokenIn] = useState("")
+  const [errorSelectTokenOut, setErrorSelectTokenOut] = useState("")
   const [withNativeSupport, setWithNativeSupport] = useState<boolean>(false)
   const [nativeSupportChecked, setNativeSupportChecked] =
     useState<CheckedState>(false)
+  const { accountId } = useWalletSelector()
   const { getAccountBalance } = useAccountBalance()
   const [nativeBalance, setNativeBalance] = useState("0")
+  const {
+    priceToUsd: priceToUsdTokenIn,
+    calculateTokenToUsd: calculateTokenToUsdTokenIn,
+  } = useCalculateTokenToUsd()
+  const {
+    priceToUsd: priceToUsdTokenOut,
+    calculateTokenToUsd: calculateTokenToUsdTokenOut,
+  } = useCalculateTokenToUsd()
+  const { data, isFetched, isLoading } = useTokensStore((state) => state)
+  const { data: evaluateSwapEstimation, getEvaluateSwapEstimate } =
+    useEvaluateSwapEstimation()
+  const { handleSignIn } = useConnectWallet()
 
   const {
     handleSubmit,
@@ -75,12 +100,30 @@ export default function Swap() {
     return false
   }
 
+  const handleValidateSelectTokens = (): boolean => {
+    let isValid = true
+    if (!selectTokenIn) {
+      isValid = false
+      setErrorSelectTokenIn("Select token is required")
+    }
+    if (!selectTokenOut) {
+      isValid = false
+      setErrorSelectTokenOut("Select token is required")
+    }
+    return isValid
+  }
+
   const onSubmit = async (values: FieldValues) => {
+    if (!accountId) {
+      return handleSignIn()
+    }
+    if (!handleValidateSelectTokens()) return
     setModalType(ModalType.MODAL_REVIEW_SWAP, {
       tokenIn: values.tokenIn,
       tokenOut: values.tokenOut,
       selectedTokenIn: selectTokenIn,
       selectedTokenOut: selectTokenOut,
+      useNative: nativeSupportChecked,
     })
   }
 
@@ -112,20 +155,22 @@ export default function Swap() {
 
   const debouncedGetSwapEstimateBot = debounce(
     async (data: DataEstimateRequest) => {
-      const estimatedAmountOut = await getSwapEstimateBot(data)
+      const { bestOut, allEstimates } = await getSwapEstimateBot(data)
+      getEvaluateSwapEstimate("tokenOut", data, allEstimates, bestOut)
       isProgrammaticUpdate.current = true
-      setValue("tokenOut", estimatedAmountOut)
+      setValue("tokenOut", bestOut ?? "0")
     },
-    1000
+    ESTIMATE_BOT_AWAIT_250_MS
   )
 
   const debouncedGetSwapEstimateBotReverse = debounce(
     async (data: DataEstimateRequest) => {
-      const estimatedAmountIn = await getSwapEstimateBot(data)
+      const { bestOut, allEstimates } = await getSwapEstimateBot(data)
+      getEvaluateSwapEstimate("tokenIn", data, allEstimates, bestOut)
       isProgrammaticUpdate.current = true
-      setValue("tokenIn", estimatedAmountIn)
+      setValue("tokenIn", bestOut ?? "0")
     },
-    2000
+    ESTIMATE_BOT_AWAIT_250_MS
   )
 
   const handleEstimateSwap = ({
@@ -137,34 +182,79 @@ export default function Swap() {
   }: EstimateSwap) => {
     if (
       (name === "tokenIn" && !parseFloat(tokenIn)) ||
-      (name === "tokenOut" && !parseFloat(tokenOut))
+      (name === "tokenOut" && !parseFloat(tokenOut)) ||
+      !selectTokenIn ||
+      !selectTokenOut
     ) {
       return
     }
 
     const unitsTokenIn = parseUnits(
       tokenIn,
-      selectTokenIn!.decimals as number
+      selectTokenIn?.decimals ?? 0
     ).toString()
     const unitsTokenOut = parseUnits(
       tokenOut,
-      selectTokenOut!.decimals as number
+      selectTokenOut?.decimals ?? 0
     ).toString()
 
     if (name === "tokenIn") {
       debouncedGetSwapEstimateBot({
         tokenIn: selectTokenIn!.address,
-        tokenOut: selectTokenOut!.address,
+        tokenOut: selectTokenOut?.address,
         amountIn: unitsTokenIn,
       } as DataEstimateRequest)
     } else if (name === "tokenOut") {
       debouncedGetSwapEstimateBotReverse({
         tokenIn: selectTokenOut!.address,
-        tokenOut: selectTokenIn!.address,
+        tokenOut: selectTokenIn?.address,
         amountIn: unitsTokenOut,
       } as DataEstimateRequest)
     }
   }
+
+  useEffect(() => {
+    if (!selectTokenIn && !selectTokenOut) {
+      const getConfirmSwapFromLocal = localStorage.getItem(
+        CONFIRM_SWAP_LOCAL_KEY
+      )
+      if (getConfirmSwapFromLocal) {
+        const parsedData: { data: ModalConfirmSwapPayload } = JSON.parse(
+          getConfirmSwapFromLocal
+        )
+        setSelectTokenIn(parsedData.data.selectedTokenIn)
+        setSelectTokenOut(parsedData.data.selectedTokenOut)
+        return
+      }
+      if (data.size) {
+        data.forEach((token) => {
+          if (token.address === "near") {
+            setSelectTokenIn(token)
+          }
+          if (token.address === "usdt") {
+            setSelectTokenOut(token)
+          }
+        })
+        return
+      }
+    }
+    // Do evaluate usd select tokens prices
+    if (
+      data.size &&
+      !isLoading &&
+      (!selectTokenIn?.convertedLast?.usd ||
+        !selectTokenOut?.convertedLast?.usd)
+    ) {
+      data.forEach((token) => {
+        if (selectTokenIn?.address === token.address) {
+          setSelectTokenIn(token)
+        }
+        if (selectTokenOut?.address === token.address) {
+          setSelectTokenOut(token)
+        }
+      })
+    }
+  }, [data, isFetched, isLoading])
 
   useEffect(() => {
     if (selectTokenIn?.defuse_asset_id) {
@@ -193,6 +283,8 @@ export default function Swap() {
         isProgrammaticUpdate.current = false
         return
       }
+      calculateTokenToUsdTokenIn(value.tokenIn as string, selectTokenIn)
+      calculateTokenToUsdTokenOut(value.tokenOut as string, selectTokenOut)
       handleEstimateSwap({
         tokenIn: String(value.tokenIn),
         tokenOut: String(value.tokenOut),
@@ -203,6 +295,21 @@ export default function Swap() {
     })
     return () => subscription.unsubscribe()
   }, [watch, selectTokenIn, selectTokenOut, getSwapEstimateBot, setValue])
+
+  useEffect(() => {
+    // Use to calculate when selectTokenIn or selectTokenOut is changed
+    const valueTokenIn = getValues("tokenIn")
+    const valueTokenOut = getValues("tokenOut")
+    calculateTokenToUsdTokenIn(valueTokenIn, selectTokenIn)
+    calculateTokenToUsdTokenOut(valueTokenOut, selectTokenOut)
+
+    // Use watch to calculate when input is changed
+    const subscription = watch((value) => {
+      calculateTokenToUsdTokenIn(value.tokenIn as string, selectTokenIn)
+      calculateTokenToUsdTokenOut(value.tokenOut as string, selectTokenOut)
+    })
+    return () => subscription.unsubscribe()
+  }, [watch, selectTokenIn, selectTokenOut])
 
   useEffect(() => {
     if (
@@ -231,6 +338,7 @@ export default function Swap() {
               selectTokenOut,
             })
           isProgrammaticUpdate.current = false
+          setErrorSelectTokenIn("")
           break
         case "tokenOut":
           setSelectTokenOut(token)
@@ -249,6 +357,7 @@ export default function Swap() {
               selectTokenOut: token,
             })
           isProgrammaticUpdate.current = false
+          setErrorSelectTokenOut("")
           break
       }
       onCloseModal(undefined)
@@ -266,13 +375,13 @@ export default function Swap() {
       >
         <FieldComboInput<FormValues>
           fieldName="tokenIn"
-          price={selectTokenIn?.balanceToUds as string}
+          price={priceToUsdTokenIn}
           balance={
             nativeSupportChecked
               ? (
                   Number(selectTokenIn?.balance) + Number(nativeBalance)
                 ).toString()
-              : (selectTokenIn?.balance as string)
+              : selectTokenIn?.balance?.toString()
           }
           selected={selectTokenIn as NetworkToken}
           handleSelect={() => handleSelect("tokenIn", selectTokenOut)}
@@ -282,19 +391,27 @@ export default function Swap() {
           withNativeSupport={withNativeSupport}
           nativeSupportChecked={nativeSupportChecked}
           handleIncludeNativeToSwap={handleIncludeNativeToSwap}
+          errorSelect={errorSelectTokenIn}
         />
         <div className="relative w-full">
           <ButtonSwitch onClick={handleSwitch} />
         </div>
         <FieldComboInput<FormValues>
           fieldName="tokenOut"
-          price={selectTokenOut?.balanceToUds as string}
-          balance={selectTokenOut?.balance as string}
+          price={priceToUsdTokenOut}
+          label={
+            <BlockEvaluatePrice
+              priceEvaluation={evaluateSwapEstimation?.priceEvaluation}
+              priceResults={evaluateSwapEstimation?.priceResults}
+            />
+          }
+          balance={selectTokenOut?.balance?.toString()}
           selected={selectTokenOut as NetworkToken}
           handleSelect={() => handleSelect("tokenOut", selectTokenIn)}
           className="border rounded-b-xl mb-5 md:max-w-[472px]"
           required="This field is required"
           errors={errors}
+          errorSelect={errorSelectTokenOut}
         />
         <Button type="submit" size="lg" fullWidth isLoading={isFetching}>
           Swap

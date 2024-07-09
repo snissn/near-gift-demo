@@ -91,6 +91,8 @@ const config: Config = {
         primary: {
           DEFAULT: "rgba(247, 107, 21, 1)",
           100: "rgba(239, 95, 0, 1)",
+          200: "rgba(219, 95, 0, 1)",
+          300: "rgba(204, 78, 0, 1)",
         },
         secondary: "rgba(128, 128, 128, 1)",
       },
@@ -117,6 +119,16 @@ const config: Config = {
         "page-light": "url('/static/images/bg-light.svg')",
         "page-dark": "url('/static/images/bg-dark.svg')",
         "page-light--mobile": "url('/static/images/bg-light--mobile.svg')",
+        "card-vision-account-fi": "url(/static/images/group-account-fi.svg)",
+        "card-vision-account-fi--mobile":
+          "url(/static/images/group-account-fi--mobile.svg)",
+        "card-vision-multi-cover": "url(/static/images/group-multi-cover.svg)",
+        "card-vision-multi-cover--mobile":
+          "url(/static/images/group-multi-cover--mobile.svg)",
+        "card-vision-bringing":
+          "url(/static/images/group-account-bringing.svg)",
+        "card-vision-bringing--mobile":
+          "url(/static/images/group-account-bringing--mobile.svg)",
       },
     },
   },

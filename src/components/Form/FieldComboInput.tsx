@@ -20,13 +20,14 @@ interface Props<T extends FieldValues> {
   register?: UseFormRegister<T>
   required?: string
   placeholder?: string
-  label?: string
+  label?: string | React.ReactNode
   price?: string
   balance?: string | BigNumber
   selected?: NetworkToken
   handleSelect?: () => void
   className?: string
   errors?: FieldErrors
+  errorSelect?: string
 }
 
 export const FieldComboInputRegistryName = "FieldComboInput"
@@ -46,6 +47,7 @@ const FieldComboInput = <T extends FieldValues>({
   withNativeSupport,
   handleIncludeNativeToSwap,
   nativeSupportChecked,
+  errorSelect,
 }: Props<T> & BlockMultiBalancesProps) => {
   if (!register) {
     return null
@@ -109,11 +111,7 @@ const FieldComboInput = <T extends FieldValues>({
         className && className
       )}
     >
-      {label && (
-        <span className="absolute top-4 left-5 text-sm font-medium text-secondary">
-          {label}
-        </span>
-      )}
+      {label && label}
       <input
         {...register(fieldName, option)}
         onKeyDown={handleKeyDown}
@@ -136,7 +134,7 @@ const FieldComboInput = <T extends FieldValues>({
       <div className="flex justify-end items-center">
         <AssetsSelect selected={selected} handleSelect={handleSelect} />
       </div>
-      {balance && (
+      {balance && !errorSelect && (
         <BlockMultiBalances
           balance={balance}
           withNativeSupport={withNativeSupport ?? false}
@@ -145,6 +143,11 @@ const FieldComboInput = <T extends FieldValues>({
           }
           nativeSupportChecked={nativeSupportChecked ?? false}
         />
+      )}
+      {errorSelect && (
+        <div className="absolute bottom-4 right-5 flex justify-center items-center gap-2">
+          <span className="text-sm text-red-400">{errorSelect}</span>
+        </div>
       )}
     </div>
   )
