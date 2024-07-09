@@ -52,11 +52,11 @@ export default function Swap() {
   const [errorSelectTokenIn, setErrorSelectTokenIn] = useState("")
   const [errorSelectTokenOut, setErrorSelectTokenOut] = useState("")
   const [withNativeSupport, setWithNativeSupport] = useState<boolean>(false)
+  const [nativeBalance, setNativeBalance] = useState("0")
   const [nativeSupportChecked, setNativeSupportChecked] =
     useState<CheckedState>(false)
   const { accountId } = useWalletSelector()
   const { getAccountBalance } = useAccountBalance()
-  const [nativeBalance, setNativeBalance] = useState("0")
   const {
     priceToUsd: priceToUsdTokenIn,
     calculateTokenToUsd: calculateTokenToUsdTokenIn,
