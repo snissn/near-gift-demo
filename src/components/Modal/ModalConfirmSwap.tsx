@@ -15,10 +15,7 @@ import {
   useSwap,
 } from "@src/hooks/useSwap"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import {
-  useCreateQueryString,
-  UseQueryCollectorKeys,
-} from "@src/hooks/useQuery"
+import { UseQueryCollectorKeys } from "@src/hooks/useQuery"
 import { ModalReviewSwapPayload } from "@src/components/Modal/ModalReviewSwap"
 import { ModalType } from "@src/stores/modalStore"
 import { sha256 } from "@src/actions/crypto"
@@ -96,7 +93,7 @@ const ModalConfirmSwap = () => {
         selectedTokenIn: modalPayload.selectedTokenIn,
         selectedTokenOut: modalPayload.selectedTokenOut,
         clientId,
-        useNative: modalPayload.useNative,
+        useNative: modalPayload.isNativeInSwap,
       })
     setTransactionQueue(queueInTrack)
     return {

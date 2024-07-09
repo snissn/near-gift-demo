@@ -48,7 +48,7 @@ export function withTokensBalance<T extends React.ComponentType>(
                 balance: parseFloat(formattedAmountOut),
                 balanceToUsd: wNear?.balanceToUsd ?? 0,
                 convertedLast: {
-                  USD: wNear?.convertedLast?.usd ?? 0,
+                  usd: wNear?.convertedLast?.usd ?? 0,
                 },
                 routes: [...nearRoutes, ...wNearRoutes],
               }

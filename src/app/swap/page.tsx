@@ -45,16 +45,14 @@ type EstimateSwap = {
 }
 
 const ESTIMATE_BOT_AWAIT_250_MS = 250
+const ESTIMATE_BOT_AWAIT_500_MS = 500
 
 export default function Swap() {
   const [selectTokenIn, setSelectTokenIn] = useState<SelectToken>()
   const [selectTokenOut, setSelectTokenOut] = useState<SelectToken>()
   const [errorSelectTokenIn, setErrorSelectTokenIn] = useState("")
   const [errorSelectTokenOut, setErrorSelectTokenOut] = useState("")
-  const [withNativeSupport, setWithNativeSupport] = useState<boolean>(false)
   const [nativeBalance, setNativeBalance] = useState("0")
-  const [nativeSupportChecked, setNativeSupportChecked] =
-    useState<CheckedState>(false)
   const { accountId } = useWalletSelector()
   const { getAccountBalance } = useAccountBalance()
   const {
@@ -118,12 +116,13 @@ export default function Swap() {
       return handleSignIn()
     }
     if (!handleValidateSelectTokens()) return
+    const pair = [selectTokenIn!.address, selectTokenOut!.address]
     setModalType(ModalType.MODAL_REVIEW_SWAP, {
       tokenIn: values.tokenIn,
       tokenOut: values.tokenOut,
       selectedTokenIn: selectTokenIn,
       selectedTokenOut: selectTokenOut,
-      useNative: nativeSupportChecked,
+      isNativeInSwap: pair.includes("0x1"),
     })
   }
 
@@ -145,10 +144,6 @@ export default function Swap() {
     setValue("tokenOut", valueTokenIn)
   }
 
-  const handleIncludeNativeToSwap = (checked: CheckedState) => {
-    setNativeSupportChecked(checked)
-  }
-
   const handleSelect = (fieldName: string, selectToken: SelectToken) => {
     setModalType(ModalType.MODAL_SELECT_ASSETS, { fieldName, selectToken })
   }
@@ -160,7 +155,7 @@ export default function Swap() {
       isProgrammaticUpdate.current = true
       setValue("tokenOut", bestOut ?? "0")
     },
-    ESTIMATE_BOT_AWAIT_250_MS
+    ESTIMATE_BOT_AWAIT_500_MS
   )
 
   const debouncedGetSwapEstimateBotReverse = debounce(
@@ -170,7 +165,7 @@ export default function Swap() {
       isProgrammaticUpdate.current = true
       setValue("tokenIn", bestOut ?? "0")
     },
-    ESTIMATE_BOT_AWAIT_250_MS
+    ESTIMATE_BOT_AWAIT_500_MS
   )
 
   const handleEstimateSwap = ({
@@ -187,6 +182,16 @@ export default function Swap() {
       !selectTokenOut
     ) {
       return
+    }
+
+    // Do not use any estimation of swap between Native and Token if ratio is 1:1
+    const pair = [selectTokenIn.address, selectTokenOut.address]
+    if (pair.includes("0x1") && pair.includes("wrap.near")) {
+      isProgrammaticUpdate.current = true
+      return setValue(
+        name === "tokenIn" ? "tokenOut" : "tokenIn",
+        name === "tokenIn" ? tokenIn : tokenOut
+      )
     }
 
     const unitsTokenIn = parseUnits(
@@ -263,7 +268,6 @@ export default function Swap() {
       )
       if (!getNativeTokenToSwap) {
         setNativeBalance("0")
-        return setWithNativeSupport(false)
       }
       ;(async () => {
         const { balance } = await getAccountBalance()
@@ -273,7 +277,6 @@ export default function Swap() {
         )
         setNativeBalance(formattedAmountOut)
       })()
-      setWithNativeSupport(true)
     }
   }, [selectTokenIn?.defuse_asset_id])
 
@@ -350,9 +353,9 @@ export default function Swap() {
           isSelectTokenInReset && setValue("tokenIn", "")
           !isSelectTokenInReset &&
             handleEstimateSwap({
-              tokenIn: "",
-              tokenOut: getValues("tokenOut"),
-              name: "tokenOut",
+              tokenIn: getValues("tokenIn"),
+              tokenOut: "",
+              name: "tokenIn",
               selectTokenIn,
               selectTokenOut: token,
             })
@@ -382,8 +385,6 @@ export default function Swap() {
           className="border rounded-t-xl md:max-w-[472px]"
           required="This field is required"
           errors={errors}
-          nativeSupportChecked={nativeSupportChecked}
-          handleIncludeNativeToSwap={handleIncludeNativeToSwap}
           errorSelect={errorSelectTokenIn}
         />
         <div className="relative w-full">
@@ -407,7 +408,7 @@ export default function Swap() {
           errorSelect={errorSelectTokenOut}
         />
         <Button type="submit" size="lg" fullWidth isLoading={isFetching}>
-          Swap
+          {isFetching ? "" : "Swap"}
         </Button>
       </Form>
     </Paper>

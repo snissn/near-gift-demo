@@ -21,7 +21,7 @@ export type ModalReviewSwapPayload = {
   tokenOut: string
   selectedTokenIn: NetworkToken
   selectedTokenOut: NetworkToken
-  useNative: boolean
+  isNativeInSwap: boolean
 }
 
 const RECALCULATE_ESTIMATION_TIME_SECS = 15
@@ -36,6 +36,13 @@ const ModalReviewSwap = () => {
   )
 
   const recalculateEstimation = async () => {
+    const pair = [
+      convertPayload.selectedTokenIn.address as string,
+      convertPayload.selectedTokenOut.address as string,
+    ]
+    // Not needed recalculation if ratio is 1:1
+    if (pair.includes("0x1") && pair.includes("wrap.near")) return
+
     const unitsTokenIn = parseUnits(
       convertPayload.tokenIn,
       convertPayload.selectedTokenIn.decimals as number

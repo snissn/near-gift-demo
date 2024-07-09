@@ -58,7 +58,6 @@ type WithSwapDepositRequest = {
 }
 
 const REFERRAL_ACCOUNT = process.env.REFERRAL_ACCOUNT ?? ""
-const SWAP_DEPOSIT_SLIPPAGE_3_PERCENTAGE = 1.03
 
 export const useSwap = ({ accountId, selector }: Props) => {
   const [isProcessing, setIsProcessing] = useState(false)
@@ -66,10 +65,11 @@ export const useSwap = ({ accountId, selector }: Props) => {
     accountId,
     selector,
   })
-  const { callRequestNearDeposit } = useNearSwapNearToWNear({
-    accountId,
-    selector,
-  })
+  const { callRequestNearDeposit, callRequestNearWithdraw } =
+    useNearSwapNearToWNear({
+      accountId,
+      selector,
+    })
   const { getNearBlock } = useNearBlock()
   const { getTransactionScan } = useTransactionScan()
 
@@ -125,6 +125,22 @@ export const useSwap = ({ accountId, selector }: Props) => {
     const { tokenIn, tokenOut, selectedTokenIn, selectedTokenOut, useNative } =
       inputs
 
+    if (useNative) {
+      const pair = [selectedTokenIn!.address, selectedTokenOut!.address]
+      if (pair.includes("0x1") && pair.includes("wrap.near")) {
+        const queueTransaction =
+          selectedTokenIn!.address === "0x1"
+            ? QueueTransactions.DEPOSIT
+            : QueueTransactions.WITHDRAW
+        return {
+          queueInTrack: 1,
+          queueTransactionsTrack: [queueTransaction],
+        }
+      }
+      queueTransaction.unshift(QueueTransactions.DEPOSIT)
+      queue++
+    }
+
     // Estimate if user did storage before in order to transfer tokens for swap
     const storageBalanceTokenIn = await getStorageBalance(
       selectedTokenIn!.address as string,
@@ -157,14 +173,6 @@ export const useSwap = ({ accountId, selector }: Props) => {
     if (!parseFloat(storageBalanceTokenOutToString)) {
       queueTransaction.unshift(QueueTransactions.STORAGE_DEPOSIT_TOKEN_OUT)
       queue++
-    }
-
-    if (useNative) {
-      const wNearBalance = selectedTokenIn.balance
-      if (Number(tokenIn) > Number(wNearBalance)) {
-        queueTransaction.unshift(QueueTransactions.SWAP_FROM_NATIVE)
-        queue++
-      }
     }
 
     return {
@@ -219,16 +227,26 @@ export const useSwap = ({ accountId, selector }: Props) => {
     setIsProcessing(true)
 
     switch (currentQueue) {
-      case QueueTransactions.SWAP_FROM_NATIVE:
+      case QueueTransactions.DEPOSIT:
         if (selectedTokenIn?.address) {
-          const countMissingAmount =
-            (Number(tokenIn) - (selectedTokenIn?.balance ?? 0)) *
-            SWAP_DEPOSIT_SLIPPAGE_3_PERCENTAGE
           const unitsSendAmount = parseUnits(
-            countMissingAmount.toString(),
+            tokenIn.toString(),
             selectedTokenIn?.decimals as number
           ).toString()
           await callRequestNearDeposit(
+            selectedTokenOut!.address as string,
+            unitsSendAmount
+          )
+        }
+        break
+
+      case QueueTransactions.WITHDRAW:
+        if (selectedTokenIn?.address) {
+          const unitsSendAmount = parseUnits(
+            tokenIn.toString(),
+            selectedTokenIn?.decimals as number
+          ).toString()
+          await callRequestNearWithdraw(
             selectedTokenIn!.address as string,
             unitsSendAmount
           )
