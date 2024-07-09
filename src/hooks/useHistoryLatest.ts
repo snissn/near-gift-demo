@@ -21,6 +21,7 @@ import { swapSchema } from "@src/utils/schema"
 
 const SCHEDULER_3_MIN = 180000
 const SCHEDULER_30_SEC = 30000
+const SCHEDULER_5_SEC = 5000
 
 export const useHistoryLatest = () => {
   const { accountId } = useWalletSelector()
@@ -201,7 +202,7 @@ export const useHistoryLatest = () => {
         cycle: isMonitoringComplete.cycle++,
       })
       runHistoryMonitoring(result)
-    }, SCHEDULER_30_SEC)
+    }, SCHEDULER_5_SEC)
   }
 
   const runHistoryUpdate = (data: HistoryData[]): void => {

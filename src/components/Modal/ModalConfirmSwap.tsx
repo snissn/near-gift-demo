@@ -149,7 +149,7 @@ const ModalConfirmSwap = () => {
           receivedHash: receivedHash as string,
         })
 
-        setIsReadingHistory(false)
+        setIsReadingHistory(true)
 
         const inputs = {
           tokenIn: data!.tokenIn,
@@ -184,7 +184,7 @@ const ModalConfirmSwap = () => {
     ) {
       const estimateQueue = await handleEstimateQueueTransactions(newClientId)
 
-      setIsReadingHistory(false)
+      setIsReadingHistory(true)
 
       const inputs = {
         tokenIn: modalPayload.tokenIn,
@@ -206,7 +206,7 @@ const ModalConfirmSwap = () => {
     }
   }, [historyData, isFetched, isProcessing])
 
-  if (isReadingHistory) {
+  if (!isReadingHistory) {
     return null
   }
 
