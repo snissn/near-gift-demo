@@ -27,7 +27,8 @@ const Header = () => {
             {!TURN_OFF_APPS && (
               <>
                 <ConnectWallet />
-                <Settings />
+                {/*  TODO Wallet page has to be re-designed */}
+                {/*<Settings />*/}
               </>
             )}
             {TURN_OFF_APPS && (

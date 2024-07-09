@@ -25,6 +25,7 @@ import { sha256 } from "@src/actions/crypto"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { usePublishIntentSolver0 } from "@src/api/hooks/Intent/usePublishIntentSolver0"
 import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
+import { smallBalanceToFormat } from "@src/utils/token"
 
 export interface ModalConfirmSwapPayload extends CallRequestIntentProps {}
 
@@ -255,7 +256,7 @@ const ModalConfirmSwap = () => {
         <div className="flex justify-center">
           <div className="flex justify-center items-center gap-1 px-2.5 py-1 bg-gray-950 rounded-full">
             <Text size="2" weight="medium" className="text-black-400">
-              {`${modalPayload?.tokenIn || dataFromLocal?.tokenIn || ""} ${modalPayload?.selectedTokenIn?.symbol || dataFromLocal?.selectedTokenIn?.symbol || ""}`}
+              {`${smallBalanceToFormat(modalPayload?.tokenIn || dataFromLocal?.tokenIn || "", 7)} ${modalPayload?.selectedTokenIn?.symbol || dataFromLocal?.selectedTokenIn?.symbol || ""}`}
             </Text>
             <Image
               src="/static/icons/arrow-right.svg"
@@ -264,7 +265,7 @@ const ModalConfirmSwap = () => {
               height={24}
             />
             <Text size="2" weight="medium" className="text-black-400">
-              {`${modalPayload?.tokenOut || dataFromLocal?.tokenOut || ""} ${modalPayload?.selectedTokenOut?.symbol || dataFromLocal?.selectedTokenOut?.symbol || ""}`}
+              {`${smallBalanceToFormat(modalPayload?.tokenOut || dataFromLocal?.tokenOut || "", 7)} ${modalPayload?.selectedTokenOut?.symbol || dataFromLocal?.selectedTokenOut?.symbol || ""}`}
             </Text>
           </div>
         </div>

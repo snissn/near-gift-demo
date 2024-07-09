@@ -376,19 +376,12 @@ export default function Swap() {
         <FieldComboInput<FormValues>
           fieldName="tokenIn"
           price={priceToUsdTokenIn}
-          balance={
-            nativeSupportChecked
-              ? (
-                  Number(selectTokenIn?.balance) + Number(nativeBalance)
-                ).toString()
-              : selectTokenIn?.balance?.toString()
-          }
+          balance={selectTokenIn?.balance?.toString()}
           selected={selectTokenIn as NetworkToken}
           handleSelect={() => handleSelect("tokenIn", selectTokenOut)}
           className="border rounded-t-xl md:max-w-[472px]"
           required="This field is required"
           errors={errors}
-          withNativeSupport={withNativeSupport}
           nativeSupportChecked={nativeSupportChecked}
           handleIncludeNativeToSwap={handleIncludeNativeToSwap}
           errorSelect={errorSelectTokenIn}

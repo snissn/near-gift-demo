@@ -10,11 +10,11 @@ import { NetworkToken } from "@src/types/interfaces"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import Button from "@src/components/Button/Button"
 import CardSwap from "@src/components/Card/CardSwap"
-import ButtonIcon from "@src/components/Button/ButtonIcon"
 import { ModalType } from "@src/stores/modalStore"
 import { useTimer } from "@src/hooks/useTimer"
 import { useTimeFormatMinutes } from "@src/hooks/useTimeFormat"
 import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
+import { smallBalanceToFormat } from "@src/utils/token"
 
 export type ModalReviewSwapPayload = {
   tokenIn: string
@@ -83,8 +83,8 @@ const ModalReviewSwap = () => {
           </button>
         </div>
         <CardSwap
-          amountIn={convertPayload.tokenIn.substring(0, 10)}
-          amountOut={convertPayload.tokenOut.substring(0, 10)}
+          amountIn={smallBalanceToFormat(convertPayload.tokenIn, 7)}
+          amountOut={smallBalanceToFormat(convertPayload.tokenOut, 7)}
           amountOutToUsd="~"
           amountInToUsd="~"
           selectTokenIn={convertPayload.selectedTokenIn}
@@ -114,12 +114,6 @@ const ModalReviewSwap = () => {
               Rate
             </Text>
             <div className="flex justify-center items-center gap-2">
-              <ButtonIcon
-                className="max-w-[24px] max-h-[24px] rounded-[3px] pointer-events-none"
-                iconWidth={16}
-                iconHeight={16}
-                icon="/static/icons/width.svg"
-              />
               <Text size="2" weight="medium">
                 1
               </Text>
