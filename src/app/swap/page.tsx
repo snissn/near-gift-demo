@@ -203,16 +203,18 @@ export default function Swap() {
       selectTokenOut?.decimals ?? 0
     ).toString()
 
+    const wTokenIn =
+      selectTokenIn!.address === "0x1" ? "wrap.near" : selectTokenIn!.address
     if (name === "tokenIn") {
       debouncedGetSwapEstimateBot({
-        tokenIn: selectTokenIn!.address,
+        tokenIn: wTokenIn,
         tokenOut: selectTokenOut?.address,
         amountIn: unitsTokenIn,
       } as DataEstimateRequest)
     } else if (name === "tokenOut") {
       debouncedGetSwapEstimateBotReverse({
         tokenIn: selectTokenOut!.address,
-        tokenOut: selectTokenIn?.address,
+        tokenOut: wTokenIn,
         amountIn: unitsTokenOut,
       } as DataEstimateRequest)
     }

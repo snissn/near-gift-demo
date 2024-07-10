@@ -23,6 +23,7 @@ import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { usePublishIntentSolver0 } from "@src/api/hooks/Intent/usePublishIntentSolver0"
 import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
 import { smallBalanceToFormat } from "@src/utils/token"
+import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
 
 export interface ModalConfirmSwapPayload extends CallRequestIntentProps {}
 
@@ -133,26 +134,45 @@ const ModalConfirmSwap = () => {
       if (data) {
         setDataFromLocal(data)
 
+        // TODO Linked to [#1]
         const receivedHash = searchParams.get(
           UseQueryCollectorKeys.TRANSACTION_HASHS
         )
-        if (!receivedHash) {
+
+        const isBatchHashes = receivedHash?.split(",")
+        if (!isBatchHashes) {
           console.log(
             "EstimateQueueTransactions has stopped due to the hash is missing, UseQueryCollectorKeys.TRANSACTION_HASHS"
           )
           return
         }
+        const lastInTransactionHashes =
+          isBatchHashes?.length > 1 ? isBatchHashes.at(-1) : isBatchHashes[0]
+
         const { value, done } = await nextEstimateQueueTransactions({
           estimateQueue: data.estimateQueue,
-          receivedHash: receivedHash as string,
+          receivedHash: lastInTransactionHashes as string,
         })
 
         setIsReadingHistory(true)
 
+        const isNativeTokenIn = data!.selectedTokenIn.address === "0x1"
+        const tokenNearNative = LIST_NATIVE_TOKENS.find(
+          (token) => token.defuse_asset_id === "near:mainnet:0x1"
+        )
+        const mutateSelectedTokenIn = isNativeTokenIn
+          ? {
+              ...data!.selectedTokenIn,
+              defuse_asset_id: tokenNearNative?.routes
+                ? tokenNearNative?.routes[1]
+                : "",
+            }
+          : data!.selectedTokenIn
+
         const inputs = {
           tokenIn: data!.tokenIn,
           tokenOut: data!.tokenOut,
-          selectedTokenIn: data!.selectedTokenIn,
+          selectedTokenIn: mutateSelectedTokenIn,
           selectedTokenOut: data!.selectedTokenOut,
           clientId: data.clientId,
           estimateQueue: value,
@@ -194,7 +214,7 @@ const ModalConfirmSwap = () => {
       }
 
       setSwapToLocal(inputs)
-      await callRequestCreateIntent(inputs)
+      await callRequestCreateIntent(inputs, (mutate) => setSwapToLocal(mutate))
     }
   }
 

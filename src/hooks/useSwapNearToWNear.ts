@@ -51,7 +51,7 @@ const useSwapNearToWNear = ({ accountId, selector }: Props) => {
                   amount: withdraw,
                 },
                 gas: FT_STORAGE_DEPOSIT_GAS,
-                deposit: "1",
+                deposit: "0",
               },
             },
           ],
