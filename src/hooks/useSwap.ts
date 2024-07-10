@@ -141,6 +141,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
           queueTransactionsTrack: [queueTransaction],
         }
       }
+      // TODO If Token to Native then use QueueTransactions.WITHDRAW
       queueTransaction.unshift(QueueTransactions.DEPOSIT)
       queue++
     }
