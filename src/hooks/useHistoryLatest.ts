@@ -161,6 +161,24 @@ export const useHistoryLatest = () => {
                 },
               })
               break
+
+            case "near_withdraw":
+              getHashedArgs =
+                historyData.details.transaction.actions[0].FunctionCall.args
+              argsJson = Buffer.from(getHashedArgs ?? "", "base64").toString(
+                "utf-8"
+              )
+              args = JSON.parse(argsJson)
+              Object.assign(historyData, {
+                status: HistoryStatus.COMPLETED,
+                details: {
+                  ...historyData.details,
+                  recoverDetails: {
+                    amount: (args as { amount: string }).amount,
+                  },
+                },
+              })
+              break
           }
         }
 
