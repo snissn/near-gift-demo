@@ -61,7 +61,7 @@ const nextConfig = {
 
 const sentryConfig = {
   org: "aurora-k2",
-  project: "aurora-cloud-console",
+  project: "defuse",
   silent: true,
   widenClientFileUpload: true,
   hideSourceMaps: true,
