@@ -11,7 +11,7 @@ import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
 
 const IS_DISABLED_ALL_TABS = true
 
-const ConnectWalletTabBox = ({ children }: PropsWithChildren) => {
+const WalletTabBox = ({ children }: PropsWithChildren) => {
   return (
     <div className="pt-[22px] pb-[26px] flex flex-col gap-2">{children}</div>
   )
@@ -24,9 +24,8 @@ const TabTotalBalance = ({
   totalBalanceInUsd: number | undefined
   isLoading: boolean
 }) => {
-  console.log(totalBalanceInUsd, "totalBalanceInUsd,<<<")
   return (
-    <ConnectWalletTabBox>
+    <WalletTabBox>
       {isLoading ? (
         <div className="h-[36px]">
           <Spinner loading={isLoading} />
@@ -39,18 +38,20 @@ const TabTotalBalance = ({
       <Text size="2" weight="medium" className="text-gray-600">
         Total balance
       </Text>
-    </ConnectWalletTabBox>
+    </WalletTabBox>
   )
 }
 
-const ConnectWalletTabs = () => {
-  const { data, isFetched, isLoading } = useTokensStore((state) => state)
+const WalletTabs = () => {
+  const [isLoading, setIsLoading] = useState(false)
+  const { data, isFetched } = useTokensStore((state) => state)
   const [totalBalanceInUsd, setTotalBalanceInUsd] = useState<
     number | undefined
   >()
   const { getAccountBalance } = useAccountBalance()
 
   const getBalanceToUsd = async () => {
+    setIsLoading(true)
     let balanceInUsd = 0
     const temp = []
     let wNearConvertedLastUsd = 0
@@ -78,13 +79,14 @@ const ConnectWalletTabs = () => {
     balanceInUsd += Number(nativeBalanceInUsd) * wNearConvertedLastUsd
 
     setTotalBalanceInUsd(balanceInUsd)
+    setIsLoading(false)
   }
 
   useEffect(() => {
-    if (data.size && isFetched && !isLoading) {
+    if (data.size && isFetched) {
       getBalanceToUsd()
     }
-  }, [data.size, isFetched, isLoading])
+  }, [data.size, isFetched])
 
   return IS_DISABLED_ALL_TABS ? (
     <TabTotalBalance
@@ -112,13 +114,13 @@ const ConnectWalletTabs = () => {
         </Tabs.Content>
 
         <Tabs.Content value="deposited">
-          <ConnectWalletTabBox>
+          <WalletTabBox>
             <Text size="2">Deposited</Text>
-          </ConnectWalletTabBox>
+          </WalletTabBox>
         </Tabs.Content>
       </Box>
     </Tabs.Root>
   )
 }
 
-export default ConnectWalletTabs
+export default WalletTabs

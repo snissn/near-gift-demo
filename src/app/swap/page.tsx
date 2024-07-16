@@ -273,10 +273,10 @@ export default function Swap() {
     // Do evaluate usd select tokens prices
     if (data.size && !isLoading) {
       data.forEach((token) => {
-        if (selectTokenIn?.address === token.address) {
+        if (selectTokenIn?.defuse_asset_id === token.defuse_asset_id) {
           setSelectTokenIn(token)
         }
-        if (selectTokenOut?.address === token.address) {
+        if (selectTokenOut?.defuse_asset_id === token.defuse_asset_id) {
           setSelectTokenOut(token)
         }
       })

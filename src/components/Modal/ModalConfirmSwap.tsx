@@ -56,6 +56,7 @@ const ModalConfirmSwap = () => {
   } = useHistoryStore((state) => state)
   const { mutate, isSuccess, isError } = usePublishIntentSolver0()
   const hardTrackRef = useRef(false)
+  const { togglePreview } = useHistoryStore((state) => state)
 
   const getSwapFromLocal = (): ModalConfirmSwapPayload | null => {
     const getConfirmSwapFromLocal = localStorage.getItem(CONFIRM_SWAP_LOCAL_KEY)
@@ -252,22 +253,23 @@ const ModalConfirmSwap = () => {
         setSwapToLocal(mutate)
       )
       if (callResult?.length) {
-        const queryParams = new URLSearchParams(searchParams.toString())
-        queryParams.set(
-          UseQueryCollectorKeys.TRANSACTION_HASHS,
-          callResult[0].transaction.hash
-        )
-        const updatedQueryString = queryParams.toString()
-        router.replace(pathname + "?" + updatedQueryString)
-
-        // Intentionally run function to validate queue of execution
-        hardTrackRef.current = true
-        updateOneHistory({
-          clientId: inputs.clientId as string,
-          hash: callResult[0].transaction.hash as string,
-          timestamp: Number(`${new Date().getTime()}` + "0".repeat(6)),
+        callResult.reverse().forEach((result, i) => {
+          updateOneHistory({
+            clientId: inputs.clientId as string,
+            hash: callResult[0].transaction.hash as string,
+            timestamp: Number(`${new Date().getTime()}` + "0".repeat(6)),
+            details: {
+              tokenIn: modalPayload.tokenIn,
+              tokenOut: modalPayload.tokenOut,
+              selectedTokenIn: modalPayload.selectedTokenIn,
+              selectedTokenOut: modalPayload.selectedTokenOut,
+            },
+          })
+          // Toggle preview for the main transaction in batch
+          if (i === callResult.length - 1) {
+            togglePreview(callResult[0].transaction.hash as string)
+          }
         })
-        await handleTrackSwap()
       }
     }
   }
