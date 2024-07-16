@@ -17,16 +17,40 @@ const ConnectWalletTabBox = ({ children }: PropsWithChildren) => {
   )
 }
 
+const TabTotalBalance = ({
+  totalBalanceInUsd,
+  isLoading,
+}: {
+  totalBalanceInUsd: number | undefined
+  isLoading: boolean
+}) => {
+  console.log(totalBalanceInUsd, "totalBalanceInUsd,<<<")
+  return (
+    <ConnectWalletTabBox>
+      {isLoading ? (
+        <div className="h-[36px]">
+          <Spinner loading={isLoading} />
+        </div>
+      ) : (
+        <Text size="7" weight="bold">
+          ${totalBalanceInUsd ? totalBalanceInUsd?.toFixed(2) : "0.00"}
+        </Text>
+      )}
+      <Text size="2" weight="medium" className="text-gray-600">
+        Total balance
+      </Text>
+    </ConnectWalletTabBox>
+  )
+}
+
 const ConnectWalletTabs = () => {
-  const [isLoading, setIsLoading] = useState(false)
-  const { data, isFetched } = useTokensStore((state) => state)
+  const { data, isFetched, isLoading } = useTokensStore((state) => state)
   const [totalBalanceInUsd, setTotalBalanceInUsd] = useState<
     number | undefined
   >()
   const { getAccountBalance } = useAccountBalance()
 
   const getBalanceToUsd = async () => {
-    setIsLoading(true)
     let balanceInUsd = 0
     const temp = []
     let wNearConvertedLastUsd = 0
@@ -54,36 +78,19 @@ const ConnectWalletTabs = () => {
     balanceInUsd += Number(nativeBalanceInUsd) * wNearConvertedLastUsd
 
     setTotalBalanceInUsd(balanceInUsd)
-    setIsLoading(false)
   }
 
   useEffect(() => {
-    if (data.size && isFetched) {
+    if (data.size && isFetched && !isLoading) {
       getBalanceToUsd()
     }
-  }, [data, isFetched])
-
-  const TabTotalBalance = () => {
-    return (
-      <ConnectWalletTabBox>
-        {isLoading ? (
-          <div className="h-[36px]">
-            <Spinner loading={isLoading} />
-          </div>
-        ) : (
-          <Text size="7" weight="bold">
-            ${totalBalanceInUsd ? totalBalanceInUsd?.toFixed(2) : "0.00"}
-          </Text>
-        )}
-        <Text size="2" weight="medium" className="text-gray-600">
-          Total balance
-        </Text>
-      </ConnectWalletTabBox>
-    )
-  }
+  }, [data.size, isFetched, isLoading])
 
   return IS_DISABLED_ALL_TABS ? (
-    <TabTotalBalance />
+    <TabTotalBalance
+      totalBalanceInUsd={totalBalanceInUsd}
+      isLoading={isLoading}
+    />
   ) : (
     <Tabs.Root defaultValue="account">
       <Tabs.List color="orange">
@@ -98,7 +105,10 @@ const ConnectWalletTabs = () => {
 
       <Box pt="3" className="border-b-[1px] border-white-900 -mx-4 px-4">
         <Tabs.Content value="available">
-          <TabTotalBalance />
+          <TabTotalBalance
+            totalBalanceInUsd={totalBalanceInUsd}
+            isLoading={isLoading}
+          />
         </Tabs.Content>
 
         <Tabs.Content value="deposited">
