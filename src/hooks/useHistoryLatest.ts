@@ -6,7 +6,10 @@ import * as borsh from "borsh"
 import { HistoryData, HistoryStatus } from "@src/stores/historyStore"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { intentStatus } from "@src/utils/near"
-import { CONTRACTS_REGISTER } from "@src/constants/contracts"
+import {
+  CONFIRM_SWAP_LOCAL_KEY,
+  CONTRACTS_REGISTER,
+} from "@src/constants/contracts"
 import {
   NearIntentCreate,
   NearIntentStatus,
@@ -18,6 +21,7 @@ import { getNearTransactionDetails } from "@src/api/transaction"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { useTransactionScan } from "@src/hooks/useTransactionScan"
 import { swapSchema } from "@src/utils/schema"
+import { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
 
 const SCHEDULER_30_SEC = 30000
 const SCHEDULER_5_SEC = 5000
@@ -190,6 +194,34 @@ export const useHistoryLatest = () => {
                 status: HistoryStatus.COMPLETED,
               })
               break
+          }
+        }
+
+        // Extract data from local
+        if (
+          !historyData.details?.selectedTokenIn ||
+          !historyData.details?.selectedTokenOut ||
+          !historyData.details?.tokenIn ||
+          !historyData.details?.tokenOut
+        ) {
+          const getConfirmSwapFromLocal = localStorage.getItem(
+            CONFIRM_SWAP_LOCAL_KEY
+          )
+          if (getConfirmSwapFromLocal) {
+            const parsedData: { data: ModalConfirmSwapPayload } = JSON.parse(
+              getConfirmSwapFromLocal
+            )
+            if (parsedData.data.clientId === historyData.clientId) {
+              Object.assign(historyData, {
+                details: {
+                  ...historyData.details,
+                  tokenIn: parsedData.data.tokenIn,
+                  tokenOut: parsedData.data.tokenOut,
+                  selectedTokenIn: parsedData.data.selectedTokenIn,
+                  selectedTokenOut: parsedData.data.selectedTokenOut,
+                },
+              })
+            }
           }
         }
 
