@@ -13,7 +13,6 @@ import WidgetCardLink from "@src/components/History/Widget/WidgetCardLink"
 
 enum CardSwapStatusEnum {
   PENDING = "Pending",
-  REFUNDED = "Refunded",
   COMPLETED = "Completed",
 }
 

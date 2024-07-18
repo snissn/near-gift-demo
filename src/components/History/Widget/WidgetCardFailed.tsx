@@ -8,14 +8,12 @@ import { NearTX, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import { smallBalanceToFormat } from "@src/utils/token"
 import WidgetCardLink from "@src/components/History/Widget/WidgetCardLink"
 
-enum CardRollbackStatusEnum {
+enum CardFailedStatusEnum {
   SWAP = "Swap",
-  REFUND = "Refund",
 }
 
-enum CardRollbackActionEnum {
+enum CardFailedActionEnum {
   FT_TRANSFER_CALL = "ft_transfer_call",
-  ROLLBACK_INTENT = "rollback_intent",
 }
 
 type Props = {
@@ -29,7 +27,7 @@ type Props = {
 
 const NEAR_EXPLORER = process?.env?.nearExplorer ?? ""
 
-const WidgetCardRollback = ({
+const WidgetCardFailed = ({
   actions,
   tokenIn,
   tokenOut,
@@ -41,17 +39,14 @@ const WidgetCardRollback = ({
 
   const handleGetActionMethodName = (
     actions: NearTX["transaction"]["actions"]
-  ): CardRollbackActionEnum => {
-    return actions[0].FunctionCall.method_name as CardRollbackActionEnum
+  ): CardFailedActionEnum => {
+    return actions[0].FunctionCall.method_name as CardFailedActionEnum
   }
 
-  let cardStatus: CardRollbackStatusEnum
+  let cardStatus: CardFailedStatusEnum
   switch (handleGetActionMethodName(actions)) {
-    case CardRollbackActionEnum.FT_TRANSFER_CALL:
-      cardStatus = CardRollbackStatusEnum.SWAP
-      break
-    case CardRollbackActionEnum.ROLLBACK_INTENT:
-      cardStatus = CardRollbackStatusEnum.REFUND
+    case CardFailedActionEnum.FT_TRANSFER_CALL:
+      cardStatus = CardFailedStatusEnum.SWAP
       break
   }
 
@@ -73,20 +68,12 @@ const WidgetCardRollback = ({
         </Text>
         {!isActive && (
           <span className="flex gap-1">
-            {cardStatus === CardRollbackStatusEnum.REFUND ? (
-              <Text size="1" weight="medium" className="text-gray-600">
-                Swap refund
-              </Text>
-            ) : (
-              <>
-                <Text size="1" weight="medium" className="text-gray-600">
-                  -{smallBalanceToFormat(tokenIn, 7)}
-                </Text>
-                <Text size="1" weight="medium" className="text-gray-600">
-                  {selectedTokenIn.symbol}
-                </Text>
-              </>
-            )}
+            <Text size="1" weight="medium" className="text-gray-600">
+              -{smallBalanceToFormat(tokenIn, 7)}
+            </Text>
+            <Text size="1" weight="medium" className="text-gray-600">
+              {selectedTokenIn.symbol}
+            </Text>
           </span>
         )}
         {isActive && (
@@ -99,22 +86,15 @@ const WidgetCardRollback = ({
       </div>
       {!isActive && (
         <div className="shrink grow flex flex-col justify-between items-end">
-          <Text size="1" weight="medium" className="text-gray-600">
-            {cardStatus === CardRollbackStatusEnum.REFUND
-              ? "Completed"
-              : "Refunded"}
+          <Text size="1" weight="medium" className="text-red-600">
+            Rejected
           </Text>
           <span className="flex gap-1">
-            <Text size="1" weight="medium" className="text-green-400">
-              +
-              {cardStatus === CardRollbackStatusEnum.REFUND
-                ? smallBalanceToFormat(tokenIn, 7)
-                : smallBalanceToFormat(tokenOut, 7)}
+            <Text size="1" weight="medium" className="text-black-200">
+              +{smallBalanceToFormat(tokenOut, 7)}
             </Text>
-            <Text size="1" weight="medium" className="text-green-400">
-              {cardStatus === CardRollbackStatusEnum.REFUND
-                ? selectedTokenIn.symbol
-                : selectedTokenOut.symbol}
+            <Text size="1" weight="medium" className="text-black-200">
+              {selectedTokenOut.symbol}
             </Text>
           </span>
         </div>
@@ -128,4 +108,4 @@ const WidgetCardRollback = ({
   )
 }
 
-export default WidgetCardRollback
+export default WidgetCardFailed

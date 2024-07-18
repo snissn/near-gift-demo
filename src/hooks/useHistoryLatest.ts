@@ -42,6 +42,9 @@ export const useHistoryLatest = () => {
       HistoryStatus.ROLLED_BACK,
       HistoryStatus.EXPIRED,
       HistoryStatus.FAILED,
+      HistoryStatus.WITHDRAW,
+      HistoryStatus.DEPOSIT,
+      HistoryStatus.STORAGE_DEPOSIT,
     ]
 
     const historyCompletion: boolean[] = []
@@ -161,7 +164,7 @@ export const useHistoryLatest = () => {
                 ? historyData.details?.receipts_outcome[0]!.outcome!.logs[0]
                 : undefined
               Object.assign(historyData, {
-                status: HistoryStatus.COMPLETED,
+                status: HistoryStatus.DEPOSIT,
                 details: {
                   ...historyData.details,
                   recoverDetails: {
@@ -179,7 +182,7 @@ export const useHistoryLatest = () => {
               )
               args = JSON.parse(argsJson)
               Object.assign(historyData, {
-                status: HistoryStatus.COMPLETED,
+                status: HistoryStatus.WITHDRAW,
                 details: {
                   ...historyData.details,
                   recoverDetails: {
@@ -191,7 +194,7 @@ export const useHistoryLatest = () => {
 
             case "storage_deposit":
               Object.assign(historyData, {
-                status: HistoryStatus.COMPLETED,
+                status: HistoryStatus.STORAGE_DEPOSIT,
               })
               break
           }
