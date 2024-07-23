@@ -12,15 +12,18 @@ import NavbarMobile from "@src/components/NavbarMobile"
 import History from "@src/components/History"
 import { LINKS_HEADER } from "@src/constants/routes"
 import HistoryLastUpdate from "@src/components/History/HistoryLastUpdate"
+import Snackbar from "@src/components/Snackbar"
+import { useInterceptors } from "@src/api/api"
 
 const Layout: React.FC<PropsWithChildren> = ({ children }) => {
+  useInterceptors()
   const pathname = usePathname()
   const isAppsPath = LINKS_HEADER.some((route) => route.href === pathname)
 
   // PREFETCH: Prefetch action could be done similarly to the prefetch action
   //           in _app.ts within the pages Router.
   return (
-    <div className="flex flex-col min-h-screen dark:bg-black-400">
+    <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex md:flex-1">{children}</main>
       <Footer />
@@ -28,6 +31,7 @@ const Layout: React.FC<PropsWithChildren> = ({ children }) => {
       <PageBackground />
       {isAppsPath && <History />}
       <HistoryLastUpdate />
+      <Snackbar />
     </div>
   )
 }

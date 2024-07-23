@@ -4,34 +4,38 @@ import React from "react"
 import Link from "next/link"
 import clsx from "clsx"
 import { Text } from "@radix-ui/themes"
+import { usePathname } from "next/navigation"
 
 import Logo from "@src/components/Logo"
 import Navbar from "@src/components/Navbar"
-import ConnectWallet from "@src/components/ConnectWallet"
-import Settings from "@src/components/Settings"
+import ConnectWallet from "@src/components/Wallet"
+// import Settings from "@src/components/Settings"
 import { Navigation } from "@src/constants/routes"
 
-const TURN_OFF_APPS = process?.env?.turnOffApps === "true" ?? true
 const NEXT_PUBLIC_APP_URL = process?.env?.appUrl ?? ""
 
 const Header = () => {
+  const pathname = usePathname()
+  const isMarketPage =
+    pathname === Navigation.HOME || pathname === Navigation.JOBS
+
   return (
     <>
       <header className="h-[56px] fixed top-0 left-0 w-full md:relative border-b-[1px] border-white-200 z-50 bg-transparent dark:border-black-600">
         <div className="h-full flex justify-between items-center px-3">
           <Logo />
           <div className="hidden md:flex justify-center w-full max-w-5xl pl-3">
-            {!TURN_OFF_APPS && <Navbar />}
+            {!isMarketPage && <Navbar />}
           </div>
           <div className="flex justify-between items-center gap-4">
-            {!TURN_OFF_APPS && (
+            {!isMarketPage && (
               <>
                 <ConnectWallet />
                 {/*  TODO Wallet page has to be re-designed */}
                 {/*<Settings />*/}
               </>
             )}
-            {TURN_OFF_APPS && (
+            {isMarketPage && (
               <>
                 <Link
                   href={Navigation.JOBS}

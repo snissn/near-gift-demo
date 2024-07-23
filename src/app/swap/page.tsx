@@ -1,9 +1,8 @@
 "use client"
 
-import React, { useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { FieldValues, useForm } from "react-hook-form"
 import { formatUnits, parseUnits } from "viem"
-import { CheckedState } from "@radix-ui/react-checkbox"
 
 import Paper from "@src/components/Paper"
 import Form from "@src/components/Form"
@@ -14,7 +13,7 @@ import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
 import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { ModalType } from "@src/stores/modalStore"
-import { NetworkToken } from "@src/types/interfaces"
+import { NetworkToken, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import { ModalSelectAssetsPayload } from "@src/components/Modal/ModalSelectAssets"
 import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
 import { DataEstimateRequest } from "@src/libs/de-sdk/types/interfaces"
@@ -28,6 +27,7 @@ import { useEvaluateSwapEstimation } from "@src/hooks/useEvaluateSwapEstimation"
 import BlockEvaluatePrice from "@src/components/Block/BlockEvaluatePrice"
 import { useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import { useSwapGuard } from "@src/hooks/useSwapGuard"
 
 type FormValues = {
   tokenIn: string
@@ -82,6 +82,7 @@ export default function Swap() {
   const { getSwapEstimateBot, isFetching } = useSwapEstimateBot()
   const isProgrammaticUpdate = useRef(false)
   useModalSearchParams()
+  const { handleValidateInputs, errorMsg } = useSwapGuard()
 
   const handleResetToken = (
     token: NetworkToken,
@@ -112,6 +113,9 @@ export default function Swap() {
   }
 
   const onSubmit = async (values: FieldValues) => {
+    if (errorMsg) {
+      return
+    }
     if (!accountId) {
       return handleSignIn()
     }
@@ -122,7 +126,7 @@ export default function Swap() {
       tokenOut: values.tokenOut,
       selectedTokenIn: selectTokenIn,
       selectedTokenOut: selectTokenOut,
-      isNativeInSwap: pair.includes("0x1"),
+      isNativeInSwap: pair.includes("native"),
     })
   }
 
@@ -148,24 +152,30 @@ export default function Swap() {
     setModalType(ModalType.MODAL_SELECT_ASSETS, { fieldName, selectToken })
   }
 
-  const debouncedGetSwapEstimateBot = debounce(
-    async (data: DataEstimateRequest) => {
+  const debouncedGetSwapEstimateBot = useCallback(
+    debounce(async (data: DataEstimateRequest) => {
       const { bestOut, allEstimates } = await getSwapEstimateBot(data)
       getEvaluateSwapEstimate("tokenOut", data, allEstimates, bestOut)
       isProgrammaticUpdate.current = true
       setValue("tokenOut", bestOut ?? "0")
-    },
-    ESTIMATE_BOT_AWAIT_500_MS
+    }, ESTIMATE_BOT_AWAIT_500_MS),
+    []
   )
 
-  const debouncedGetSwapEstimateBotReverse = debounce(
-    async (data: DataEstimateRequest) => {
+  const debouncedGetSwapEstimateBotReverse = useCallback(
+    debounce(async (data: DataEstimateRequest) => {
       const { bestOut, allEstimates } = await getSwapEstimateBot(data)
       getEvaluateSwapEstimate("tokenIn", data, allEstimates, bestOut)
       isProgrammaticUpdate.current = true
       setValue("tokenIn", bestOut ?? "0")
-    },
-    ESTIMATE_BOT_AWAIT_500_MS
+
+      handleValidateInputs({
+        tokenIn: bestOut ?? "0",
+        selectTokenIn: selectTokenIn as NetworkTokenWithSwapRoute,
+        selectTokenOut: selectTokenOut as NetworkTokenWithSwapRoute,
+      })
+    }, ESTIMATE_BOT_AWAIT_500_MS),
+    []
   )
 
   const handleEstimateSwap = ({
@@ -186,7 +196,7 @@ export default function Swap() {
 
     // Do not use any estimation of swap between Native and Token if ratio is 1:1
     const pair = [selectTokenIn.address, selectTokenOut.address]
-    if (pair.includes("0x1") && pair.includes("wrap.near")) {
+    if (pair.includes("native") && pair.includes("wrap.near")) {
       isProgrammaticUpdate.current = true
       return setValue(
         name === "tokenIn" ? "tokenOut" : "tokenIn",
@@ -204,7 +214,7 @@ export default function Swap() {
     ).toString()
 
     const wTokenIn =
-      selectTokenIn!.address === "0x1" ? "wrap.near" : selectTokenIn!.address
+      selectTokenIn!.address === "native" ? "wrap.near" : selectTokenIn!.address
     if (name === "tokenIn") {
       debouncedGetSwapEstimateBot({
         tokenIn: wTokenIn,
@@ -218,6 +228,12 @@ export default function Swap() {
         amountIn: unitsTokenOut,
       } as DataEstimateRequest)
     }
+
+    handleValidateInputs({
+      tokenIn,
+      selectTokenIn,
+      selectTokenOut,
+    })
   }
 
   useEffect(() => {
@@ -229,8 +245,17 @@ export default function Swap() {
         const parsedData: { data: ModalConfirmSwapPayload } = JSON.parse(
           getConfirmSwapFromLocal
         )
-        setSelectTokenIn(parsedData.data.selectedTokenIn)
-        setSelectTokenOut(parsedData.data.selectedTokenOut)
+        const cleanBalance = {
+          balance: 0,
+          balanceToUsd: 0,
+          convertedLast: 0,
+        }
+        setSelectTokenIn(
+          Object.assign(parsedData.data.selectedTokenIn, cleanBalance)
+        )
+        setSelectTokenOut(
+          Object.assign(parsedData.data.selectedTokenOut, cleanBalance)
+        )
         return
       }
       if (data.size) {
@@ -246,17 +271,12 @@ export default function Swap() {
       }
     }
     // Do evaluate usd select tokens prices
-    if (
-      data.size &&
-      !isLoading &&
-      (!selectTokenIn?.convertedLast?.usd ||
-        !selectTokenOut?.convertedLast?.usd)
-    ) {
+    if (data.size && !isLoading) {
       data.forEach((token) => {
-        if (selectTokenIn?.address === token.address) {
+        if (selectTokenIn?.defuse_asset_id === token.defuse_asset_id) {
           setSelectTokenIn(token)
         }
-        if (selectTokenOut?.address === token.address) {
+        if (selectTokenOut?.defuse_asset_id === token.defuse_asset_id) {
           setSelectTokenOut(token)
         }
       })
@@ -409,8 +429,14 @@ export default function Swap() {
           errors={errors}
           errorSelect={errorSelectTokenOut}
         />
-        <Button type="submit" size="lg" fullWidth isLoading={isFetching}>
-          {isFetching ? "" : "Swap"}
+        <Button
+          type="submit"
+          size="lg"
+          fullWidth
+          isLoading={isFetching}
+          disabled={Boolean(errorMsg)}
+        >
+          {isFetching ? "" : errorMsg ? errorMsg : "Swap"}
         </Button>
       </Form>
     </Paper>

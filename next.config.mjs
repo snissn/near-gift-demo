@@ -1,3 +1,4 @@
+import { withSentryConfig } from "@sentry/nextjs"
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config) => {
@@ -21,7 +22,7 @@ const nextConfig = {
     turnOffLanding: process.env.NEXT_PUBLIC_TURN_OFF_LANDING,
     solverRelay: process.env.NEXT_PUBLIC_SOLVER_RELAY_API,
     coingeckoApiKey: process.env.COINGECKO_API_KEY,
-    landing: process.env.NEXT_PUBLIC_LANDING_URL,
+    walletConnectProjectId: process.env.WALLET_CONNECT_PROJECT_ID,
     appUrl: process.env.NEXT_PUBLIC_APP_URL,
     nearExplorer: process.env.NEXT_PUBLIC_NEAR_EXPLORER,
     publicMail: process.env.NEXT_PUBLIC_PUBLIC_MAIL,
@@ -57,4 +58,13 @@ const nextConfig = {
   },
 }
 
-export default nextConfig
+const sentryConfig = {
+  org: "aurora-k2",
+  project: "defuse",
+  silent: true,
+  widenClientFileUpload: true,
+  hideSourceMaps: true,
+  disableLogger: true,
+}
+
+export default withSentryConfig(nextConfig, sentryConfig)

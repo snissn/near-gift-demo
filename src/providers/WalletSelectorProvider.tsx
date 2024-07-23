@@ -2,7 +2,6 @@
 
 import type {
   AccountState,
-  NetworkId,
   Wallet,
   WalletSelector,
 } from "@near-wallet-selector/core"
@@ -58,6 +57,8 @@ import { Loading } from "@src/components/Loading"
 import { CONTRACTS_REGISTER } from "@src/constants/contracts"
 
 const NEAR_ENV = process.env.NEAR_ENV ?? "testnet"
+const NEAR_NODE_URL = process.env.nearNodeUrl ?? "https://rpc.mainnet.near.org"
+const WALLET_CONNECT_PROJECT_ID = process.env.walletConnectProjectId ?? ""
 
 export const WalletSelectorContext =
   createContext<WalletSelectorContextValue | null>(null)
@@ -72,7 +73,14 @@ export const WalletSelectorProvider: React.FC<{
 
   const init = useCallback(async () => {
     const _selector = await setupWalletSelector({
-      network: NEAR_ENV as NetworkId,
+      network: {
+        networkId: NEAR_ENV,
+        nodeUrl: NEAR_NODE_URL,
+        helperUrl: "",
+        explorerUrl: "https://nearblocks.io",
+        indexerUrl:
+          "postgres://public_readonly:nearprotocol@mainnet.db.explorer.indexer.near.dev/mainnet_explorer",
+      },
       debug: true,
       modules: [
         setupMyNearWallet(),
@@ -95,17 +103,18 @@ export const WalletSelectorProvider: React.FC<{
         }),
         setupXDEFI(),
         setupWalletConnect({
-          projectId: "", // Example c4f79cc...
+          projectId: WALLET_CONNECT_PROJECT_ID,
           metadata: {
-            name: "NEAR Wallet Selector",
-            description: "Example dApp used by NEAR Wallet Selector",
-            url: "https://github.com/near/wallet-selector",
-            icons: ["https://avatars.githubusercontent.com/u/37784886"],
+            name: "Defuse Protocol",
+            description:
+              "Defuse: the premier platform for cross-chain liquidity and trading. Experience efficient, secure, and transparent swaps across multiple blockchains.",
+            url: "https://github.com/defuse-protocol",
+            icons: ["https://defuse.org/static/icons/Logo.svg"],
           },
         }),
         setupNearMobileWallet(),
         setupMintbaseWallet({
-          contractId: "", // Example guest-book.testnet
+          contractId: CONTRACTS_REGISTER.INTENT,
         }) as WalletModuleFactory<Wallet>,
       ],
     })

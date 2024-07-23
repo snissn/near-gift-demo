@@ -12,6 +12,9 @@ export enum HistoryStatus {
   ROLLED_BACK = "RolledBack",
   EXPIRED = "Expired",
   FAILED = "Failed", // Internal status
+  WITHDRAW = "Withdraw", // Internal status
+  DEPOSIT = "Deposit", // Internal status
+  STORAGE_DEPOSIT = "Storage Deposit", // Internal status
 }
 
 export type HistoryData = {
@@ -43,6 +46,7 @@ export type HistoryActions = {
   togglePreview: (hash: string | undefined) => void
   toggleWidget: () => void
   updateHistory: (data: HistoryData[]) => void
+  updateOneHistory: (data: HistoryData) => void
   closeHistoryItem: (hash: HistoryData["hash"]) => void
 }
 
@@ -82,6 +86,12 @@ export const createHistoryStore = (
         data.forEach((item) => updatedData.set(item.hash, item))
         helperHistoryLocalStore(updatedData as HistoryState["data"])
         return { data: updatedData, isFetched: true }
+      }),
+    updateOneHistory: (one: HistoryData) =>
+      set((state) => {
+        const updatedData = new Map(state.data)
+        updatedData.set(one.hash, one)
+        return { data: updatedData }
       }),
     closeHistoryItem: (hash: HistoryData["hash"]) =>
       set((state) => {

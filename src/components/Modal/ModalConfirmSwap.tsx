@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useId, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { Spinner, Text } from "@radix-ui/themes"
 import Image from "next/image"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
@@ -24,6 +24,16 @@ import { usePublishIntentSolver0 } from "@src/api/hooks/Intent/usePublishIntentS
 import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
 import { smallBalanceToFormat } from "@src/utils/token"
 import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
+import { PublishAtomicNearIntentProps } from "@src/api/intent"
+import { useNotificationStore } from "@src/providers/NotificationProvider"
+import { NotificationType } from "@src/stores/notificationStore"
+import { getNearBlockById } from "@src/api/transaction"
+import {
+  NearBlock,
+  NearTX,
+  NetworkTokenWithSwapRoute,
+  QueueTransactions,
+} from "@src/types/interfaces"
 
 export interface ModalConfirmSwapPayload extends CallRequestIntentProps {}
 
@@ -37,6 +47,7 @@ const ModalConfirmSwap = () => {
     nextEstimateQueueTransactions,
     getEstimateQueueTransactions,
     isProcessing,
+    isError: isErrorSwap,
   } = useSwap({
     selector,
     accountId,
@@ -46,8 +57,14 @@ const ModalConfirmSwap = () => {
   const searchParams = useSearchParams()
   const { onCloseModal, payload } = useModalStore((state) => state)
   const modalPayload = payload as ModalReviewSwapPayload
-  const { data: historyData, isFetched } = useHistoryStore((state) => state)
-  const { mutate } = usePublishIntentSolver0()
+  const {
+    data: historyData,
+    updateOneHistory,
+    isFetched,
+  } = useHistoryStore((state) => state)
+  const { mutate, isSuccess, isError } = usePublishIntentSolver0()
+  const ongoingPublishingRef = useRef(false)
+  const { togglePreview } = useHistoryStore((state) => state)
 
   const getSwapFromLocal = (): ModalConfirmSwapPayload | null => {
     const getConfirmSwapFromLocal = localStorage.getItem(CONFIRM_SWAP_LOCAL_KEY)
@@ -64,6 +81,12 @@ const ModalConfirmSwap = () => {
       CONFIRM_SWAP_LOCAL_KEY,
       JSON.stringify({ data: inputs })
     )
+  }
+
+  const handleBatchCleanupQuery = (keys: string[]) => {
+    const params = new URLSearchParams(searchParams.toString())
+    keys.forEach((key) => params.delete(key))
+    router.replace(pathname + "?" + params)
   }
 
   const handleBatchCreateSwapQuery = ({
@@ -103,31 +126,55 @@ const ModalConfirmSwap = () => {
     }
   }
 
+  const { setNotification } = useNotificationStore((state) => state)
+
   const handlePublishIntentToSolver = (
-    inputs: ModalConfirmSwapPayload
+    inputs: ModalConfirmSwapPayload,
+    receivedClientId: string | undefined,
+    receivedHash: string
   ): void => {
-    historyData.forEach((value) => {
-      if (value.clientId === inputs.clientId) {
-        mutate({
-          hash: value.hash,
-          defuseAssetIdIn: inputs.selectedTokenIn.defuse_asset_id,
-          accountId: accountId as string,
-          clientId: inputs.clientId,
-          defuseAssetIdOut: inputs.selectedTokenOut.defuse_asset_id,
-          unitsAmountIn: parseUnits(
-            inputs.tokenIn,
-            inputs.selectedTokenIn?.decimals as number
-          ).toString(),
-          unitsAmountOut: parseUnits(
-            inputs.tokenOut,
-            inputs.selectedTokenOut?.decimals as number
-          ).toString(),
-        })
-      }
-    })
+    if (!receivedClientId) {
+      setNotification({
+        id: v4(),
+        message: "Intent hasn't been published!",
+        type: NotificationType.ERROR,
+      })
+      return
+    }
+    mutate({
+      hash: receivedHash,
+      defuseAssetIdIn: inputs.selectedTokenIn.defuse_asset_id,
+      accountId: accountId,
+      clientId: receivedClientId,
+      defuseAssetIdOut: inputs.selectedTokenOut.defuse_asset_id,
+      unitsAmountIn: parseUnits(
+        inputs.tokenIn,
+        inputs.selectedTokenIn?.decimals as number
+      ).toString(),
+      unitsAmountOut: parseUnits(
+        inputs.tokenOut,
+        inputs.selectedTokenOut?.decimals as number
+      ).toString(),
+    } as PublishAtomicNearIntentProps)
+  }
+
+  const handleMutateTokenToNativeSupport = (
+    selectedToken: NetworkTokenWithSwapRoute
+  ) => {
+    const tokenNearNative = LIST_NATIVE_TOKENS.find(
+      (token) => token.defuse_asset_id === "near:mainnet:native"
+    )
+    return {
+      ...selectedToken,
+      defuse_asset_id: tokenNearNative?.routes
+        ? tokenNearNative?.routes[1]
+        : "",
+    }
   }
 
   const handleTrackSwap = async () => {
+    if (ongoingPublishingRef.current) return
+
     if (!modalPayload) {
       const data = getSwapFromLocal()
 
@@ -137,6 +184,9 @@ const ModalConfirmSwap = () => {
         // TODO Linked to [#1]
         const receivedHash = searchParams.get(
           UseQueryCollectorKeys.TRANSACTION_HASHS
+        )
+        const receivedClientId = searchParams.get(
+          UseQueryCollectorKeys.CLIENT_ID
         )
 
         const isBatchHashes = receivedHash?.split(",")
@@ -149,24 +199,19 @@ const ModalConfirmSwap = () => {
         const lastInTransactionHashes =
           isBatchHashes?.length > 1 ? isBatchHashes.at(-1) : isBatchHashes[0]
 
+        const isCreateIntentRequest =
+          data.estimateQueue.queueTransactionsTrack.includes(
+            QueueTransactions.CREATE_INTENT
+          )
+
         const { value, done } = await nextEstimateQueueTransactions({
           estimateQueue: data.estimateQueue,
           receivedHash: lastInTransactionHashes as string,
         })
 
-        setIsReadingHistory(true)
-
-        const isNativeTokenIn = data!.selectedTokenIn.address === "0x1"
-        const tokenNearNative = LIST_NATIVE_TOKENS.find(
-          (token) => token.defuse_asset_id === "near:mainnet:0x1"
-        )
+        const isNativeTokenIn = data!.selectedTokenIn.address === "native"
         const mutateSelectedTokenIn = isNativeTokenIn
-          ? {
-              ...data!.selectedTokenIn,
-              defuse_asset_id: tokenNearNative?.routes
-                ? tokenNearNative?.routes[1]
-                : "",
-            }
+          ? handleMutateTokenToNativeSupport(data!.selectedTokenIn)
           : data!.selectedTokenIn
 
         const inputs = {
@@ -178,12 +223,27 @@ const ModalConfirmSwap = () => {
           estimateQueue: value,
         }
 
+        if (done && isCreateIntentRequest) {
+          ongoingPublishingRef.current = true
+          handlePublishIntentToSolver(
+            inputs,
+            receivedClientId ?? data.clientId,
+            lastInTransactionHashes as string
+          )
+          return
+        }
         if (done) {
-          handlePublishIntentToSolver(inputs)
           onCloseModal()
           router.replace(pathname)
           return
         }
+
+        setIsReadingHistory(true)
+
+        handleBatchCleanupQuery([
+          UseQueryCollectorKeys.CLIENT_ID,
+          UseQueryCollectorKeys.TRANSACTION_HASHS,
+        ])
 
         setSwapToLocal(inputs)
         handleBatchCreateSwapQuery({
@@ -214,7 +274,67 @@ const ModalConfirmSwap = () => {
       }
 
       setSwapToLocal(inputs)
-      await callRequestCreateIntent(inputs, (mutate) => setSwapToLocal(mutate))
+
+      ongoingPublishingRef.current = true
+      const callResult: NearTX[] | void = await callRequestCreateIntent(
+        inputs,
+        (mutate) => setSwapToLocal(mutate)
+      )
+      if (callResult?.length) {
+        const timestamps = await Promise.all(
+          callResult.map(async (result) => {
+            const { result: resultBlock } = (await getNearBlockById(
+              result.transaction.hash as string
+            )) as NearBlock
+            return (
+              resultBlock?.header?.timestamp ??
+              Number(`${new Date().getTime()}` + "0".repeat(6))
+            )
+          })
+        )
+
+        callResult.forEach((result, i) => {
+          updateOneHistory({
+            clientId: inputs.clientId as string,
+            hash: result.transaction.hash as string,
+            timestamp: timestamps[i] ?? 0,
+            details: {
+              tokenIn: modalPayload.tokenIn,
+              tokenOut: modalPayload.tokenOut,
+              selectedTokenIn: modalPayload.selectedTokenIn,
+              selectedTokenOut: modalPayload.selectedTokenOut,
+            },
+          })
+          // Toggle preview for the main transaction in batch
+          if (i === callResult.length - 1) {
+            togglePreview(result.transaction.hash as string)
+            if (
+              estimateQueue.queueTransactionsTrack.includes(
+                QueueTransactions.CREATE_INTENT
+              )
+            ) {
+              const isNativeTokenIn =
+                modalPayload!.selectedTokenIn.address === "native"
+              const mutateSelectedTokenIn = isNativeTokenIn
+                ? handleMutateTokenToNativeSupport(
+                    modalPayload!.selectedTokenIn
+                  )
+                : modalPayload!.selectedTokenIn
+
+              handlePublishIntentToSolver(
+                Object.assign(inputs, {
+                  selectedTokenIn: mutateSelectedTokenIn,
+                }),
+                inputs.clientId,
+                result.transaction.hash as string
+              )
+            } else {
+              onCloseModal()
+              router.replace(pathname)
+            }
+          }
+        })
+      }
     }
   }
 
@@ -223,6 +343,35 @@ const ModalConfirmSwap = () => {
       handleTrackSwap()
     }
   }, [historyData, isFetched, isProcessing])
+
+  useEffect(() => {
+    if (isSuccess) {
+      onCloseModal()
+      ongoingPublishingRef.current = false
+      router.replace(pathname)
+    }
+    if (isError) {
+      ongoingPublishingRef.current = false
+      setNotification({
+        id: v4(),
+        message: "Intent hasn't been published!",
+        type: NotificationType.ERROR,
+      })
+    }
+  }, [isSuccess, isError])
+
+  useEffect(() => {
+    if (isErrorSwap) {
+      onCloseModal()
+      ongoingPublishingRef.current = false
+      router.replace(pathname)
+      setNotification({
+        id: "418",
+        message: isErrorSwap,
+        type: NotificationType.ERROR,
+      })
+    }
+  }, [isErrorSwap])
 
   if (!isReadingHistory) {
     return null

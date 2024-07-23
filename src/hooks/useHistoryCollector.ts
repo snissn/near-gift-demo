@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { useQueryCollector } from "@src/hooks/useQuery"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
@@ -48,7 +48,7 @@ export const useHistoryCollector = (collectorHooks: CollectorHook[]) => {
 
       const isHistoryNotComplete = history.some(
         (history) =>
-          !history!.errorMessage?.length &&
+          !history?.errorMessage?.length &&
           history.status !== HistoryStatus.COMPLETED &&
           history.status !== HistoryStatus.ROLLED_BACK &&
           history.status !== HistoryStatus.EXPIRED
@@ -62,6 +62,12 @@ export const useHistoryCollector = (collectorHooks: CollectorHook[]) => {
       setIsFetching(false)
     }
   }
+
+  useEffect(() => {
+    if (data.size) {
+      runTransactionCollector()
+    }
+  }, [data.size])
 
   return {
     runTransactionCollector,

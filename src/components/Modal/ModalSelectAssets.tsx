@@ -2,7 +2,6 @@
 
 import { useState, useDeferredValue, useEffect } from "react"
 import { Text } from "@radix-ui/themes"
-import { BigNumber } from "ethers"
 
 import ModalDialog from "@src/components/Modal/ModalDialog"
 import SearchBar from "@src/components/SearchBar"
@@ -31,7 +30,7 @@ const ModalSelectAssets = () => {
   >([])
 
   const { onCloseModal, modalType, payload } = useModalStore((state) => state)
-  const { data } = useTokensStore((state) => state)
+  const { data, isLoading } = useTokensStore((state) => state)
   const deferredQuery = useDeferredValue(searchValue)
 
   const handleSearchClear = () => setSearchValue("")
@@ -53,7 +52,7 @@ const ModalSelectAssets = () => {
   }
 
   useEffect(() => {
-    if (!data.size) {
+    if (!data.size && !isLoading) {
       return
     }
     const { selectToken, fieldName } = payload as {
@@ -88,12 +87,12 @@ const ModalSelectAssets = () => {
     })
     setAssetList(getAssetList)
     setAssetListWithBalances(getAssetListWithBalances)
-  }, [data])
+  }, [data, isLoading])
 
   return (
     <ModalDialog>
       <div className="flex flex-col min-h-[680px] max-h-[680px] h-full">
-        <div className="flex-none p-5 border-b border-gray-100 dark:border-black">
+        <div className="flex-none p-5 border-b border-gray-100 dark:border-black-950">
           <SearchBar
             query={searchValue}
             setQuery={setSearchValue}
@@ -101,7 +100,7 @@ const ModalSelectAssets = () => {
           />
         </div>
         {!deferredQuery.length && assetListWithBalances.length ? (
-          <div className="relative flex-1 border-b border-gray-100 px-2.5 min-h-[228px] h-full max-h-[228px] overflow-y-auto dark:border-black">
+          <div className="relative flex-1 border-b border-gray-100 px-2.5 min-h-[228px] h-full max-h-[228px] overflow-y-auto dark:border-black-950">
             <AssetList
               assets={assetListWithBalances}
               title="Your tokens"
@@ -109,7 +108,7 @@ const ModalSelectAssets = () => {
             />
           </div>
         ) : null}
-        <div className="flex-1 flex flex-col justify-between border-b border-gray-100 px-2.5 overflow-y-auto dark:border-black-700">
+        <div className="flex-1 flex flex-col justify-between border-b border-gray-100 px-2.5 overflow-y-auto dark:border-black-950">
           <AssetList
             assets={deferredQuery ? assetList.filter(filterPattern) : assetList}
             title={deferredQuery ? "Search results" : "Popular tokens"}

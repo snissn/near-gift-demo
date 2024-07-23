@@ -63,8 +63,6 @@ export const useQueryCollector = (): CollectorHook => {
 
   const handleCleanupQuery = () => {
     cleanupQuery([
-      UseQueryCollectorKeys.CLIENT_ID,
-      UseQueryCollectorKeys.TRANSACTION_HASHS,
       UseQueryCollectorKeys.ERROR_MESSAGE,
       UseQueryCollectorKeys.ERROR_CODE,
     ])
@@ -96,50 +94,72 @@ export const useQueryCollector = (): CollectorHook => {
       const errorMessage = searchParams.get(UseQueryCollectorKeys.ERROR_MESSAGE)
       const errorCode = searchParams.get(UseQueryCollectorKeys.ERROR_CODE)
 
-      // TODO All transaction has to be added to history, not only the last in a batch [#1]
-      const isBatch = transactionHashes?.split(",") ?? []
-      const lastInTransactionHashes =
-        isBatch.length > 1 ? isBatch.at(-1) : isBatch[0]
-
-      if (lastInTransactionHashes) {
-        const { result } = (await getNearTransactionDetails(
-          lastInTransactionHashes as string,
-          accountId as string
-        )) as Result<NearTX>
-
-        let getNearBlockData = 0
-        if (result.receipts_outcome.length) {
-          const { result: resultBlock } = (await getNearBlockById(
-            result.receipts_outcome[0].block_hash
-          )) as NearBlock
-          getNearBlockData = resultBlock.header.timestamp
-        }
-
-        togglePreview(lastInTransactionHashes)
+      if (errorMessage || errorCode) {
+        // TODO Add failure events
         handleCleanupQuery()
-
-        return [
-          {
-            clientId: clientId as string,
-            hash: lastInTransactionHashes as string,
-            timestamp: getNearBlockData ?? 0,
-            details: {
-              receipts_outcome: result?.receipts_outcome,
-              transaction: result?.transaction,
-              ...getTryToExtractDataFromLocal(clientId as string),
-            },
-          },
-        ]
+        return []
       }
 
-      // TODO Add failure events
-      // if (errorCode || errorMessage) {
-      //   return {
-      //     status: (errorMessage as string) || (errorCode as string),
-      //     hash: transactionHashes,
-      //     logs: [],
-      //   }
-      // }
+      const transactionBatch = transactionHashes?.split(",") ?? []
+      if (!transactionBatch.length) {
+        console.log(
+          "getTransactions has stopped due to the hash is missing, UseQueryCollectorKeys.TRANSACTION_HASHS"
+        )
+        return []
+      }
+
+      const txDatas = await Promise.all(
+        transactionBatch.map(async (hash) => {
+          const txData = (await getNearTransactionDetails(
+            hash as string,
+            accountId as string
+          )) as Result<NearTX>
+          if (txData?.error?.data) {
+            console.log(
+              "getTransactions: ",
+              txData?.error?.data,
+              ", hash:",
+              hash
+            )
+          }
+          let blockData = 0
+          if (txData?.result?.receipts_outcome?.length) {
+            const { result: resultBlock } = (await getNearBlockById(
+              txData.result.receipts_outcome[0].block_hash
+            )) as NearBlock
+            blockData = resultBlock.header.timestamp
+            return {
+              hash,
+              blockData,
+              ...txData,
+            }
+          }
+          return null
+        })
+      )
+
+      if (txDatas.length) {
+        const result: HistoryData[] = []
+        txDatas.forEach((txData, i) => {
+          if (i === txDatas.length - 1) {
+            togglePreview(txData!.hash)
+          }
+          if (txData) {
+            result.push({
+              clientId: clientId as string,
+              hash: txData.hash as string,
+              timestamp: txData.blockData ?? 0,
+              details: {
+                receipts_outcome: txData.result?.receipts_outcome,
+                transaction: txData.result?.transaction,
+                ...getTryToExtractDataFromLocal(clientId as string),
+              },
+            })
+          }
+        })
+        handleCleanupQuery()
+        return result
+      }
 
       handleCleanupQuery()
       return []

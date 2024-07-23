@@ -1,13 +1,16 @@
 import { WalletSelector } from "@near-wallet-selector/core"
 
-import { FT_STORAGE_DEPOSIT_GAS } from "@src/constants/contracts"
+import {
+  FT_STORAGE_DEPOSIT_GAS,
+  FT_WITHDRAW_GAS,
+} from "@src/constants/contracts"
 
 type Props = {
   accountId: string | null
   selector: WalletSelector | null
 }
 
-const useSwapNearToWNear = ({ accountId, selector }: Props) => {
+const useSwapNearToWNear = ({ selector }: Props) => {
   const callRequestNearDeposit = async (
     contractAddress: string,
     deposit: string
@@ -35,7 +38,7 @@ const useSwapNearToWNear = ({ accountId, selector }: Props) => {
 
   const callRequestNearWithdraw = async (
     contractAddress: string,
-    withdraw: string
+    amount: string
   ) => {
     const wallet = await selector!.wallet()
     return await wallet.signAndSendTransactions({
@@ -48,10 +51,10 @@ const useSwapNearToWNear = ({ accountId, selector }: Props) => {
               params: {
                 methodName: "near_withdraw",
                 args: {
-                  amount: withdraw,
+                  amount,
                 },
-                gas: FT_STORAGE_DEPOSIT_GAS,
-                deposit: "0",
+                gas: FT_WITHDRAW_GAS,
+                deposit: "1",
               },
             },
           ],

@@ -6,7 +6,10 @@ import * as borsh from "borsh"
 import { HistoryData, HistoryStatus } from "@src/stores/historyStore"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { intentStatus } from "@src/utils/near"
-import { CONTRACTS_REGISTER } from "@src/constants/contracts"
+import {
+  CONFIRM_SWAP_LOCAL_KEY,
+  CONTRACTS_REGISTER,
+} from "@src/constants/contracts"
 import {
   NearIntentCreate,
   NearIntentStatus,
@@ -18,8 +21,8 @@ import { getNearTransactionDetails } from "@src/api/transaction"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { useTransactionScan } from "@src/hooks/useTransactionScan"
 import { swapSchema } from "@src/utils/schema"
+import { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
 
-const SCHEDULER_3_MIN = 180000
 const SCHEDULER_30_SEC = 30000
 const SCHEDULER_5_SEC = 5000
 
@@ -34,13 +37,14 @@ export const useHistoryLatest = () => {
   })
 
   const runHistoryMonitoring = async (data: HistoryData[]): Promise<void> => {
-    setIsHistoryWorkerSleeping(false)
-
     const validHistoryStatuses = [
       HistoryStatus.COMPLETED,
       HistoryStatus.ROLLED_BACK,
       HistoryStatus.EXPIRED,
       HistoryStatus.FAILED,
+      HistoryStatus.WITHDRAW,
+      HistoryStatus.DEPOSIT,
+      HistoryStatus.STORAGE_DEPOSIT,
     ]
 
     const historyCompletion: boolean[] = []
@@ -127,6 +131,14 @@ export const useHistoryLatest = () => {
                   },
                 },
               })
+
+              const getIntentStatus = (await intentStatus(
+                CONTRACTS_REGISTER.INTENT,
+                historyData.clientId
+              )) as NearIntentStatus | null
+              if (getIntentStatus?.status) {
+                Object.assign(historyData, { status: getIntentStatus?.status })
+              }
               break
 
             case "rollback_intent":
@@ -152,7 +164,7 @@ export const useHistoryLatest = () => {
                 ? historyData.details?.receipts_outcome[0]!.outcome!.logs[0]
                 : undefined
               Object.assign(historyData, {
-                status: HistoryStatus.COMPLETED,
+                status: HistoryStatus.DEPOSIT,
                 details: {
                   ...historyData.details,
                   recoverDetails: {
@@ -170,7 +182,7 @@ export const useHistoryLatest = () => {
               )
               args = JSON.parse(argsJson)
               Object.assign(historyData, {
-                status: HistoryStatus.COMPLETED,
+                status: HistoryStatus.WITHDRAW,
                 details: {
                   ...historyData.details,
                   recoverDetails: {
@@ -179,6 +191,40 @@ export const useHistoryLatest = () => {
                 },
               })
               break
+
+            case "storage_deposit":
+              Object.assign(historyData, {
+                status: HistoryStatus.STORAGE_DEPOSIT,
+              })
+              break
+          }
+        }
+
+        // Extract data from local
+        if (
+          !historyData.details?.selectedTokenIn ||
+          !historyData.details?.selectedTokenOut ||
+          !historyData.details?.tokenIn ||
+          !historyData.details?.tokenOut
+        ) {
+          const getConfirmSwapFromLocal = localStorage.getItem(
+            CONFIRM_SWAP_LOCAL_KEY
+          )
+          if (getConfirmSwapFromLocal) {
+            const parsedData: { data: ModalConfirmSwapPayload } = JSON.parse(
+              getConfirmSwapFromLocal
+            )
+            if (parsedData.data.clientId === historyData.clientId) {
+              Object.assign(historyData, {
+                details: {
+                  ...historyData.details,
+                  tokenIn: parsedData.data.tokenIn,
+                  tokenOut: parsedData.data.tokenOut,
+                  selectedTokenIn: parsedData.data.selectedTokenIn,
+                  selectedTokenOut: parsedData.data.selectedTokenOut,
+                },
+              })
+            }
           }
         }
 
@@ -191,14 +237,7 @@ export const useHistoryLatest = () => {
           return historyData
         }
 
-        const getIntentStatus = (await intentStatus(
-          CONTRACTS_REGISTER.INTENT,
-          historyData.clientId
-        )) as NearIntentStatus | null
-        if (getIntentStatus?.status) {
-          Object.assign(historyData, { status: getIntentStatus?.status })
-        }
-
+        historyCompletion.push(false)
         return historyData
       })
     )
@@ -211,6 +250,7 @@ export const useHistoryLatest = () => {
         ...isMonitoringComplete,
         done: true,
       })
+      return
     }
 
     setTimeout(() => {
@@ -224,7 +264,8 @@ export const useHistoryLatest = () => {
   }
 
   const runHistoryUpdate = (data: HistoryData[]): void => {
-    runHistoryMonitoring(data)
+    setIsHistoryWorkerSleeping(false)
+    void runHistoryMonitoring(data)
   }
 
   return {
