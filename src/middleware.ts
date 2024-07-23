@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-const TURN_OFF_APPS = process?.env?.turnOffApps === "true" ?? false
-const TURN_OFF_LANDING = process?.env?.turnOffLanding === "true" ?? false
-const SOLVER_RELAY = "https://solver-relay.chaindefuser.com/rpc"
-
-const allowedOrigins = [SOLVER_RELAY]
+const allowedOrigins = [
+  process.env.SOLVER_RELAY_0_URL ?? "https://solver-relay.chaindefuser.com/rpc",
+]
 
 const corsOptions = {
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
@@ -13,20 +11,6 @@ const corsOptions = {
 }
 
 export function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname
-
-  if (
-    TURN_OFF_APPS &&
-    !TURN_OFF_LANDING &&
-    pathname !== "/" &&
-    pathname !== "/jobs"
-  ) {
-    return NextResponse.redirect(new URL("/", request.url))
-  }
-  if (TURN_OFF_LANDING && !TURN_OFF_APPS && pathname === "/") {
-    return NextResponse.redirect(new URL("/swap", request.url))
-  }
-
   const origin = request.headers.get("origin") ?? ""
 
   const isAllowedOrigin = allowedOrigins.includes(origin)
