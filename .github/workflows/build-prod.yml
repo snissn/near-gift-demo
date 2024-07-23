@@ -3,9 +3,8 @@ name: Build PROD - Frontend
 on:
   pull_request:
     branches:
-      - "main"
       - "staging"
-      - "release"
+      - "production"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
