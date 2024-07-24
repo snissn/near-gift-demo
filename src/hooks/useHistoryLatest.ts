@@ -9,6 +9,7 @@ import { intentStatus } from "@src/utils/near"
 import {
   CONFIRM_SWAP_LOCAL_KEY,
   CONTRACTS_REGISTER,
+  INDEXER,
 } from "@src/constants/contracts"
 import {
   NearIntentCreate,
@@ -132,8 +133,10 @@ export const useHistoryLatest = () => {
                 },
               })
 
+              // TODO As we will hale many intents then we have to check status
+              //      from particular contract which specified in TX hash
               const getIntentStatus = (await intentStatus(
-                CONTRACTS_REGISTER.INTENT,
+                CONTRACTS_REGISTER[INDEXER.INTENT_0],
                 historyData.clientId
               )) as NearIntentStatus | null
               if (getIntentStatus?.status) {

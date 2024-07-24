@@ -1,16 +1,15 @@
 "use client"
 
 import { WalletSelector } from "@near-wallet-selector/core"
-import * as borsh from "borsh"
 import { parseUnits } from "viem"
 import { BigNumber } from "ethers"
 import { useState } from "react"
 
 import {
   CONTRACTS_REGISTER,
-  CREATE_INTENT_EXPIRATION_BLOCK_BOOST,
   FT_MINIMUM_STORAGE_BALANCE_LARGE,
   FT_STORAGE_DEPOSIT_GAS,
+  INDEXER,
   MAX_GAS_TRANSACTION,
 } from "@src/constants/contracts"
 import {
@@ -19,13 +18,13 @@ import {
   QueueTransactions,
   Result,
 } from "@src/types/interfaces"
-import { swapSchema } from "@src/utils/schema"
 import useStorageDeposit from "@src/hooks/useStorageDeposit"
 import useNearSwapNearToWNear from "@src/hooks/useSwapNearToWNear"
 import { useNearBlock } from "@src/hooks/useNearBlock"
 import { getNearTransactionDetails } from "@src/api/transaction"
 import { useTransactionScan } from "@src/hooks/useTransactionScan"
 import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
+import { mapCreateIntentTransactionCall } from "@src/libs/de-sdk/utils/maps"
 
 type Props = {
   accountId: string | null
@@ -274,45 +273,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
 
       setIsProcessing(true)
 
-      const unitsSendAmount = parseUnits(
-        tokenIn,
-        selectedTokenIn?.decimals as number
-      ).toString()
-      const estimateUnitsBackAmount = parseUnits(
-        tokenOut,
-        selectedTokenOut?.decimals as number
-      ).toString()
       const getBlock = await getNearBlock()
-      const msg = {
-        CreateIntent: {
-          id: clientId,
-          IntentStruct: {
-            initiator: accountId,
-            send: {
-              token_id:
-                selectedTokenIn!.address === "native"
-                  ? "wrap.near"
-                  : selectedTokenIn!.address,
-              amount: unitsSendAmount,
-            },
-            receive: {
-              token_id:
-                selectedTokenOut!.address === "native"
-                  ? "wrap.near"
-                  : selectedTokenOut!.address,
-              amount: estimateUnitsBackAmount,
-            },
-            expiration: {
-              Block: getBlock.height + CREATE_INTENT_EXPIRATION_BLOCK_BOOST,
-            },
-            referral: {
-              Some: REFERRAL_ACCOUNT,
-            },
-          },
-        },
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const msgBorsh = borsh.serialize(swapSchema as any, msg)
 
       // TODO Update type to NearTX[] | void
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -383,28 +344,24 @@ export const useSwap = ({ accountId, selector }: Props) => {
 
           case QueueTransactions.CREATE_INTENT:
             const wallet = await selector!.wallet()
+            const getIntentsTransactionCall = mapCreateIntentTransactionCall({
+              tokenIn,
+              tokenOut,
+              selectedTokenIn,
+              selectedTokenOut,
+              clientId,
+              blockHeight: getBlock.height,
+              accountId,
+            })
+            // TODO Concurrent mode for intents where selection is picked by criteria
+            const findFirst = getIntentsTransactionCall.find(
+              ([intentId, transaction]) => intentId === 0
+            )
+            if (!findFirst) {
+              throw new Error("getIntentsTransactionCall - intent is not found")
+            }
             transactionResult = await wallet.signAndSendTransactions({
-              transactions: [
-                {
-                  receiverId: selectedTokenIn!.address as string,
-                  actions: [
-                    {
-                      type: "FunctionCall",
-                      params: {
-                        methodName: "ft_transfer_call",
-                        args: {
-                          receiver_id: CONTRACTS_REGISTER.INTENT,
-                          amount: unitsSendAmount,
-                          memo: "Execute intent: NEP-141 to NEP-141",
-                          msg: Buffer.from(msgBorsh).toString("base64"),
-                        },
-                        gas: MAX_GAS_TRANSACTION,
-                        deposit: "1",
-                      },
-                    },
-                  ],
-                },
-              ],
+              transactions: [findFirst[1]],
             })
             break
         }
@@ -515,25 +472,23 @@ export const useSwap = ({ accountId, selector }: Props) => {
               tempQueueTransactionsTrack
             break
           case QueueTransactions.CREATE_INTENT:
-            transactions.push({
-              receiverId: receiverIdIn,
-              actions: [
-                {
-                  type: "FunctionCall",
-                  params: {
-                    methodName: "ft_transfer_call",
-                    args: {
-                      receiver_id: CONTRACTS_REGISTER.INTENT,
-                      amount: unitsSendAmount,
-                      memo: "Execute intent: NEP-141 to NEP-141",
-                      msg: Buffer.from(msgBorsh).toString("base64"),
-                    },
-                    gas: MAX_GAS_TRANSACTION,
-                    deposit: "1",
-                  },
-                },
-              ],
+            const getIntentsTransactionCall = mapCreateIntentTransactionCall({
+              tokenIn,
+              tokenOut,
+              selectedTokenIn,
+              selectedTokenOut,
+              clientId,
+              blockHeight: getBlock.height,
+              accountId,
             })
+            // TODO Concurrent mode for intents where selection is picked by criteria
+            const findFirst = getIntentsTransactionCall.find(
+              ([intentId, transaction]) => intentId === 0
+            )
+            if (!findFirst) {
+              throw new Error("getIntentsTransactionCall - intent is not found")
+            }
+            transactions.push(findFirst[1])
             break
         }
       })
@@ -562,7 +517,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
       await wallet.signAndSendTransactions({
         transactions: [
           {
-            receiverId: CONTRACTS_REGISTER.INTENT,
+            receiverId: CONTRACTS_REGISTER[INDEXER.INTENT_0],
             actions: [
               {
                 type: "FunctionCall",
