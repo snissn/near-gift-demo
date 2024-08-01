@@ -190,6 +190,7 @@ export interface RecoverDetails {
   referral: string
   msg?: string
   amount?: string
+  receiverId?: string
 }
 
 export type JobsDetails = {

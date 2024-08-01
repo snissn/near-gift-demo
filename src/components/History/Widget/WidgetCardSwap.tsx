@@ -25,7 +25,8 @@ type Props = {
   tokenOut: string
   selectedTokenIn: NetworkTokenWithSwapRoute
   selectedTokenOut: NetworkTokenWithSwapRoute
-  handleCloseIntent: ({ id }: { id: string }) => void
+  handleCloseIntent: ({ id }: { id: string; receiverId?: string }) => void
+  receiverId?: string
 }
 
 const NEAR_EXPLORER = process?.env?.nearExplorer ?? ""
@@ -40,6 +41,7 @@ const WidgetCardSwap = ({
   selectedTokenOut,
   selectedTokenIn,
   handleCloseIntent,
+  receiverId,
 }: Props) => {
   const [isActive, setIsActive] = useState(false)
 
@@ -113,7 +115,7 @@ const WidgetCardSwap = ({
                 color="red"
                 onClick={(e) => {
                   e.stopPropagation()
-                  handleCloseIntent({ id: clientId })
+                  handleCloseIntent({ id: clientId, receiverId })
                 }}
                 className="relative w-[32px] h-[32px] cursor-pointer"
               >
