@@ -18,6 +18,9 @@ export interface MapCreateIntentProps {
   clientId: CallRequestIntentProps["clientId"]
   blockHeight: number
   accountId: string | null
+  accountFrom?: string
+  accountTo?: string
+  solverId?: string
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -38,12 +41,24 @@ export type MapCreateIntentResult = [number, any][]
 export const mapCreateIntentTransactionCall = (
   inputs: MapCreateIntentProps
 ): MapCreateIntentResult => {
-  const [network, id] = inputs.selectedTokenIn.defuse_asset_id.split(":")
-  switch (`${network}:${id}` as MapsEnum) {
+  const [networkFrom, idFrom] =
+    inputs.selectedTokenIn.defuse_asset_id.split(":")
+  const [networkTo, idTo] = inputs.selectedTokenOut.defuse_asset_id.split(":")
+  const fromNetworkId = `${networkFrom}:${idFrom}` as MapsEnum
+  const toNetworkId = `${networkTo}:${idTo}` as MapsEnum
+
+  switch (fromNetworkId) {
     case MapsEnum.NEAR_MAINNET:
       // Notes: In future each map will have not only one intent,
       //        as example here `[[INDEXER.INTENT_0, tx],...,[INDEXER.INTENT_N, tx_N]]`
-      return [[INDEXER.INTENT_0, prepareCreateIntent0(inputs)]]
+      switch (toNetworkId) {
+        case MapsEnum.NEAR_MAINNET:
+          return [[INDEXER.INTENT_0, prepareCreateIntent0(inputs)]]
+        case MapsEnum.ETH_BASE:
+          return [[INDEXER.INTENT_1, prepareCreateIntent1(inputs)]]
+        default:
+          return []
+      }
     case MapsEnum.ETH_BASE:
       return [[INDEXER.INTENT_1, prepareCreateIntent1(inputs)]]
     default:

@@ -271,6 +271,9 @@ const ModalConfirmSwap = () => {
         selectedTokenOut: modalPayload.selectedTokenOut,
         clientId: newClientId,
         estimateQueue,
+        accountFrom: modalPayload?.accountFrom,
+        accountTo: modalPayload?.accountTo,
+        solverId: modalPayload?.solverId,
       }
 
       setSwapToLocal(inputs)

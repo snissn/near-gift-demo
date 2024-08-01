@@ -28,6 +28,7 @@ interface Props<T extends FieldValues> {
   className?: string
   errors?: FieldErrors
   errorSelect?: string
+  disabled?: boolean
 }
 
 export const FieldComboInputRegistryName = "FieldComboInput"
@@ -48,6 +49,7 @@ const FieldComboInput = <T extends FieldValues>({
   handleIncludeNativeToSwap,
   nativeSupportChecked,
   errorSelect,
+  disabled,
 }: Props<T> & BlockMultiBalancesProps) => {
   if (!register) {
     return null
@@ -117,7 +119,8 @@ const FieldComboInput = <T extends FieldValues>({
         onPaste={handlePaste}
         placeholder={placeholder}
         className={clsx(
-          "grow flex-1 bg-gray-50 max-w-[140px] md:max-w-[none] md:min-w-[calc(100%-210px)] text-3xl font-medium placeholder-black border-transparent focus:border-transparent focus:ring-0 dark:bg-black-900 dark:placeholder-white"
+          "grow flex-1 bg-gray-50 max-w-[140px] md:max-w-[none] md:min-w-[calc(100%-210px)] text-3xl font-medium placeholder-black border-transparent focus:border-transparent focus:ring-0 dark:bg-black-900 dark:placeholder-white",
+          disabled && "text-black-200 pointer-events-none placeholder-black-200"
         )}
       />
       {errors && errors[fieldName] ? (

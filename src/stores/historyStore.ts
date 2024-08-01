@@ -6,6 +6,7 @@ import { NearTX, NetworkToken, RecoverDetails } from "@src/types/interfaces"
 import { NEAR_COLLECTOR_KEY } from "@src/constants/contracts"
 
 export enum HistoryStatus {
+  INTENT_1_AVAILABLE = "available",
   AVAILABLE = "Available",
   PROCESSING = "Processing",
   COMPLETED = "Completed",

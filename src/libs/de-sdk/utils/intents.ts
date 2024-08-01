@@ -10,6 +10,7 @@ import {
 import { MapCreateIntentProps } from "@src/libs/de-sdk/utils/maps"
 import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
 import { swapSchema } from "@src/utils/schema"
+import { NearIntent1Create } from "@src/types/interfaces"
 
 const REFERRAL_ACCOUNT = process.env.REFERRAL_ACCOUNT ?? ""
 
@@ -85,4 +86,53 @@ export const prepareCreateIntent0 = (inputs: MapCreateIntentProps) => {
   }
 }
 
-export const prepareCreateIntent1 = (inputs: MapCreateIntentProps) => {}
+export const prepareCreateIntent1 = (inputs: MapCreateIntentProps) => {
+  const receiverIdIn = inputs.selectedTokenIn.address
+  const unitsSendAmount = parseUnits(
+    inputs.tokenIn,
+    inputs.selectedTokenIn.decimals as number
+  ).toString()
+  const estimateUnitsBackAmount = parseUnits(
+    inputs.tokenOut,
+    inputs.selectedTokenOut.decimals as number
+  ).toString()
+
+  const msg: NearIntent1Create = {
+    type: "create",
+    id: inputs.clientId as string,
+    asset_out: {
+      type: "cross_chain",
+      oracle: inputs.solverId as string,
+      asset: inputs.selectedTokenOut.defuse_asset_id,
+      amount: estimateUnitsBackAmount,
+      account: inputs.accountTo as string,
+    },
+    lockup_until: {
+      block_number: inputs.blockHeight + CREATE_INTENT_EXPIRATION_BLOCK_BOOST,
+    },
+    expiration: {
+      block_number: inputs.blockHeight + CREATE_INTENT_EXPIRATION_BLOCK_BOOST,
+    },
+    referral: REFERRAL_ACCOUNT,
+  }
+
+  return {
+    receiverId: receiverIdIn,
+    actions: [
+      {
+        type: "FunctionCall",
+        params: {
+          methodName: "ft_transfer_call",
+          args: {
+            receiver_id: CONTRACTS_REGISTER[INDEXER.INTENT_1],
+            amount: unitsSendAmount,
+            memo: "Execute intent: NEP-141 to NEP-141",
+            msg: JSON.stringify(msg),
+          },
+          gas: MAX_GAS_TRANSACTION,
+          deposit: "1",
+        },
+      },
+    ],
+  }
+}

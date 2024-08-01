@@ -110,6 +110,7 @@ export const useEvaluateSwapEstimation = () => {
     getSolversResults(estimatesFromSolvers)
 
     setIsFetched(true)
+
     await getSwapEstimateFromRefFinance(fieldName, data, bestOut)
     setIsFetched(false)
   }

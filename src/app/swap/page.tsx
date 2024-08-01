@@ -44,8 +44,7 @@ type EstimateSwap = {
   selectTokenOut: SelectToken
 }
 
-const ESTIMATE_BOT_AWAIT_250_MS = 250
-const ESTIMATE_BOT_AWAIT_500_MS = 500
+const ESTIMATE_BOT_AWAIT_MS = 500
 
 export default function Swap() {
   const [selectTokenIn, setSelectTokenIn] = useState<SelectToken>()
@@ -121,13 +120,33 @@ export default function Swap() {
     }
     if (!handleValidateSelectTokens()) return
     const pair = [selectTokenIn!.address, selectTokenOut!.address]
-    setModalType(ModalType.MODAL_REVIEW_SWAP, {
-      tokenIn: values.tokenIn,
-      tokenOut: values.tokenOut,
-      selectedTokenIn: selectTokenIn,
-      selectedTokenOut: selectTokenOut,
-      isNativeInSwap: pair.includes("native"),
+    const isForeignChainInSwap = [
+      selectTokenIn?.defuse_asset_id ?? "",
+      selectTokenOut?.defuse_asset_id ?? "",
+    ].some((defuseAssetId) => {
+      const keys = defuseAssetId.split(":")
+      if (keys.length) {
+        const [chain] = keys
+        return chain !== "near"
+      }
+      return false
     })
+    const solverId = evaluateSwapEstimation?.priceResults
+      ? evaluateSwapEstimation.priceResults[0].solver_id
+      : ""
+    setModalType(
+      isForeignChainInSwap
+        ? ModalType.MODAL_CONNECT_NETWORKS
+        : ModalType.MODAL_REVIEW_SWAP,
+      {
+        tokenIn: values.tokenIn,
+        tokenOut: values.tokenOut,
+        selectedTokenIn: selectTokenIn,
+        selectedTokenOut: selectTokenOut,
+        isNativeInSwap: pair.includes("native"),
+        solverId,
+      }
+    )
   }
 
   const handleSwitch = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -158,7 +177,7 @@ export default function Swap() {
       getEvaluateSwapEstimate("tokenOut", data, allEstimates, bestOut)
       isProgrammaticUpdate.current = true
       setValue("tokenOut", bestOut ?? "0")
-    }, ESTIMATE_BOT_AWAIT_500_MS),
+    }, ESTIMATE_BOT_AWAIT_MS),
     []
   )
 
@@ -174,7 +193,7 @@ export default function Swap() {
         selectTokenIn: selectTokenIn as NetworkTokenWithSwapRoute,
         selectTokenOut: selectTokenOut as NetworkTokenWithSwapRoute,
       })
-    }, ESTIMATE_BOT_AWAIT_500_MS),
+    }, ESTIMATE_BOT_AWAIT_MS),
     []
   )
 
@@ -428,6 +447,7 @@ export default function Swap() {
           required="This field is required"
           errors={errors}
           errorSelect={errorSelectTokenOut}
+          disabled={true}
         />
         <Button
           type="submit"
