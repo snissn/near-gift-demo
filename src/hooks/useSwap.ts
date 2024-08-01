@@ -525,13 +525,17 @@ export const useSwap = ({ accountId, selector }: Props) => {
     }
   }
 
-  const callRequestRollbackIntent = async (inputs: { id: string }) => {
+  const callRequestRollbackIntent = async (inputs: {
+    id: string
+    receiverId?: string
+  }) => {
     try {
       const wallet = await selector!.wallet()
       await wallet.signAndSendTransactions({
         transactions: [
           {
-            receiverId: CONTRACTS_REGISTER[INDEXER.INTENT_0],
+            receiverId:
+              inputs?.receiverId ?? CONTRACTS_REGISTER[INDEXER.INTENT_0],
             actions: [
               {
                 type: "FunctionCall",
@@ -541,7 +545,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
                     id: inputs.id,
                   },
                   gas: MAX_GAS_TRANSACTION,
-                  deposit: "0",
+                  deposit: inputs?.receiverId ? "1" : "0",
                 },
               },
             ],

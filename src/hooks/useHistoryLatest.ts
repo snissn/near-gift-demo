@@ -159,6 +159,7 @@ export const useHistoryLatest = () => {
                       amount: receiveAmount,
                     },
                     expiration,
+                    receiverId: (args as { receiver_id: string })?.receiver_id,
                   },
                 },
               })
