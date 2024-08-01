@@ -25,6 +25,7 @@ import { getNearTransactionDetails } from "@src/api/transaction"
 import { useTransactionScan } from "@src/hooks/useTransactionScan"
 import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
 import { mapCreateIntentTransactionCall } from "@src/libs/de-sdk/utils/maps"
+import { isForeignNetworkToken } from "@src/utils/network"
 
 type Props = {
   accountId: string | null
@@ -46,17 +47,23 @@ export type NextEstimateQueueTransactionsResult = {
   done: boolean
 }
 
-export type CallRequestIntentProps = {
+type WithSwapDepositRequest = {
+  useNative?: boolean
+}
+
+type WithAccounts = {
+  accountFrom?: string
+  accountTo?: string
+}
+
+export interface CallRequestIntentProps extends WithAccounts {
   tokenIn: string
   tokenOut: string
   selectedTokenIn: NetworkToken
   selectedTokenOut: NetworkToken
   estimateQueue: EstimateQueueTransactions
   clientId?: string
-}
-
-type WithSwapDepositRequest = {
-  useNative?: boolean
+  solverId?: string
 }
 
 const REFERRAL_ACCOUNT = process.env.REFERRAL_ACCOUNT ?? ""
@@ -135,13 +142,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
         }
       }
 
-      const {
-        tokenIn,
-        tokenOut,
-        selectedTokenIn,
-        selectedTokenOut,
-        useNative,
-      } = inputs
+      const { selectedTokenIn, selectedTokenOut, useNative } = inputs
 
       if (useNative) {
         const pair = [selectedTokenIn!.address, selectedTokenOut!.address]
@@ -174,16 +175,18 @@ export const useSwap = ({ accountId, selector }: Props) => {
         storageBalanceTokenInAddress as string,
         accountId as string
       )
-      const storageBalanceTokenInToString = BigNumber.from(
-        storageBalanceTokenIn
-      ).toString()
-      console.log(
-        "useSwap storageBalanceTokenIn: ",
-        storageBalanceTokenInToString
-      )
-      if (!parseFloat(storageBalanceTokenInToString)) {
-        queueTransaction.unshift(QueueTransactions.STORAGE_DEPOSIT_TOKEN_IN)
-        queue++
+      if (!isForeignNetworkToken(selectedTokenIn.defuse_asset_id)) {
+        const storageBalanceTokenInToString = BigNumber.from(
+          storageBalanceTokenIn
+        ).toString()
+        console.log(
+          "useSwap storageBalanceTokenIn: ",
+          storageBalanceTokenInToString
+        )
+        if (!parseFloat(storageBalanceTokenInToString)) {
+          queueTransaction.unshift(QueueTransactions.STORAGE_DEPOSIT_TOKEN_IN)
+          queue++
+        }
       }
 
       // Estimate if user did storage before in order to transfer tokens for swap
@@ -191,16 +194,18 @@ export const useSwap = ({ accountId, selector }: Props) => {
         selectedTokenOut!.address as string,
         accountId as string
       )
-      const storageBalanceTokenOutToString = BigNumber.from(
-        storageBalanceTokenOut
-      ).toString()
-      console.log(
-        "useSwap storageBalanceTokenOut: ",
-        storageBalanceTokenOutToString
-      )
-      if (!parseFloat(storageBalanceTokenOutToString)) {
-        queueTransaction.unshift(QueueTransactions.STORAGE_DEPOSIT_TOKEN_OUT)
-        queue++
+      if (!isForeignNetworkToken(selectedTokenOut.defuse_asset_id)) {
+        const storageBalanceTokenOutToString = BigNumber.from(
+          storageBalanceTokenOut
+        ).toString()
+        console.log(
+          "useSwap storageBalanceTokenOut: ",
+          storageBalanceTokenOutToString
+        )
+        if (!parseFloat(storageBalanceTokenOutToString)) {
+          queueTransaction.unshift(QueueTransactions.STORAGE_DEPOSIT_TOKEN_OUT)
+          queue++
+        }
       }
 
       return {
@@ -269,6 +274,9 @@ export const useSwap = ({ accountId, selector }: Props) => {
         selectedTokenOut,
         clientId,
         estimateQueue,
+        accountFrom,
+        accountTo,
+        solverId,
       } = inputs
 
       setIsProcessing(true)
@@ -352,10 +360,13 @@ export const useSwap = ({ accountId, selector }: Props) => {
               clientId,
               blockHeight: getBlock.height,
               accountId,
+              accountFrom,
+              accountTo,
+              solverId,
             })
             // TODO Concurrent mode for intents where selection is picked by criteria
             const findFirst = getIntentsTransactionCall.find(
-              ([intentId, transaction]) => intentId === 0
+              ([intentId, transaction]) => intentId === 0 || intentId === 1
             )
             if (!findFirst) {
               throw new Error("getIntentsTransactionCall - intent is not found")
@@ -480,10 +491,13 @@ export const useSwap = ({ accountId, selector }: Props) => {
               clientId,
               blockHeight: getBlock.height,
               accountId,
+              accountFrom,
+              accountTo,
+              solverId,
             })
             // TODO Concurrent mode for intents where selection is picked by criteria
             const findFirst = getIntentsTransactionCall.find(
-              ([intentId, transaction]) => intentId === 0
+              ([intentId, transaction]) => intentId === 0 || intentId === 1
             )
             if (!findFirst) {
               throw new Error("getIntentsTransactionCall - intent is not found")

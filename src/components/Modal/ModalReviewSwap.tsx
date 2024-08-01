@@ -22,6 +22,9 @@ export type ModalReviewSwapPayload = {
   selectedTokenIn: NetworkToken
   selectedTokenOut: NetworkToken
   isNativeInSwap: boolean
+  accountFrom?: string
+  accountTo?: string
+  solverId?: string
 }
 
 const RECALCULATE_ESTIMATION_TIME_SECS = 15
@@ -71,7 +74,7 @@ const ModalReviewSwap = () => {
       <div className="flex flex-col min-h-[256px] max-h-[680px] h-full p-5">
         <div className="flex justify-between items-center mb-[44px]">
           <div className="relative w-full shrink text-center text-black-400">
-            <Text size="4" weight="bold">
+            <Text size="4" weight="bold" className="dark:text-gray-500">
               Review swap
             </Text>
             <div className="absolute top-[30px] left-[50%] -translate-x-2/4 text-gray-600">
