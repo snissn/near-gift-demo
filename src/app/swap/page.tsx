@@ -174,7 +174,7 @@ export default function Swap() {
   const debouncedGetSwapEstimateBot = useCallback(
     debounce(async (data: DataEstimateRequest) => {
       const { bestOut, allEstimates } = await getSwapEstimateBot(data)
-      getEvaluateSwapEstimate("tokenOut", data, allEstimates, bestOut)
+      getEvaluateSwapEstimate(data, allEstimates, bestOut)
       isProgrammaticUpdate.current = true
       setValue("tokenOut", bestOut ?? "0")
     }, ESTIMATE_BOT_AWAIT_MS),
@@ -184,7 +184,7 @@ export default function Swap() {
   const debouncedGetSwapEstimateBotReverse = useCallback(
     debounce(async (data: DataEstimateRequest) => {
       const { bestOut, allEstimates } = await getSwapEstimateBot(data)
-      getEvaluateSwapEstimate("tokenIn", data, allEstimates, bestOut)
+      getEvaluateSwapEstimate(data, allEstimates, bestOut)
       isProgrammaticUpdate.current = true
       setValue("tokenIn", bestOut ?? "0")
 

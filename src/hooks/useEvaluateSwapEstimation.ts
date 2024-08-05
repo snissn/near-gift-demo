@@ -5,8 +5,6 @@ import { useState } from "react"
 import { DataEstimateRequest } from "@src/libs/de-sdk/types/interfaces"
 import { SwapEstimateBotResult } from "@src/hooks/useSwapEstimateBot"
 import { swapEstimateRefFinanceProvider } from "@src/libs/de-sdk/providers/refFinanceProvider"
-import { useTokensStore } from "@src/providers/TokensStoreProvider"
-import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 
 const IS_DISABLE_QUOTING_FROM_REF =
   process.env.NEXT_PUBLIC_DISABLE_QUOTING_FROM_REF === "true"
@@ -30,25 +28,8 @@ const ESTIMATE_DIFFERENCE_PERCENTAGE = 2
 
 export const useEvaluateSwapEstimation = () => {
   const [data, setData] = useState<EvaluateSwapEstimationResult | undefined>()
-  const [isFetched, setIsFetched] = useState(false)
-  const { data: tokensData } = useTokensStore((state) => state)
-
-  const findTokenByName = (
-    tokenAddress: string
-  ): NetworkTokenWithSwapRoute | undefined => {
-    let token = undefined
-    if (tokensData.size) {
-      tokensData.forEach((networkToken) => {
-        if (networkToken.address === tokenAddress) {
-          token = networkToken
-        }
-      })
-    }
-    return token
-  }
 
   const getSwapEstimateFromRefFinance = async (
-    fieldName: string,
     dataEstimate: DataEstimateRequest,
     bestOut: SwapEstimateBotResult["bestOut"]
   ): Promise<void> => {
@@ -93,32 +74,22 @@ export const useEvaluateSwapEstimation = () => {
     }))
   }
 
-  const cleanEvaluateSwapEstimate = () => {
-    setData({
-      priceEvaluation: undefined,
-      priceResults: undefined,
-    })
-  }
-
   const getEvaluateSwapEstimate = async (
-    fieldName: string,
     data: DataEstimateRequest,
     estimatesFromSolvers: SwapEstimateBotResult["allEstimates"],
     bestOut: SwapEstimateBotResult["bestOut"]
   ): Promise<void> => {
-    cleanEvaluateSwapEstimate()
+    setData({
+      priceEvaluation: undefined,
+      priceResults: undefined,
+    })
     getSolversResults(estimatesFromSolvers)
 
-    setIsFetched(true)
-
-    await getSwapEstimateFromRefFinance(fieldName, data, bestOut)
-    setIsFetched(false)
+    await getSwapEstimateFromRefFinance(data, bestOut)
   }
 
   return {
     data,
-    cleanEvaluateSwapEstimate,
     getEvaluateSwapEstimate,
-    isFetched,
   }
 }
