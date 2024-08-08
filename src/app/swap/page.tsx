@@ -68,6 +68,7 @@ export default function Swap() {
     watch,
     setValue,
     getValues,
+    trigger,
     formState: { errors },
   } = useForm<FormValues>()
   const { setModalType, payload, onCloseModal } = useModalStore(
@@ -194,6 +195,7 @@ export default function Swap() {
             ? formatUnits(BigInt(bestEstimate.amount_out), tokenOut.decimals!)
             : "0"
         setValue("tokenOut", formattedOut)
+        trigger("tokenOut")
       },
       ESTIMATE_BOT_AWAIT_MS
     ),
