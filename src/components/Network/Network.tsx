@@ -11,7 +11,7 @@ type Props = {
   onChange: (value: string) => void
   onBlur: (value: string) => void
 }
-const NetworkEth = ({
+const Network = ({
   chainIcon,
   chainName,
   account,
@@ -46,4 +46,4 @@ const NetworkEth = ({
   )
 }
 
-export default NetworkEth
+export default Network

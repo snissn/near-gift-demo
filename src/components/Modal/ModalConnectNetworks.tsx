@@ -14,7 +14,7 @@ import { ModalType } from "@src/stores/modalStore"
 import NetworkNear from "@src/components/Network/NetworkNear"
 import { useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import NetworkEth from "@src/components/Network/NetworkEth"
+import Network from "@src/components/Network/Network"
 
 export type ModalConnectNetworksPayload = {
   tokenIn: string
@@ -36,10 +36,9 @@ const ModalConnectNetworks = () => {
   const { accountId } = useWalletSelector()
 
   const { handleSignIn, handleSignOut } = useConnectWallet()
-  const [convertPayload, setConvertPayload] =
-    useState<ModalConnectNetworksPayload>(
-      payload as ModalConnectNetworksPayload
-    )
+  const [convertPayload] = useState<ModalConnectNetworksPayload>(
+    payload as ModalConnectNetworksPayload
+  )
 
   const handleContinue = async () => {
     setModalType(ModalType.MODAL_REVIEW_SWAP, {
@@ -53,26 +52,29 @@ const ModalConnectNetworks = () => {
     account: string,
     setErrorAccount: (value: string) => void
   ) => {
-    if (!ethers.utils.isAddress(account)) {
-      setErrorAccount("Invalid wallet address.")
-    } else {
-      setErrorAccount("")
+    const chainName = convertPayload.selectedTokenOut?.blockchain
+    if (chainName === "eth") {
+      if (!ethers.utils.isAddress(account)) {
+        setErrorAccount("Invalid wallet address.")
+      } else {
+        setErrorAccount("")
+      }
     }
   }
 
   useEffect(() => {
-    const chainName = convertPayload.selectedTokenIn?.chainName
+    const chainName = convertPayload.selectedTokenIn?.blockchain
     if (chainName && accountId && chainName === "near") {
       setAccountFrom(accountId)
     }
-  }, [convertPayload.selectedTokenIn.chainName, accountId])
+  }, [convertPayload.selectedTokenIn.blockchain, accountId])
 
   useEffect(() => {
-    const chainName = convertPayload.selectedTokenOut?.chainName
+    const chainName = convertPayload.selectedTokenOut?.blockchain
     if (chainName && accountId && chainName === "near") {
       setAccountTo(accountId)
     }
-  }, [convertPayload.selectedTokenOut.chainName, accountId])
+  }, [convertPayload.selectedTokenOut.blockchain, accountId])
 
   return (
     <ModalDialog>
@@ -102,7 +104,7 @@ const ModalConnectNetworks = () => {
         </div>
         <div className="w-full flex flex-col mb-6 relative">
           <div className="relative flex-1 p-[18px] border-[1px] border-gray-100 rounded-t-xl bg-gray dark:bg-black-900 dark:border-black-950">
-            {convertPayload.selectedTokenIn?.chainName === "near" ? (
+            {convertPayload.selectedTokenIn?.blockchain === "near" ? (
               <NetworkNear
                 chainIcon={convertPayload.selectedTokenIn?.chainIcon ?? ""}
                 chainName={convertPayload.selectedTokenIn?.chainName ?? ""}
@@ -114,7 +116,7 @@ const ModalConnectNetworks = () => {
                 onDisconnect={handleSignOut}
               />
             ) : (
-              <NetworkEth
+              <Network
                 chainIcon={convertPayload.selectedTokenIn?.chainIcon ?? ""}
                 chainName={convertPayload.selectedTokenIn?.chainName ?? ""}
                 account={accountFrom}
@@ -131,7 +133,7 @@ const ModalConnectNetworks = () => {
             )}
           </div>
           <div className="relative flex-1 p-[18px] border-[1px] border-gray-100 rounded-b-xl bg-gray dark:bg-black-900 dark:border-black-950">
-            {convertPayload.selectedTokenOut?.chainName === "near" ? (
+            {convertPayload.selectedTokenOut?.blockchain === "near" ? (
               <NetworkNear
                 chainIcon={convertPayload.selectedTokenOut?.chainIcon ?? ""}
                 chainName={convertPayload.selectedTokenOut?.chainName ?? ""}
@@ -143,7 +145,7 @@ const ModalConnectNetworks = () => {
                 onDisconnect={handleSignOut}
               />
             ) : (
-              <NetworkEth
+              <Network
                 chainIcon={convertPayload.selectedTokenOut?.chainIcon ?? ""}
                 chainName={convertPayload.selectedTokenOut?.chainName ?? ""}
                 account={accountTo}
