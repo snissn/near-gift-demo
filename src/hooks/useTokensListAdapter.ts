@@ -16,6 +16,8 @@ const getChainIconFromId = (defuseAssetId: string): string => {
       return "/static/icons/network/near.svg"
     case "eth":
       return "/static/icons/network/ethereum_white.svg"
+    case "btc":
+      return "/static/icons/network/btc.svg"
     default:
       return ""
   }
