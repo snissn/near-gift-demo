@@ -3,7 +3,7 @@
 import { Text } from "@radix-ui/themes"
 import Image from "next/image"
 import React, { useState } from "react"
-import { parseUnits } from "viem"
+import { formatUnits, parseUnits } from "viem"
 
 import ModalDialog from "@src/components/Modal/ModalDialog"
 import { NetworkToken } from "@src/types/interfaces"
@@ -51,12 +51,20 @@ const ModalReviewSwap = () => {
       convertPayload.selectedTokenIn.decimals as number
     ).toString()
 
-    const { bestOut } = await getSwapEstimateBot({
-      tokenIn: convertPayload.selectedTokenIn.address as string,
-      tokenOut: convertPayload.selectedTokenOut.address as string,
+    const { bestEstimate } = await getSwapEstimateBot({
+      tokenIn: convertPayload.selectedTokenIn.defuse_asset_id,
+      tokenOut: convertPayload.selectedTokenOut.defuse_asset_id,
       amountIn: unitsTokenIn,
     })
-    setConvertPayload({ ...convertPayload, tokenOut: bestOut ?? "0" })
+    if (bestEstimate === null) return
+    const formattedOut =
+      bestEstimate !== null
+        ? formatUnits(
+            BigInt(bestEstimate.amount_out),
+            convertPayload.selectedTokenOut.decimals!
+          )
+        : "0"
+    setConvertPayload({ ...convertPayload, tokenOut: formattedOut })
   }
 
   const { timeLeft } = useTimer(

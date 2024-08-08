@@ -66,6 +66,7 @@ export const defaultInitState: HistoryState = {
 const helperHistoryLocalStore = (data: HistoryState["data"]): void => {
   const getHistoryFromStore: HistoryData[] = []
   data.forEach((value) => getHistoryFromStore.push(value))
+  console.log(getHistoryFromStore)
   localStorage.setItem(
     NEAR_COLLECTOR_KEY,
     JSON.stringify({ data: getHistoryFromStore })
