@@ -181,22 +181,6 @@ export default function Swap() {
     []
   )
 
-  const debouncedGetSwapEstimateBotReverse = useCallback(
-    debounce(async (data: DataEstimateRequest) => {
-      const { bestOut, allEstimates } = await getSwapEstimateBot(data)
-      getEvaluateSwapEstimate(data, allEstimates, bestOut)
-      isProgrammaticUpdate.current = true
-      setValue("tokenIn", bestOut ?? "0")
-
-      handleValidateInputs({
-        tokenIn: bestOut ?? "0",
-        selectTokenIn: selectTokenIn as NetworkTokenWithSwapRoute,
-        selectTokenOut: selectTokenOut as NetworkTokenWithSwapRoute,
-      })
-    }, ESTIMATE_BOT_AWAIT_MS),
-    []
-  )
-
   const handleEstimateSwap = ({
     tokenIn,
     tokenOut,
@@ -227,10 +211,6 @@ export default function Swap() {
       tokenIn,
       selectTokenIn?.decimals ?? 0
     ).toString()
-    const unitsTokenOut = parseUnits(
-      tokenOut,
-      selectTokenOut?.decimals ?? 0
-    ).toString()
 
     const wTokenIn =
       selectTokenIn!.address === "native" ? "wrap.near" : selectTokenIn!.address
@@ -239,12 +219,6 @@ export default function Swap() {
         tokenIn: wTokenIn,
         tokenOut: selectTokenOut?.address,
         amountIn: unitsTokenIn,
-      } as DataEstimateRequest)
-    } else if (name === "tokenOut") {
-      debouncedGetSwapEstimateBotReverse({
-        tokenIn: selectTokenOut!.address,
-        tokenOut: wTokenIn,
-        amountIn: unitsTokenOut,
       } as DataEstimateRequest)
     }
 
