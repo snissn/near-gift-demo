@@ -177,7 +177,11 @@ export default function Swap() {
           amountIn: parseUnits(amountIn, tokenIn?.decimals ?? 0).toString(),
         }
         const { bestEstimate } = await getSwapEstimateBot(data)
-        if (bestEstimate === null) return
+        if (bestEstimate === null) {
+          isProgrammaticUpdate.current = true
+          setValue("tokenOut", "")
+          return
+        }
         getEvaluateSwapEstimate(
           tokenIn,
           tokenOut,
