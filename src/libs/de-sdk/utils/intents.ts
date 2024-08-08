@@ -126,7 +126,58 @@ export const prepareCreateIntent1 = (inputs: MapCreateIntentProps) => {
           args: {
             receiver_id: CONTRACTS_REGISTER[INDEXER.INTENT_1],
             amount: unitsSendAmount,
-            memo: "Execute intent: NEP-141 to NEP-141",
+            memo: "Execute intent: NEP-141 to BASE ERC-20",
+            msg: JSON.stringify(msg),
+          },
+          gas: MAX_GAS_TRANSACTION,
+          deposit: "1",
+        },
+      },
+    ],
+  }
+}
+
+export const prepareCreateIntent2 = (inputs: MapCreateIntentProps) => {
+  const receiverIdIn = inputs.selectedTokenIn.address
+  const unitsSendAmount = parseUnits(
+    inputs.tokenIn,
+    inputs.selectedTokenIn.decimals as number
+  ).toString()
+  const estimateUnitsBackAmount = parseUnits(
+    inputs.tokenOut,
+    inputs.selectedTokenOut.decimals as number
+  ).toString()
+
+  const msg: NearIntent1Create = {
+    type: "create",
+    id: inputs.clientId as string,
+    asset_out: {
+      type: "cross_chain",
+      oracle: inputs.solverId as string,
+      asset: inputs.selectedTokenOut.defuse_asset_id,
+      amount: estimateUnitsBackAmount,
+      account: inputs.accountTo as string,
+    },
+    lockup_until: {
+      block_number: inputs.blockHeight + CREATE_INTENT_EXPIRATION_BLOCK_BOOST,
+    },
+    expiration: {
+      block_number: inputs.blockHeight + CREATE_INTENT_EXPIRATION_BLOCK_BOOST,
+    },
+    referral: REFERRAL_ACCOUNT,
+  }
+
+  return {
+    receiverId: receiverIdIn,
+    actions: [
+      {
+        type: "FunctionCall",
+        params: {
+          methodName: "ft_transfer_call",
+          args: {
+            receiver_id: CONTRACTS_REGISTER[INDEXER.INTENT_1],
+            amount: unitsSendAmount,
+            memo: "Execute intent: NEP-141 to BTC",
             msg: JSON.stringify(msg),
           },
           gas: MAX_GAS_TRANSACTION,

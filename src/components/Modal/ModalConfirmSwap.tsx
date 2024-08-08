@@ -117,7 +117,6 @@ const ModalConfirmSwap = () => {
         selectedTokenIn: modalPayload.selectedTokenIn,
         selectedTokenOut: modalPayload.selectedTokenOut,
         clientId,
-        useNative: modalPayload.isNativeInSwap,
       })
     setTransactionQueue(queueInTrack)
     return {

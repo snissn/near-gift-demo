@@ -116,7 +116,6 @@ export default function Swap() {
       return handleSignIn()
     }
     if (!handleValidateSelectTokens()) return
-    const pair = [selectTokenIn!.address, selectTokenOut!.address]
     const isForeignChainInSwap = [
       selectTokenIn?.defuse_asset_id ?? "",
       selectTokenOut?.defuse_asset_id ?? "",
@@ -137,7 +136,6 @@ export default function Swap() {
         tokenOut: values.tokenOut,
         selectedTokenIn: selectTokenIn,
         selectedTokenOut: selectTokenOut,
-        isNativeInSwap: pair.includes("native"),
         solverId: bestEstimate?.solver_id || "",
       }
     )

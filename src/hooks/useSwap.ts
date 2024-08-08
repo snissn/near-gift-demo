@@ -47,10 +47,6 @@ export type NextEstimateQueueTransactionsResult = {
   done: boolean
 }
 
-type WithSwapDepositRequest = {
-  useNative?: boolean
-}
-
 type WithAccounts = {
   accountFrom?: string
   accountTo?: string
@@ -128,8 +124,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
         | "clientId"
       >,
       "estimateQueue"
-    > &
-      WithSwapDepositRequest
+    >
   ): Promise<EstimateQueueTransactions> => {
     try {
       let queue = 1
@@ -142,9 +137,14 @@ export const useSwap = ({ accountId, selector }: Props) => {
         }
       }
 
-      const { selectedTokenIn, selectedTokenOut, useNative } = inputs
+      const { selectedTokenIn, selectedTokenOut } = inputs
 
-      if (useNative) {
+      if (
+        (selectedTokenIn.blockchain === "near" &&
+          selectedTokenIn.address === "native") ||
+        (selectedTokenOut.blockchain === "near" &&
+          selectedTokenOut.address === "native")
+      ) {
         const pair = [selectedTokenIn!.address, selectedTokenOut!.address]
         if (pair.includes("native") && pair.includes("wrap.near")) {
           const queueTransaction =
