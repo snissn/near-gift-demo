@@ -1,15 +1,15 @@
 "use client"
 
 import { useState } from "react"
+import { formatUnits } from "viem"
 
-import { DataEstimateRequest } from "@src/libs/de-sdk/types/interfaces"
-import { SwapEstimateBotResult } from "@src/hooks/useSwapEstimateBot"
 import { swapEstimateRefFinanceProvider } from "@src/libs/de-sdk/providers/refFinanceProvider"
+import { NetworkToken } from "@src/types/interfaces"
 
 const IS_DISABLE_QUOTING_FROM_REF =
   process.env.NEXT_PUBLIC_DISABLE_QUOTING_FROM_REF === "true"
-const IS_DISABLE_QUOTING_FROM_COINGECKO =
-  process.env.NEXT_PUBLIC_DISABLE_QUOTING_FROM_COINGECKO === "true"
+// const IS_DISABLE_QUOTING_FROM_COINGECKO =
+//   process.env.NEXT_PUBLIC_DISABLE_QUOTING_FROM_COINGECKO === "true"
 
 export enum EvaluateResultEnum {
   BEST = "best price",
@@ -18,74 +18,73 @@ export enum EvaluateResultEnum {
 
 export interface EvaluateSwapEstimationResult {
   priceEvaluation: EvaluateResultEnum | undefined
-  priceResults?: {
-    solver_id: string
-    amount_out: string
-  }[]
 }
 
 const ESTIMATE_DIFFERENCE_PERCENTAGE = 2
-
+function prepareRefAddressData(address: string) {
+  if (address === "native") return "wrap.near"
+  return address
+}
 export const useEvaluateSwapEstimation = () => {
   const [data, setData] = useState<EvaluateSwapEstimationResult | undefined>()
 
   const getSwapEstimateFromRefFinance = async (
-    dataEstimate: DataEstimateRequest,
-    bestOut: SwapEstimateBotResult["bestOut"]
+    tokenIn: NetworkToken,
+    tokenOut: NetworkToken,
+    amountIn: string,
+    bestOut: string
   ): Promise<void> => {
-    if (!IS_DISABLE_QUOTING_FROM_REF) {
-      const result = await swapEstimateRefFinanceProvider(dataEstimate)
-      if (parseFloat(result.amount_out) && bestOut) {
-        if (bestOut > result.amount_out) {
-          setData((state) => ({
-            priceEvaluation: EvaluateResultEnum.BEST,
-            priceResults: state?.priceResults,
-          }))
-          return
-        }
-        const resultAmountOut = parseFloat(result.amount_out)
-        const difference = Math.abs(Number(bestOut) - resultAmountOut)
-        const average = (Number(bestOut) + resultAmountOut) / 2
-        const percentageDifference = (difference / average) * 100
-
-        if (percentageDifference > ESTIMATE_DIFFERENCE_PERCENTAGE) {
-          setData((state) => ({
-            priceEvaluation: EvaluateResultEnum.LOW,
-            priceResults: state?.priceResults,
-          }))
-          return
-        }
-      }
+    const result = await swapEstimateRefFinanceProvider({
+      tokenIn: prepareRefAddressData(tokenIn.address!),
+      tokenOut: prepareRefAddressData(tokenOut.address!),
+      amountIn,
+    })
+    const refFinancePrice = +result
+    const bestOutN = +formatUnits(BigInt(bestOut), tokenOut.decimals!)
+    if (bestOutN > refFinancePrice) {
+      setData({
+        priceEvaluation: EvaluateResultEnum.BEST,
+      })
       return
     }
 
-    setData((state) => ({
-      priceEvaluation: EvaluateResultEnum.BEST,
-      priceResults: state?.priceResults,
-    }))
-  }
+    const difference = Math.abs(Number(bestOutN) - refFinancePrice)
+    const average = (bestOutN + refFinancePrice) / 2
+    const percentageDifference = (difference / average) * 100
 
-  const getSolversResults = (
-    estimatesFromSolvers: SwapEstimateBotResult["allEstimates"]
-  ) => {
-    setData((state) => ({
-      priceEvaluation: state?.priceEvaluation,
-      priceResults: estimatesFromSolvers,
-    }))
+    if (percentageDifference > ESTIMATE_DIFFERENCE_PERCENTAGE) {
+      setData({
+        priceEvaluation: EvaluateResultEnum.LOW,
+      })
+      return
+    }
+
+    return
   }
 
   const getEvaluateSwapEstimate = async (
-    data: DataEstimateRequest,
-    estimatesFromSolvers: SwapEstimateBotResult["allEstimates"],
-    bestOut: SwapEstimateBotResult["bestOut"]
+    tokenIn: NetworkToken,
+    tokenOut: NetworkToken,
+    amountIn: string,
+    bestOut: string | null
   ): Promise<void> => {
     setData({
       priceEvaluation: undefined,
-      priceResults: undefined,
     })
-    getSolversResults(estimatesFromSolvers)
 
-    await getSwapEstimateFromRefFinance(data, bestOut)
+    if (bestOut === null) return
+
+    if (!IS_DISABLE_QUOTING_FROM_REF) {
+      if (tokenIn.blockchain === "near" && tokenOut.blockchain === "near") {
+        await getSwapEstimateFromRefFinance(
+          tokenIn,
+          tokenOut,
+          amountIn,
+          bestOut
+        )
+      }
+      return
+    }
   }
 
   return {

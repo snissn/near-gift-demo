@@ -68,7 +68,9 @@ const helperHistoryLocalStore = (data: HistoryState["data"]): void => {
   data.forEach((value) => getHistoryFromStore.push(value))
   localStorage.setItem(
     NEAR_COLLECTOR_KEY,
-    JSON.stringify({ data: getHistoryFromStore })
+    JSON.stringify({ data: getHistoryFromStore }, (key, value) =>
+      typeof value === "bigint" ? value.toString() : value
+    )
   )
 }
 
