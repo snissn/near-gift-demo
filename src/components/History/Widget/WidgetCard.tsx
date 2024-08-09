@@ -80,9 +80,9 @@ const WidgetCard = ({
               subTitle: `You received back ${smallBalanceToFormat((details?.tokenIn || tokenIn) ?? "0") ?? PLACEHOLDER} ${(details?.selectedTokenIn?.symbol || tokensData[0]?.symbol) ?? PLACEHOLDER}.`,
             }
 
-          case HistoryStatus.COMPLETED:
           // to support new intent
           // TODO : remove all stuff related to old Intents
+          case HistoryStatus.COMPLETED:
           case HistoryStatus.INTENT_1_EXECUTED:
             return {
               title: `Transaction complete!`,
