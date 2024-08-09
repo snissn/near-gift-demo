@@ -74,8 +74,9 @@ export default function Swap() {
     setValue,
     getValues,
     trigger,
+    clearErrors,
     formState: { errors },
-  } = useForm<FormValues>()
+  } = useForm<FormValues>({ reValidateMode: "onSubmit" })
   const { setModalType, payload, onCloseModal } = useModalStore(
     (state) => state
   )
@@ -220,6 +221,7 @@ export default function Swap() {
     selectTokenOut,
   }: EstimateSwap) => {
     setErrorMsg(undefined)
+    clearErrors()
     const parsedTokeinIn = parseFloat(tokenIn)
     if (
       (name === "tokenIn" && !parsedTokeinIn) ||
