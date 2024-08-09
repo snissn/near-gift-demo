@@ -3,7 +3,6 @@ import { CallRequestIntentProps } from "@src/hooks/useSwap"
 import {
   prepareCreateIntent0,
   prepareCreateIntent1,
-  prepareCreateIntent2,
 } from "@src/libs/de-sdk/utils/intents"
 
 enum MapsEnum {
@@ -59,7 +58,7 @@ export const mapCreateIntentTransactionCall = (
         case MapsEnum.ETH_BASE:
           return [[INDEXER.INTENT_1, prepareCreateIntent1(inputs)]]
         case MapsEnum.BTC_MAINNET:
-          return [[INDEXER.INTENT_1, prepareCreateIntent2(inputs)]]
+          return [[INDEXER.INTENT_1, prepareCreateIntent1(inputs)]]
         default:
           return []
       }
