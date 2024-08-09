@@ -59,6 +59,7 @@ const ModalReviewSwap = () => {
         tokenOut: convertPayload.selectedTokenOut.defuse_asset_id,
         amountIn: unitsTokenIn,
       })
+      // ToDo: Here we need to handle the issue when all of a sudden there is no quotes
       if (bestEstimate === null) return
       const formattedOut =
         bestEstimate !== null
