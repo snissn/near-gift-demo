@@ -219,15 +219,17 @@ export default function Swap() {
     selectTokenIn,
     selectTokenOut,
   }: EstimateSwap) => {
+    setErrorMsg(undefined)
     const parsedTokeinIn = parseFloat(tokenIn)
     if (
       (name === "tokenIn" && !parsedTokeinIn) ||
       !selectTokenIn ||
       !selectTokenOut
     ) {
+      isProgrammaticUpdate.current = true
+      setValue("tokenOut", "")
       return
     }
-    setErrorMsg(undefined)
     if (parsedTokeinIn > (selectTokenIn?.balance ?? 0)) {
       setErrorMsg(ErrorEnum.INSUFFICIENT_BALANCE)
     }
@@ -238,6 +240,8 @@ export default function Swap() {
       )
     ) {
       setErrorMsg(ErrorEnum.NOT_AVAILABLE_SWAP)
+      isProgrammaticUpdate.current = true
+      setValue("tokenOut", "")
       return
     }
 
