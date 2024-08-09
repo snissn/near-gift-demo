@@ -48,9 +48,11 @@ const WidgetCardSwap = ({
   let cardStatus: CardSwapStatusEnum | null = null
   switch (status) {
     case HistoryStatus.AVAILABLE:
+    case HistoryStatus.INTENT_1_AVAILABLE:
       cardStatus = CardSwapStatusEnum.PENDING
       break
     case HistoryStatus.COMPLETED:
+    case HistoryStatus.INTENT_1_EXECUTED:
       cardStatus = CardSwapStatusEnum.COMPLETED
       break
   }
