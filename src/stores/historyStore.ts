@@ -10,6 +10,7 @@ export enum HistoryStatus {
   AVAILABLE = "Available",
   PROCESSING = "Processing",
   COMPLETED = "Completed",
+  EXECUTED = "executed",
   ROLLED_BACK = "RolledBack",
   EXPIRED = "Expired",
   FAILED = "Failed", // Internal status

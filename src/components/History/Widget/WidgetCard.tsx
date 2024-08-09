@@ -80,6 +80,9 @@ const WidgetCard = ({
             }
 
           case HistoryStatus.COMPLETED:
+          // to support new intent
+          // TODO : remove all stuff related to old Intents
+          case HistoryStatus.EXECUTED:
             return {
               title: `Transaction complete!`,
               subTitle: `You received ${smallBalanceToFormat(details?.tokenOut ?? "0") ?? PLACEHOLDER} ${details?.selectedTokenOut?.symbol ?? PLACEHOLDER}.`,
@@ -218,6 +221,7 @@ const WidgetCard = ({
     <div className="max-w-full md:max-w-[260px] min-h-[152px] flex flex-col justify-between mx-5 my-2 p-3 card-history bg-white rounded-[8px] border overflow-hidden">
       <div className="flex justify-between items-center mb-3">
         {(status === HistoryStatus.COMPLETED ||
+          status === HistoryStatus.EXECUTED ||
           status === HistoryStatus.ROLLED_BACK ||
           details?.transaction?.actions[0].FunctionCall.method_name ===
             "storage_deposit") && (
@@ -237,6 +241,7 @@ const WidgetCard = ({
           />
         )}
         {status !== HistoryStatus.COMPLETED &&
+          status !== HistoryStatus.EXECUTED &&
           status !== HistoryStatus.FAILED &&
           status !== HistoryStatus.ROLLED_BACK &&
           details?.transaction?.actions[0].FunctionCall.method_name !==
@@ -266,6 +271,7 @@ const WidgetCard = ({
       </Text>
       <div className="flex justify-start items-center gap-3 cursor-pointer">
         {status !== HistoryStatus.COMPLETED &&
+        status !== HistoryStatus.EXECUTED &&
         status !== HistoryStatus.FAILED &&
         status !== HistoryStatus.ROLLED_BACK &&
         details?.transaction?.actions[0].FunctionCall.method_name ===
