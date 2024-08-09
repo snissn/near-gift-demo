@@ -40,7 +40,7 @@ type EstimateSwap = {
   selectTokenOut: SelectToken
 }
 
-export enum ErrorEnum {
+enum ErrorEnum {
   INSUFFICIENT_BALANCE = "Insufficient Balance",
   NOT_AVAILABLE_SWAP = "Not Available Swap",
   NO_QUOTES = "No Quotes",
