@@ -15,7 +15,6 @@ import { ModalType } from "@src/stores/modalStore"
 import { NetworkToken, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import { ModalSelectAssetsPayload } from "@src/components/Modal/ModalSelectAssets"
 import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
-import { debounce } from "@src/utils/debounce"
 import { useModalSearchParams } from "@src/hooks/useModalSearchParams"
 import { useCalculateTokenToUsd } from "@src/hooks/useCalculateTokenToUsd"
 import { useTokensStore } from "@src/providers/TokensStoreProvider"
@@ -24,6 +23,7 @@ import { useEvaluateSwapEstimation } from "@src/hooks/useEvaluateSwapEstimation"
 import BlockEvaluatePrice from "@src/components/Block/BlockEvaluatePrice"
 import { useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import { debouncePromise } from "@src/utils/debouncePromise"
 
 type FormValues = {
   tokenIn: string
@@ -83,6 +83,7 @@ export default function Swap() {
   const { bestEstimate, allEstimates, getSwapEstimateBot } =
     useSwapEstimateBot()
   const isProgrammaticUpdate = useRef(false)
+  const lastInputValue = useRef("")
   useModalSearchParams()
   const [errorMsg, setErrorMsg] = useState<ErrorEnum>()
   const [isFetching, setIsFetching] = useState(false)
@@ -170,95 +171,102 @@ export default function Swap() {
   }
 
   const debouncedGetSwapEstimateBot = useCallback(
-    debounce(
-      async (
-        tokenIn: NetworkToken,
-        tokenOut: NetworkToken,
-        amountIn: string
-      ) => {
-        try {
-          const data = {
-            tokenIn: tokenIn.defuse_asset_id,
-            tokenOut: tokenOut.defuse_asset_id,
-            amountIn: parseUnits(amountIn, tokenIn?.decimals ?? 0).toString(),
-          }
-          const { bestEstimate } = await getSwapEstimateBot(data)
-          if (bestEstimate === null) {
-            isProgrammaticUpdate.current = true
-            setValue("tokenOut", "")
-            setErrorMsg(ErrorEnum.NO_QUOTES)
-            return
-          }
-          getEvaluateSwapEstimate(
-            tokenIn,
-            tokenOut,
-            amountIn,
-            bestEstimate.amount_out
-          )
-          isProgrammaticUpdate.current = true
-          const formattedOut =
-            bestEstimate.amount_out !== null
-              ? formatUnits(BigInt(bestEstimate.amount_out), tokenOut.decimals!)
-              : "0"
-          setValue("tokenOut", formattedOut)
-          trigger("tokenOut")
-        } catch (e) {
-          console.error("Failed to estimate price", e)
-        } finally {
-          setIsFetching(false)
-        }
-      },
+    debouncePromise(
+      async (data: { tokenIn: string; tokenOut: string; amountIn: string }) =>
+        getSwapEstimateBot(data),
       ESTIMATE_BOT_AWAIT_MS
     ),
     []
   )
 
-  const handleEstimateSwap = ({
+  const handleEstimateSwap = async ({
     tokenIn,
     tokenOut,
     name,
     selectTokenIn,
     selectTokenOut,
   }: EstimateSwap) => {
-    setErrorMsg(undefined)
-    clearErrors()
-    const parsedTokeinIn = parseFloat(tokenIn)
-    if (
-      (name === "tokenIn" && !parsedTokeinIn) ||
-      !selectTokenIn ||
-      !selectTokenOut
-    ) {
-      isProgrammaticUpdate.current = true
-      setValue("tokenOut", "")
-      return
-    }
-    if (parsedTokeinIn > (selectTokenIn?.balance ?? 0)) {
-      setErrorMsg(ErrorEnum.INSUFFICIENT_BALANCE)
-    }
+    try {
+      setErrorMsg(undefined)
+      clearErrors()
+      lastInputValue.current = tokenIn
+      const parsedTokeinIn = parseFloat(tokenIn)
+      // Empty input
+      if (
+        (name === "tokenIn" && !parsedTokeinIn) ||
+        !selectTokenIn ||
+        !selectTokenOut
+      ) {
+        isProgrammaticUpdate.current = true
+        setValue("tokenOut", "")
+        setIsFetching(false)
+        return
+      }
+      if (parsedTokeinIn > (selectTokenIn?.balance ?? 0)) {
+        setErrorMsg(ErrorEnum.INSUFFICIENT_BALANCE)
+      }
 
-    if (
-      !(selectTokenIn as NetworkTokenWithSwapRoute).routes?.includes(
-        selectTokenOut.defuse_asset_id
-      )
-    ) {
-      setErrorMsg(ErrorEnum.NOT_AVAILABLE_SWAP)
-      isProgrammaticUpdate.current = true
-      setValue("tokenOut", "")
-      return
-    }
+      if (
+        !(selectTokenIn as NetworkTokenWithSwapRoute).routes?.includes(
+          selectTokenOut.defuse_asset_id
+        )
+      ) {
+        setErrorMsg(ErrorEnum.NOT_AVAILABLE_SWAP)
+        isProgrammaticUpdate.current = true
+        setIsFetching(false)
+        setValue("tokenOut", "")
+        return
+      }
 
-    // Do not use any estimation of swap between Native and Token if ratio is 1:1
-    const pair = [selectTokenIn.address, selectTokenOut.address]
-    if (pair.includes("native") && pair.includes("wrap.near")) {
-      isProgrammaticUpdate.current = true
-      return setValue(
-        name === "tokenIn" ? "tokenOut" : "tokenIn",
-        name === "tokenIn" ? tokenIn : tokenOut
-      )
-    }
+      // Do not use any estimation of swap between Native and Token if ratio is 1:1
+      const pair = [selectTokenIn.address, selectTokenOut.address]
+      if (pair.includes("native") && pair.includes("wrap.near")) {
+        isProgrammaticUpdate.current = true
+        setIsFetching(false)
+        return setValue(
+          name === "tokenIn" ? "tokenOut" : "tokenIn",
+          name === "tokenIn" ? tokenIn : tokenOut
+        )
+      }
 
-    setIsFetching(true)
-    debouncedGetSwapEstimateBot(selectTokenIn, selectTokenOut, tokenIn)
+      setIsFetching(true)
+      const { bestEstimate } = await debouncedGetSwapEstimateBot({
+        tokenIn: selectTokenIn.defuse_asset_id,
+        tokenOut: selectTokenOut.defuse_asset_id,
+        amountIn: parseUnits(tokenIn, selectTokenIn?.decimals ?? 0).toString(),
+      })
+
+      if (lastInputValue.current === tokenIn) {
+        // no estimate available
+        if (bestEstimate === null) {
+          isProgrammaticUpdate.current = true
+          setValue("tokenOut", "")
+          setErrorMsg(ErrorEnum.NO_QUOTES)
+          setIsFetching(false)
+          return
+        }
+        getEvaluateSwapEstimate(
+          selectTokenIn,
+          selectTokenOut,
+          tokenIn,
+          bestEstimate.amount_out
+        )
+        isProgrammaticUpdate.current = true
+        const formattedOut =
+          bestEstimate.amount_out !== null
+            ? formatUnits(
+                BigInt(bestEstimate.amount_out),
+                selectTokenOut.decimals!
+              )
+            : "0"
+        setValue("tokenOut", formattedOut)
+        trigger("tokenOut")
+        setIsFetching(false)
+      }
+    } catch (e) {
+      console.error(e)
+      setIsFetching(false)
+    }
   }
 
   useEffect(() => {
