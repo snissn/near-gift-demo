@@ -12,7 +12,7 @@ import ButtonSwitch from "@src/components/Button/ButtonSwitch"
 import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { ModalType } from "@src/stores/modalStore"
-import { NetworkToken } from "@src/types/interfaces"
+import { NetworkToken, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import { ModalSelectAssetsPayload } from "@src/components/Modal/ModalSelectAssets"
 import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
 import { debounce } from "@src/utils/debounce"
@@ -176,6 +176,14 @@ export default function Swap() {
           amountIn: parseUnits(amountIn, tokenIn?.decimals ?? 0).toString(),
         }
         const { bestEstimate } = await getSwapEstimateBot(data)
+
+        handleValidateInputs({
+          tokenIn: tokenIn.defuse_asset_id as string,
+          tokenOut: (bestEstimate?.amount_out as string) ?? "0",
+          selectTokenIn: tokenIn as NetworkTokenWithSwapRoute,
+          selectTokenOut: tokenOut as NetworkTokenWithSwapRoute,
+        })
+
         if (bestEstimate === null) {
           isProgrammaticUpdate.current = true
           setValue("tokenOut", "")
@@ -226,12 +234,6 @@ export default function Swap() {
     }
 
     debouncedGetSwapEstimateBot(selectTokenIn, selectTokenOut, tokenIn)
-
-    handleValidateInputs({
-      tokenIn,
-      selectTokenIn,
-      selectTokenOut,
-    })
   }
 
   useEffect(() => {
