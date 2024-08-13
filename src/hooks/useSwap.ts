@@ -545,7 +545,10 @@ export const useSwap = ({ accountId, selector }: Props) => {
                     id: inputs.id,
                   },
                   gas: MAX_GAS_TRANSACTION,
-                  deposit: inputs?.receiverId ? "1" : "0",
+                  deposit:
+                    inputs?.receiverId !== CONTRACTS_REGISTER[INDEXER.INTENT_0]
+                      ? "1"
+                      : "0",
                 },
               },
             ],

@@ -10,6 +10,7 @@ import { NetworkToken, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { ModalType } from "@src/stores/modalStore"
 import { useTokensStore } from "@src/providers/TokensStoreProvider"
+import { tieNativeToWrapToken } from "@src/utils/tokenList"
 
 export type ModalSelectAssetsPayload = {
   modalType?: ModalType.MODAL_SELECT_ASSETS
@@ -85,8 +86,8 @@ const ModalSelectAssets = () => {
       }
       getAssetList.push({ ...value, isNotSelectable })
     })
-    setAssetList(getAssetList)
-    setAssetListWithBalances(getAssetListWithBalances)
+    setAssetList(tieNativeToWrapToken(getAssetList))
+    setAssetListWithBalances(tieNativeToWrapToken(getAssetListWithBalances))
   }, [data, isLoading])
 
   return (
