@@ -131,6 +131,8 @@ export default function Swap() {
     if (isFetchingData) {
       return
     }
+    setErrorMsg(undefined)
+    setPriceEvaluation(null)
     const tempTokenInCopy = Object.assign({}, selectTokenIn)
     setSelectTokenIn(selectTokenOut)
     setSelectTokenOut(tempTokenInCopy)
@@ -139,9 +141,16 @@ export default function Swap() {
     const valueTokenIn = getValues("tokenIn")
     const valueTokenOut = getValues("tokenOut")
     isProgrammaticUpdate.current = true
-    setValue("tokenIn", valueTokenOut)
-    isProgrammaticUpdate.current = true
     setValue("tokenOut", valueTokenIn)
+    isProgrammaticUpdate.current = true
+    setValue("tokenIn", valueTokenOut)
+    handleEstimateSwap({
+      tokenIn: getValues("tokenIn"),
+      tokenOut: getValues("tokenOut"),
+      name: "tokenIn",
+      selectTokenIn: selectTokenOut,
+      selectTokenOut: tempTokenInCopy,
+    })
   }
 
   const handleSelect = (fieldName: string, selectToken: SelectToken) => {
