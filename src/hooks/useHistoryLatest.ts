@@ -8,7 +8,8 @@ import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { intentStatus } from "@src/utils/near"
 import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
 import {
-  NearIntent1Create,
+  NearIntent1CreateCrossChain,
+  NearIntent1CreateSingleChain,
   NearIntentCreate,
   NearIntentStatus,
   NearTX,
@@ -33,9 +34,27 @@ function isValidJSON(str: string): boolean {
   }
 }
 
+async function getIntent(
+  receiverId: string,
+  intentId: string
+): Promise<HistoryStatus | null> {
+  const getIntentStatus = (await intentStatus(
+    receiverId,
+    intentId
+  )) as NearIntentStatus | null
+
+  if (!getIntentStatus?.status) {
+    return null
+  }
+
+  return getIntentStatus?.status === HistoryStatus.INTENT_1_AVAILABLE
+    ? HistoryStatus.AVAILABLE
+    : (getIntentStatus!.status as HistoryStatus)
+}
+
 export const useHistoryLatest = () => {
   const { accountId } = useWalletSelector()
-  const { updateHistory } = useHistoryStore((state) => state)
+  const { updateHistory, data } = useHistoryStore((state) => state)
   const [isHistoryWorkerSleeping, setIsHistoryWorkerSleeping] = useState(true)
   const { getTransactionScan } = useTransactionScan()
   const [isMonitoringComplete, setIsMonitoringComplete] = useState({
@@ -43,10 +62,35 @@ export const useHistoryLatest = () => {
     done: false,
   })
 
+  const applyDataFromCreateIntent = (
+    clientId: string
+  ): Partial<HistoryData["details"]> => {
+    const details: Partial<HistoryData["details"]> = {}
+    if (data.size) {
+      data.forEach((history) => {
+        const method =
+          history.details?.transaction?.actions[0].FunctionCall.method_name
+        if (
+          history.clientId === clientId &&
+          (method === "ft_transfer_call" || method === "native_on_transfer")
+        ) {
+          Object.assign(details, {
+            tokenIn: history.details?.tokenIn,
+            tokenOut: history.details?.tokenOut,
+            selectedTokenIn: history.details?.selectedTokenIn,
+            selectedTokenOut: history.details?.selectedTokenOut,
+          })
+        }
+      })
+    }
+    return details
+  }
+
   const runHistoryMonitoring = async (data: HistoryData[]): Promise<void> => {
     const validHistoryStatuses = [
       HistoryStatus.COMPLETED,
       HistoryStatus.ROLLED_BACK,
+      HistoryStatus.INTENT_1_ROLLED_BACK,
       HistoryStatus.EXPIRED,
       HistoryStatus.FAILED,
       HistoryStatus.WITHDRAW,
@@ -95,6 +139,8 @@ export const useHistoryLatest = () => {
           let args: unknown
           let msgBase64 = ""
           let msgBuffer: Buffer
+          let getIntentStatus: HistoryStatus | null
+          let recoverData: unknown
           switch (getMethodName) {
             case "ft_transfer_call":
               getHashedArgs =
@@ -104,7 +150,7 @@ export const useHistoryLatest = () => {
               )
               args = JSON.parse(argsJson)
               msgBase64 = (args as { msg: string }).msg
-              let recoverData: unknown
+
               if (isValidJSON(msgBase64)) {
                 recoverData = JSON.parse(msgBase64)
               }
@@ -119,10 +165,10 @@ export const useHistoryLatest = () => {
 
               const clientId =
                 (recoverData as NearIntentCreate)?.CreateIntent?.id ||
-                (recoverData as NearIntent1Create)?.id
+                (recoverData as NearIntent1CreateCrossChain)?.id
               const recoverDetails =
                 (recoverData as NearIntentCreate).CreateIntent ||
-                (recoverData as NearIntent1Create)
+                (recoverData as NearIntent1CreateCrossChain)
               const sendAmount =
                 (
                   recoverDetails as NearIntentCreate["CreateIntent"]
@@ -132,15 +178,15 @@ export const useHistoryLatest = () => {
                 (
                   recoverDetails as unknown as NearIntentCreate["CreateIntent"]
                 )?.IntentStruct?.receive?.amount.toString() ||
-                (recoverDetails as unknown as NearIntent1Create)?.asset_out
-                  ?.amount
+                (recoverDetails as unknown as NearIntent1CreateCrossChain)
+                  ?.asset_out?.amount
               const expiration = {
                 Block:
                   (
                     recoverDetails as unknown as NearIntentCreate["CreateIntent"]
                   )?.IntentStruct?.expiration?.Block.toString() ||
                   (
-                    recoverDetails as unknown as NearIntent1Create
+                    recoverDetails as unknown as NearIntent1CreateCrossChain
                   )?.expiration?.block_number.toString(),
               }
 
@@ -164,17 +210,13 @@ export const useHistoryLatest = () => {
                 },
               })
 
-              const getIntentStatus = (await intentStatus(
+              getIntentStatus = await getIntent(
                 (args as { receiver_id: string }).receiver_id,
                 historyData.clientId
-              )) as NearIntentStatus | null
-              if (getIntentStatus?.status) {
-                const statusAdapter =
-                  getIntentStatus?.status === HistoryStatus.INTENT_1_AVAILABLE
-                    ? HistoryStatus.AVAILABLE
-                    : getIntentStatus?.status
+              )
+              if (getIntentStatus) {
                 Object.assign(historyData, {
-                  status: statusAdapter as HistoryStatus,
+                  status: getIntentStatus,
                 })
               }
               break
@@ -187,6 +229,10 @@ export const useHistoryLatest = () => {
               )
               args = JSON.parse(argsJson)
               Object.assign(historyData, {
+                details: {
+                  ...historyData.details,
+                  ...applyDataFromCreateIntent((args as { id: string }).id),
+                },
                 clientId: (args as { id: string }).id,
                 status: HistoryStatus.ROLLED_BACK,
               })
@@ -234,6 +280,43 @@ export const useHistoryLatest = () => {
               Object.assign(historyData, {
                 status: HistoryStatus.STORAGE_DEPOSIT,
               })
+              break
+
+            case "native_on_transfer":
+              getHashedArgs =
+                historyData.details.transaction.actions[0].FunctionCall.args
+              argsJson = Buffer.from(getHashedArgs ?? "", "base64").toString(
+                "utf-8"
+              )
+              args = JSON.parse(argsJson)
+              msgBase64 = (args as { msg: string }).msg
+              recoverData = JSON.parse(msgBase64)
+              Object.assign(historyData, {
+                clientId: (recoverData as NearIntent1CreateSingleChain)?.id,
+                details: {
+                  ...historyData.details,
+                  recoverDetails: {
+                    ...(recoverData as NearIntent1CreateSingleChain),
+                    receive: {
+                      amount: (recoverData as NearIntent1CreateSingleChain)
+                        ?.asset_out?.amount,
+                    },
+                    expiration: (recoverData as NearIntent1CreateSingleChain)
+                      .expiration.block_number,
+                    receiverId: historyData.details.transaction.receiver_id,
+                  },
+                },
+              })
+
+              getIntentStatus = await getIntent(
+                historyData.details.transaction.receiver_id,
+                historyData.clientId
+              )
+              if (getIntentStatus) {
+                Object.assign(historyData, {
+                  status: getIntentStatus,
+                })
+              }
               break
           }
         }

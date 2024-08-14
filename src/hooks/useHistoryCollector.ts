@@ -51,6 +51,7 @@ export const useHistoryCollector = (collectorHooks: CollectorHook[]) => {
           !history?.errorMessage?.length &&
           history.status !== HistoryStatus.COMPLETED &&
           history.status !== HistoryStatus.ROLLED_BACK &&
+          history.status !== HistoryStatus.INTENT_1_ROLLED_BACK &&
           history.status !== HistoryStatus.EXPIRED
       )
       if (isHistoryNotComplete) runHistoryUpdate(history)

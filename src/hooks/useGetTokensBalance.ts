@@ -5,22 +5,16 @@ import { formatUnits } from "viem"
 
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { nep141Balance } from "@src/utils/near"
-import { NetworkTokenWithSwapRoute, TokenBalance } from "@src/types/interfaces"
+import {
+  NetworkTokenWithSwapRoute,
+  TokenBalance,
+  TokenChainEnum,
+  TokenNetworkEnum,
+} from "@src/types/interfaces"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { useGetCoingeckoExchangesList } from "@src/api/hooks/exchanges/useGetCoingeckoExchangesList"
 import { CoingeckoExchanges } from "@src/types/coingecko"
 import { useAccountBalance } from "@src/hooks/useAccountBalance"
-
-export enum TokenNetworkEnum {
-  Near = "near",
-  Eth = "eth",
-  Btc = "btc",
-}
-
-export enum TokenChainEnum {
-  Mainnet = "mainnet",
-  Base = "8453",
-}
 
 export const useGetTokensBalance = (
   tokensList: NetworkTokenWithSwapRoute[]

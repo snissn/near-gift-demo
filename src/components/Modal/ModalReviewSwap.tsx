@@ -1,12 +1,16 @@
 "use client"
 
-import { Text } from "@radix-ui/themes"
+import { Blockquote, Text } from "@radix-ui/themes"
 import Image from "next/image"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { formatUnits, parseUnits } from "viem"
 
 import ModalDialog from "@src/components/Modal/ModalDialog"
-import { NetworkToken } from "@src/types/interfaces"
+import {
+  NetworkToken,
+  TokenNativeEnum,
+  TokenNetworkEnum,
+} from "@src/types/interfaces"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import Button from "@src/components/Button/Button"
 import CardSwap from "@src/components/Card/CardSwap"
@@ -15,6 +19,7 @@ import { useTimer } from "@src/hooks/useTimer"
 import { useTimeFormatMinutes } from "@src/hooks/useTimeFormat"
 import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
 import { smallBalanceToFormat } from "@src/utils/token"
+import { useAccountBalance } from "@src/hooks/useAccountBalance"
 
 export type ModalReviewSwapPayload = {
   tokenIn: string
@@ -33,10 +38,14 @@ const ModalReviewSwap = () => {
   const { onCloseModal, setModalType, payload } = useModalStore(
     (state) => state
   )
+  const { getAccountBalance } = useAccountBalance()
   const { getSwapEstimateBot, isFetching } = useSwapEstimateBot()
+
   const [convertPayload, setConvertPayload] = useState<ModalReviewSwapPayload>(
     payload as ModalReviewSwapPayload
   )
+  const [isWNearConjunctionRequired, setIsWNearConjunctionRequired] =
+    useState(false)
 
   const recalculateEstimation = async () => {
     const pair = [
@@ -45,6 +54,8 @@ const ModalReviewSwap = () => {
     ]
     // Not needed recalculation if ratio is 1:1
     if (pair.includes("native") && pair.includes("wrap.near")) return
+
+    handleCheckNativeBalance()
 
     const unitsTokenIn = parseUnits(
       convertPayload.tokenIn,
@@ -73,9 +84,28 @@ const ModalReviewSwap = () => {
   )
   const { formatTwoNumbers } = useTimeFormatMinutes()
 
+  const handleCheckNativeBalance = async (): Promise<void> => {
+    const [network, chain, token] =
+      convertPayload.selectedTokenIn.defuse_asset_id.split(":")
+    if (network !== TokenNetworkEnum.Near || token !== TokenNativeEnum.Native) {
+      return
+    }
+    const { balance } = await getAccountBalance()
+    const formattedAmountOut = formatUnits(
+      BigInt(balance),
+      convertPayload.selectedTokenIn?.decimals ?? 0
+    )
+    const isLackOfBalance = convertPayload.tokenIn > formattedAmountOut
+    setIsWNearConjunctionRequired(isLackOfBalance)
+  }
+
   const handleConfirmSwap = async () => {
     setModalType(ModalType.MODAL_CONFIRM_SWAP, payload)
   }
+
+  useEffect(() => {
+    void handleCheckNativeBalance()
+  }, [])
 
   return (
     <ModalDialog>
@@ -151,6 +181,14 @@ const ModalReviewSwap = () => {
             </div>
           </div>
         </div>
+        {isWNearConjunctionRequired && (
+          <div className="flex flex-col w-full mb-6 gap-3">
+            <Blockquote color="cyan">
+              Wrapped Near will be used in conjunction with Near to boost your
+              current swap experience.
+            </Blockquote>
+          </div>
+        )}
         <Button
           size="lg"
           fullWidth
