@@ -2,7 +2,7 @@
 
 import { Text } from "@radix-ui/themes"
 import Image from "next/image"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { formatUnits, parseUnits } from "viem"
 
 import ModalDialog from "@src/components/Modal/ModalDialog"
@@ -15,6 +15,7 @@ import { useTimer } from "@src/hooks/useTimer"
 import { useTimeFormatMinutes } from "@src/hooks/useTimeFormat"
 import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
 import { smallBalanceToFormat } from "@src/utils/token"
+import { useCalculateTokenToUsd } from "@src/hooks/useCalculateTokenToUsd"
 
 export type ModalReviewSwapPayload = {
   tokenIn: string
@@ -38,6 +39,14 @@ const ModalReviewSwap = () => {
   const [convertPayload, setConvertPayload] = useState<ModalReviewSwapPayload>(
     payload as ModalReviewSwapPayload
   )
+  const {
+    priceToUsd: priceToUsdTokenIn,
+    calculateTokenToUsd: calculateTokenToUsdTokenIn,
+  } = useCalculateTokenToUsd()
+  const {
+    priceToUsd: priceToUsdTokenOut,
+    calculateTokenToUsd: calculateTokenToUsdTokenOut,
+  } = useCalculateTokenToUsd()
 
   const recalculateEstimation = async () => {
     try {
@@ -79,6 +88,17 @@ const ModalReviewSwap = () => {
     }
   }
 
+  useEffect(() => {
+    calculateTokenToUsdTokenIn(
+      convertPayload.tokenIn,
+      convertPayload.selectedTokenIn
+    )
+    calculateTokenToUsdTokenOut(
+      convertPayload.tokenOut,
+      convertPayload.selectedTokenOut
+    )
+  }, [convertPayload])
+
   const { timeLeft } = useTimer(
     RECALCULATE_ESTIMATION_TIME_SECS,
     recalculateEstimation
@@ -115,8 +135,8 @@ const ModalReviewSwap = () => {
         <CardSwap
           amountIn={smallBalanceToFormat(convertPayload.tokenIn, 7)}
           amountOut={smallBalanceToFormat(convertPayload.tokenOut, 7)}
-          amountOutToUsd="~"
-          amountInToUsd="~"
+          amountInToUsd={`~$${parseFloat(priceToUsdTokenIn).toFixed(2)}`}
+          amountOutToUsd={`~$${parseFloat(priceToUsdTokenOut).toFixed(2)}`}
           selectTokenIn={convertPayload.selectedTokenIn}
           selectTokenOut={convertPayload.selectedTokenOut}
         />
