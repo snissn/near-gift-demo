@@ -208,15 +208,10 @@ const ModalConfirmSwap = () => {
           receivedHash: lastInTransactionHashes as string,
         })
 
-        const isNativeTokenIn = data!.selectedTokenIn.address === "native"
-        const mutateSelectedTokenIn = isNativeTokenIn
-          ? handleMutateTokenToNativeSupport(data!.selectedTokenIn)
-          : data!.selectedTokenIn
-
         const inputs = {
           tokenIn: data!.tokenIn,
           tokenOut: data!.tokenOut,
-          selectedTokenIn: mutateSelectedTokenIn,
+          selectedTokenIn: data!.selectedTokenIn,
           selectedTokenOut: data!.selectedTokenOut,
           clientId: data.clientId,
           estimateQueue: value,
@@ -315,17 +310,9 @@ const ModalConfirmSwap = () => {
                 QueueTransactions.CREATE_INTENT
               )
             ) {
-              const isNativeTokenIn =
-                modalPayload!.selectedTokenIn.address === "native"
-              const mutateSelectedTokenIn = isNativeTokenIn
-                ? handleMutateTokenToNativeSupport(
-                    modalPayload!.selectedTokenIn
-                  )
-                : modalPayload!.selectedTokenIn
-
               handlePublishIntentToSolver(
                 Object.assign(inputs, {
-                  selectedTokenIn: mutateSelectedTokenIn,
+                  selectedTokenIn: modalPayload!.selectedTokenIn,
                 }),
                 inputs.clientId,
                 result.transaction.hash as string

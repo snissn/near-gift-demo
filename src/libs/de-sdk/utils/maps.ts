@@ -1,8 +1,8 @@
 import { INDEXER } from "@src/constants/contracts"
 import { CallRequestIntentProps } from "@src/hooks/useSwap"
 import {
-  prepareCreateIntent0,
-  prepareCreateIntent1,
+  prepareCreateIntent1CrossChain,
+  prepareCreateIntent1SingleChain,
 } from "@src/libs/de-sdk/utils/intents"
 
 enum MapsEnum {
@@ -54,16 +54,16 @@ export const mapCreateIntentTransactionCall = (
       //        as example here `[[INDEXER.INTENT_0, tx],...,[INDEXER.INTENT_N, tx_N]]`
       switch (toNetworkId) {
         case MapsEnum.NEAR_MAINNET:
-          return [[INDEXER.INTENT_0, prepareCreateIntent0(inputs)]]
+          return [[INDEXER.INTENT_1, prepareCreateIntent1SingleChain(inputs)]]
         case MapsEnum.ETH_BASE:
-          return [[INDEXER.INTENT_1, prepareCreateIntent1(inputs)]]
+          return [[INDEXER.INTENT_1, prepareCreateIntent1CrossChain(inputs)]]
         case MapsEnum.BTC_MAINNET:
-          return [[INDEXER.INTENT_1, prepareCreateIntent1(inputs)]]
+          return [[INDEXER.INTENT_1, prepareCreateIntent1CrossChain(inputs)]]
         default:
           return []
       }
     case MapsEnum.ETH_BASE:
-      return [[INDEXER.INTENT_1, prepareCreateIntent1(inputs)]]
+      return [[INDEXER.INTENT_1, prepareCreateIntent1CrossChain(inputs)]]
     default:
       return []
   }

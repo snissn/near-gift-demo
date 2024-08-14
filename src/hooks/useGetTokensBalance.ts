@@ -5,10 +5,16 @@ import { formatUnits } from "viem"
 
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { nep141Balance } from "@src/utils/near"
-import { NetworkTokenWithSwapRoute, TokenBalance } from "@src/types/interfaces"
+import {
+  NetworkTokenWithSwapRoute,
+  TokenBalance,
+  TokenChainEnum,
+  TokenNetworkEnum,
+} from "@src/types/interfaces"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { useGetCoingeckoExchangesList } from "@src/api/hooks/exchanges/useGetCoingeckoExchangesList"
 import { CoingeckoExchanges } from "@src/types/coingecko"
+import { useAccountBalance } from "@src/hooks/useAccountBalance"
 
 export const useGetTokensBalance = (
   tokensList: NetworkTokenWithSwapRoute[]
@@ -19,65 +25,92 @@ export const useGetTokensBalance = (
   const { accountId } = useWalletSelector()
   const { activePreview } = useHistoryStore((state) => state)
   const { data: exchangesList, isFetched } = useGetCoingeckoExchangesList()
+  const { getAccountBalance } = useAccountBalance()
+
+  const isTokenNative = (address: string): boolean => {
+    switch (address) {
+      case "native":
+        return true
+      default:
+        return false
+    }
+  }
+
+  const getNearTokenBalance = async (
+    address: string,
+    decimals: number
+  ): Promise<TokenBalance> => {
+    const tokenBalance: TokenBalance = {}
+    let balance: number | undefined = undefined
+
+    if (accountId && isTokenNative(address)) {
+      const { balance } = await getAccountBalance()
+      if (balance) {
+        const formattedAmountOut = formatUnits(BigInt(balance), decimals)
+        Object.assign(tokenBalance, { balance: parseFloat(formattedAmountOut) })
+      }
+    } else if (accountId && !isTokenNative(address)) {
+      const getBalance = await nep141Balance(accountId as string, address)
+      if (getBalance) {
+        balance = Number(formatUnits(BigInt(getBalance as string), decimals))
+        Object.assign(tokenBalance, { balance })
+      }
+    }
+
+    const getCoinIndex = (
+      exchangesList as CoingeckoExchanges
+    )?.tickers?.findIndex((coin) => {
+      return isTokenNative(address)
+        ? coin.base.toLowerCase() === "wrap.near"
+        : coin.base.toLowerCase() === address.toLowerCase()
+    })
+
+    if (getCoinIndex !== -1) {
+      const convertedLastUsd = (exchangesList as CoingeckoExchanges)?.tickers[
+        getCoinIndex
+      ].converted_last.usd
+      if (convertedLastUsd) {
+        Object.assign(tokenBalance, {
+          convertedLast: { usd: convertedLastUsd },
+        })
+        if (tokenBalance?.balance) {
+          const balanceToUsd = tokenBalance?.balance * convertedLastUsd
+          Object.assign(tokenBalance, {
+            balanceToUsd,
+          })
+        }
+      }
+    }
+
+    return tokenBalance
+  }
 
   const getTokensBalance = async () => {
     try {
       setIsFetching(true)
       const dataWithBalances = await Promise.all(
         tokensList.map(async (token) => {
-          // Not proceed with fetching balances if token is not belong to near chain
-          // Use different Promise map
-          if (token.chainName?.toLocaleLowerCase() !== "near") {
-            return token
-          }
+          const [network, chain, address] = token?.defuse_asset_id.split(
+            ":"
+          ) ?? ["", "", ""]
 
-          const tokenBalance: TokenBalance = {}
-
-          let balance: number | undefined = undefined
-          if (accountId && token?.address && token.address !== "native") {
-            const getBalance = await nep141Balance(
-              accountId as string,
-              token.address as string
-            )
-            if (getBalance) {
-              balance = Number(
-                formatUnits(
-                  BigInt(getBalance as string),
-                  token.decimals as number
-                )
-              )
-              Object.assign(tokenBalance, { balance })
-            }
-          }
-
-          const getCoinIndex = (
-            exchangesList as CoingeckoExchanges
-          )?.tickers?.findIndex((coin) => {
-            const defuseAssetId = token?.defuse_asset_id?.split(":")
-            if (defuseAssetId.length === 3) {
-              return coin.base.toLowerCase() === defuseAssetId[2].toLowerCase()
-            }
-          })
-
-          if (getCoinIndex !== -1) {
-            const convertedLastUsd = (exchangesList as CoingeckoExchanges)
-              ?.tickers[getCoinIndex].converted_last.usd
-            if (convertedLastUsd) {
-              Object.assign(tokenBalance, {
-                convertedLast: { usd: convertedLastUsd },
-              })
-            }
-            if (balance) {
-              const balanceToUsd = balance * convertedLastUsd
-              Object.assign(tokenBalance, {
-                balanceToUsd,
-              })
-            }
-          }
-
-          return {
-            ...token,
-            ...tokenBalance,
+          switch (network) {
+            case TokenNetworkEnum.Near:
+              switch (chain) {
+                case TokenChainEnum.Mainnet:
+                  return {
+                    ...token,
+                    ...(await getNearTokenBalance(
+                      address,
+                      token?.decimals ?? 0
+                    )),
+                  }
+                default:
+                  return token
+              }
+              break
+            default:
+              return token
           }
         })
       )

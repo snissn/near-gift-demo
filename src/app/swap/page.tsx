@@ -85,10 +85,7 @@ export default function Swap() {
     checkToken: NetworkToken,
     setSelectToken: (value?: NetworkToken) => void
   ): boolean => {
-    if (
-      token.address === checkToken?.address &&
-      token.chainId === checkToken?.chainId
-    ) {
+    if (token.defuse_asset_id === checkToken?.defuse_asset_id) {
       setSelectToken(undefined)
       return true
     }
@@ -178,7 +175,7 @@ export default function Swap() {
         const { bestEstimate } = await getSwapEstimateBot(data)
 
         handleValidateInputs({
-          tokenIn: tokenIn.defuse_asset_id as string,
+          tokenIn: amountIn as string,
           tokenOut: (bestEstimate?.amount_out as string) ?? "0",
           selectTokenIn: tokenIn as NetworkTokenWithSwapRoute,
           selectTokenOut: tokenOut as NetworkTokenWithSwapRoute,
@@ -395,7 +392,7 @@ export default function Swap() {
         </div>
         <FieldComboInput<FormValues>
           fieldName="tokenOut"
-          price={priceToUsdTokenOut}
+          price={Number(getValues("tokenOut")) > 0 ? priceToUsdTokenOut : "0"}
           label={
             <BlockEvaluatePrice
               priceEvaluation={evaluateSwapEstimation?.priceEvaluation}
