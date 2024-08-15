@@ -216,17 +216,17 @@ export type JobsDetails = {
   link: string
 }
 
-export enum TokenNetworkEnum {
+export enum BlockchainEnum {
   Near = "near",
   Eth = "eth",
   Btc = "btc",
 }
 
-export enum TokenChainEnum {
+export enum NetworkEnum {
   Mainnet = "mainnet",
   Base = "8453",
 }
 
-export enum TokenNativeEnum {
+export enum ContractIdEnum {
   Native = "native",
 }

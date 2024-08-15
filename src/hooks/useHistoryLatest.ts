@@ -21,6 +21,7 @@ import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { useTransactionScan } from "@src/hooks/useTransactionScan"
 import { swapSchema } from "@src/utils/schema"
 import { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
+import { adapterIntent0, adapterIntent1 } from "@src/libs/de-sdk/utils/adapters"
 
 const SCHEDULER_30_SEC = 30000
 const SCHEDULER_5_SEC = 5000
@@ -87,11 +88,9 @@ export const useHistoryLatest = () => {
   }
 
   const runHistoryMonitoring = async (data: HistoryData[]): Promise<void> => {
-    const validHistoryStatuses = [
-      HistoryStatus.COMPLETED,
-      HistoryStatus.ROLLED_BACK,
-      HistoryStatus.INTENT_1_ROLLED_BACK,
-      HistoryStatus.EXPIRED,
+    const validHistoryStatuses: string[] = [
+      ...adapterIntent0.completedStatuses,
+      ...adapterIntent1.completedStatuses,
       HistoryStatus.FAILED,
       HistoryStatus.WITHDRAW,
       HistoryStatus.DEPOSIT,
@@ -103,9 +102,7 @@ export const useHistoryLatest = () => {
       data.map(async (historyData) => {
         if (
           (historyData?.status &&
-            validHistoryStatuses.includes(
-              historyData!.status as HistoryStatus
-            )) ||
+            validHistoryStatuses.includes(historyData!.status ?? "")) ||
           historyData.errorMessage ||
           historyData.isClosed
         ) {

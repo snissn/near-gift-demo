@@ -174,7 +174,8 @@ const WidgetCard = ({
   ): QueueTransactions | undefined => {
     if (
       transaction.actions[0].FunctionCall.method_name === "ft_transfer_call" ||
-      transaction.actions[0].FunctionCall.method_name === "rollback_intent"
+      transaction.actions[0].FunctionCall.method_name === "rollback_intent" ||
+      transaction.actions[0].FunctionCall.method_name === "native_on_transfer"
     ) {
       return QueueTransactions.CREATE_INTENT
     }

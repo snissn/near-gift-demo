@@ -8,13 +8,14 @@ import { nep141Balance } from "@src/utils/near"
 import {
   NetworkTokenWithSwapRoute,
   TokenBalance,
-  TokenChainEnum,
-  TokenNetworkEnum,
+  NetworkEnum,
+  BlockchainEnum,
 } from "@src/types/interfaces"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { useGetCoingeckoExchangesList } from "@src/api/hooks/exchanges/useGetCoingeckoExchangesList"
 import { CoingeckoExchanges } from "@src/types/coingecko"
 import { useAccountBalance } from "@src/hooks/useAccountBalance"
+import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 
 export const useGetTokensBalance = (
   tokensList: NetworkTokenWithSwapRoute[]
@@ -90,18 +91,19 @@ export const useGetTokensBalance = (
       setIsFetching(true)
       const dataWithBalances = await Promise.all(
         tokensList.map(async (token) => {
-          const [network, chain, address] = token?.defuse_asset_id.split(
-            ":"
-          ) ?? ["", "", ""]
+          const result = parseDefuseAsset(token?.defuse_asset_id ?? "")
+          if (!result) {
+            return token
+          }
 
-          switch (network) {
-            case TokenNetworkEnum.Near:
-              switch (chain) {
-                case TokenChainEnum.Mainnet:
+          switch (result.blockchain) {
+            case BlockchainEnum.Near:
+              switch (result.network) {
+                case NetworkEnum.Mainnet:
                   return {
                     ...token,
                     ...(await getNearTokenBalance(
-                      address,
+                      result.contractId,
                       token?.decimals ?? 0
                     )),
                   }

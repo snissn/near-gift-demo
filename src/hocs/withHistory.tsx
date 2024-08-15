@@ -17,7 +17,7 @@ export function withHistory<T extends React.ComponentType>(
     const { runTransactionCollector } = useCombinedHistoryCollector()
 
     useEffect(() => {
-      runTransactionCollector()
+      void runTransactionCollector()
     }, [])
 
     return (
