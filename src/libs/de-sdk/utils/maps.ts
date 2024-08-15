@@ -4,6 +4,7 @@ import {
   prepareCreateIntent1CrossChain,
   prepareCreateIntent1SingleChain,
 } from "@src/libs/de-sdk/utils/intents"
+import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 
 enum MapsEnum {
   NEAR_MAINNET = "near:mainnet",
@@ -42,11 +43,10 @@ export type MapCreateIntentResult = [number, any][]
 export const mapCreateIntentTransactionCall = (
   inputs: MapCreateIntentProps
 ): MapCreateIntentResult => {
-  const [networkFrom, idFrom] =
-    inputs.selectedTokenIn.defuse_asset_id.split(":")
-  const [networkTo, idTo] = inputs.selectedTokenOut.defuse_asset_id.split(":")
-  const fromNetworkId = `${networkFrom}:${idFrom}` as MapsEnum
-  const toNetworkId = `${networkTo}:${idTo}` as MapsEnum
+  const from = parseDefuseAsset(inputs.selectedTokenIn.defuse_asset_id)
+  const fromNetworkId = `${from?.blockchain}:${from?.network}` as MapsEnum
+  const to = parseDefuseAsset(inputs.selectedTokenOut.defuse_asset_id)
+  const toNetworkId = `${to?.blockchain}:${to?.network}` as MapsEnum
 
   switch (fromNetworkId) {
     case MapsEnum.NEAR_MAINNET:

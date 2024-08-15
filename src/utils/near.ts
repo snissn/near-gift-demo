@@ -63,9 +63,9 @@ export async function nep141Balance(
       ).toString("base64"),
       finality: "optimistic",
     })
-    console.log(
-      `ft_balance_of ${contractId} for ${accountId} is ${storageBalance}`
-    )
+    // console.log(
+    //   `ft_balance_of ${contractId} for ${accountId} is ${storageBalance}`
+    // )
     return JSON.parse(Buffer.from(storageBalance.result).toString())
   } catch (e) {
     console.error("Failed to check storage balance")

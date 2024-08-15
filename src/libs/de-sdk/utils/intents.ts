@@ -1,6 +1,5 @@
 import { parseUnits } from "viem"
 import * as borsh from "borsh"
-import { Ojuju } from "next/dist/compiled/@next/font/dist/google"
 
 import {
   CONTRACTS_REGISTER,
@@ -14,8 +13,9 @@ import { swapSchema } from "@src/utils/schema"
 import {
   NearIntent1CreateCrossChain,
   NearIntent1CreateSingleChain,
-  TokenNativeEnum,
+  ContractIdEnum,
 } from "@src/types/interfaces"
+import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 
 const REFERRAL_ACCOUNT = process.env.REFERRAL_ACCOUNT ?? ""
 
@@ -157,15 +157,15 @@ export const prepareCreateIntent1SingleChain = (
     inputs.selectedTokenOut.decimals as number
   ).toString()
 
-  const [network, chain, token] =
-    inputs.selectedTokenOut.defuse_asset_id.split(":")
+  const result = parseDefuseAsset(inputs.selectedTokenOut.defuse_asset_id)
+  const contractId = result?.contractId ?? ""
 
   const msg: NearIntent1CreateSingleChain = {
     type: "create",
     id: inputs.clientId as string,
     asset_out: {
-      type: token === TokenNativeEnum.Native ? "native" : "nep141",
-      token: token,
+      type: contractId === ContractIdEnum.Native ? "native" : "nep141",
+      token: contractId,
       amount: estimateUnitsBackAmount,
       account: inputs.accountTo
         ? (inputs.accountTo as string)
@@ -181,7 +181,7 @@ export const prepareCreateIntent1SingleChain = (
   }
 
   const params = {}
-  if (token === TokenNativeEnum.Native) {
+  if (contractId === ContractIdEnum.Native) {
     Object.assign(params, {
       methodName: "ft_transfer_call",
       args: {
@@ -206,7 +206,7 @@ export const prepareCreateIntent1SingleChain = (
 
   return {
     receiverId:
-      token === TokenNativeEnum.Native
+      contractId === ContractIdEnum.Native
         ? receiverIdIn
         : CONTRACTS_REGISTER[INDEXER.INTENT_1],
     actions: [

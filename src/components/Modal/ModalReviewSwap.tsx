@@ -8,8 +8,8 @@ import { formatUnits, parseUnits } from "viem"
 import ModalDialog from "@src/components/Modal/ModalDialog"
 import {
   NetworkToken,
-  TokenNativeEnum,
-  TokenNetworkEnum,
+  ContractIdEnum,
+  BlockchainEnum,
 } from "@src/types/interfaces"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import Button from "@src/components/Button/Button"
@@ -20,6 +20,7 @@ import { useTimeFormatMinutes } from "@src/hooks/useTimeFormat"
 import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
 import { smallBalanceToFormat } from "@src/utils/token"
 import { useAccountBalance } from "@src/hooks/useAccountBalance"
+import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 
 export type ModalReviewSwapPayload = {
   tokenIn: string
@@ -85,9 +86,13 @@ const ModalReviewSwap = () => {
   const { formatTwoNumbers } = useTimeFormatMinutes()
 
   const handleCheckNativeBalance = async (): Promise<void> => {
-    const [network, chain, token] =
-      convertPayload.selectedTokenIn.defuse_asset_id.split(":")
-    if (network !== TokenNetworkEnum.Near || token !== TokenNativeEnum.Native) {
+    const result = parseDefuseAsset(
+      convertPayload.selectedTokenIn.defuse_asset_id
+    )
+    if (
+      result?.blockchain !== BlockchainEnum.Near ||
+      result?.contractId !== ContractIdEnum.Native
+    ) {
       return
     }
     const { balance } = await getAccountBalance()

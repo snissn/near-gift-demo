@@ -18,8 +18,8 @@ import {
   NetworkToken,
   QueueTransactions,
   Result,
-  TokenNativeEnum,
-  TokenNetworkEnum,
+  ContractIdEnum,
+  BlockchainEnum,
 } from "@src/types/interfaces"
 import useStorageDeposit from "@src/hooks/useStorageDeposit"
 import useNearSwapNearToWNear from "@src/hooks/useSwapNearToWNear"
@@ -147,8 +147,8 @@ export const useSwap = ({ accountId, selector }: Props) => {
       const [network, chain, address] =
         selectedTokenIn.defuse_asset_id.split(":")
       if (
-        network === TokenNetworkEnum.Near &&
-        address === TokenNativeEnum.Native
+        network === BlockchainEnum.Near &&
+        address === ContractIdEnum.Native
       ) {
         const { balance } = await getAccountBalance()
         const formattedAmountOut = formatUnits(
