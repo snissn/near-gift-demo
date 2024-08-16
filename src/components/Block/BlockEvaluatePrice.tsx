@@ -41,7 +41,7 @@ const BlockEvaluatePrice = ({
                   {priceResults.map((providers, i) =>
                     providers.map((result) => {
                       return (
-                        <span key={i}>
+                        <span key={`${i}:${result.solver_id}`}>
                           Rate{" "}
                           {tokenBalanceToFormatUnits({
                             balance: result.amount_out,
