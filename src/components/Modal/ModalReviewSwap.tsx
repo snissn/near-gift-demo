@@ -19,6 +19,7 @@ import { useTimer } from "@src/hooks/useTimer"
 import { useTimeFormatMinutes } from "@src/hooks/useTimeFormat"
 import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
 import { smallBalanceToFormat } from "@src/utils/token"
+import { useCalculateTokenToUsd } from "@src/hooks/useCalculateTokenToUsd"
 import { useAccountBalance } from "@src/hooks/useAccountBalance"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 
@@ -39,45 +40,75 @@ const ModalReviewSwap = () => {
   const { onCloseModal, setModalType, payload } = useModalStore(
     (state) => state
   )
-  const { getAccountBalance } = useAccountBalance()
-  const { getSwapEstimateBot, isFetching } = useSwapEstimateBot()
-
+  const [isFetching, setIsFetching] = useState(false)
+  const { getSwapEstimateBot } = useSwapEstimateBot()
   const [convertPayload, setConvertPayload] = useState<ModalReviewSwapPayload>(
     payload as ModalReviewSwapPayload
   )
+  const {
+    priceToUsd: priceToUsdTokenIn,
+    calculateTokenToUsd: calculateTokenToUsdTokenIn,
+  } = useCalculateTokenToUsd()
+  const {
+    priceToUsd: priceToUsdTokenOut,
+    calculateTokenToUsd: calculateTokenToUsdTokenOut,
+  } = useCalculateTokenToUsd()
+  const { getAccountBalance } = useAccountBalance()
   const [isWNearConjunctionRequired, setIsWNearConjunctionRequired] =
     useState(false)
 
   const recalculateEstimation = async () => {
-    const pair = [
-      convertPayload.selectedTokenIn.address as string,
-      convertPayload.selectedTokenOut.address as string,
-    ]
-    // Not needed recalculation if ratio is 1:1
-    if (pair.includes("native") && pair.includes("wrap.near")) return
+    try {
+      setIsFetching(true)
+      const pair = [
+        convertPayload.selectedTokenIn.address as string,
+        convertPayload.selectedTokenOut.address as string,
+      ]
+      // Not needed recalculation if ratio is 1:1
+      if (pair.includes("native") && pair.includes("wrap.near")) return
 
-    handleCheckNativeBalance()
+      handleCheckNativeBalance()
 
-    const unitsTokenIn = parseUnits(
-      convertPayload.tokenIn,
-      convertPayload.selectedTokenIn.decimals as number
-    ).toString()
+      const unitsTokenIn = parseUnits(
+        convertPayload.tokenIn,
+        convertPayload.selectedTokenIn.decimals as number
+      ).toString()
 
-    const { bestEstimate } = await getSwapEstimateBot({
-      tokenIn: convertPayload.selectedTokenIn.defuse_asset_id,
-      tokenOut: convertPayload.selectedTokenOut.defuse_asset_id,
-      amountIn: unitsTokenIn,
-    })
-    if (bestEstimate === null) return
-    const formattedOut =
-      bestEstimate !== null
-        ? formatUnits(
-            BigInt(bestEstimate.amount_out),
-            convertPayload.selectedTokenOut.decimals!
-          )
-        : "0"
-    setConvertPayload({ ...convertPayload, tokenOut: formattedOut })
+      const { bestEstimate } = await getSwapEstimateBot({
+        tokenIn: convertPayload.selectedTokenIn.defuse_asset_id,
+        tokenOut: convertPayload.selectedTokenOut.defuse_asset_id,
+        amountIn: unitsTokenIn,
+      })
+      // ToDo: Here we need to handle the issue when all of a sudden there is no quotes
+      if (bestEstimate === null) return
+      const formattedOut =
+        bestEstimate !== null
+          ? formatUnits(
+              BigInt(bestEstimate.amount_out),
+              convertPayload.selectedTokenOut.decimals!
+            )
+          : "0"
+      setConvertPayload({ ...convertPayload, tokenOut: formattedOut })
+    } catch (e) {
+      console.error(
+        "Failed to recalculate swap estimation in Modal Review Swap",
+        e
+      )
+    } finally {
+      setIsFetching(false)
+    }
   }
+
+  useEffect(() => {
+    calculateTokenToUsdTokenIn(
+      convertPayload.tokenIn,
+      convertPayload.selectedTokenIn
+    )
+    calculateTokenToUsdTokenOut(
+      convertPayload.tokenOut,
+      convertPayload.selectedTokenOut
+    )
+  }, [convertPayload])
 
   const { timeLeft } = useTimer(
     RECALCULATE_ESTIMATION_TIME_SECS,
@@ -138,8 +169,16 @@ const ModalReviewSwap = () => {
         <CardSwap
           amountIn={smallBalanceToFormat(convertPayload.tokenIn, 7)}
           amountOut={smallBalanceToFormat(convertPayload.tokenOut, 7)}
-          amountOutToUsd="~"
-          amountInToUsd="~"
+          amountInToUsd={
+            priceToUsdTokenIn !== "0"
+              ? `~$${smallBalanceToFormat(priceToUsdTokenIn, 7)}`
+              : ""
+          }
+          amountOutToUsd={
+            priceToUsdTokenOut !== "0"
+              ? `~$${smallBalanceToFormat(priceToUsdTokenOut, 7)}`
+              : ""
+          }
           selectTokenIn={convertPayload.selectedTokenIn}
           selectTokenOut={convertPayload.selectedTokenOut}
         />
