@@ -169,8 +169,16 @@ const ModalReviewSwap = () => {
         <CardSwap
           amountIn={smallBalanceToFormat(convertPayload.tokenIn, 7)}
           amountOut={smallBalanceToFormat(convertPayload.tokenOut, 7)}
-          amountInToUsd={`~$${parseFloat(priceToUsdTokenIn).toFixed(2)}`}
-          amountOutToUsd={`~$${parseFloat(priceToUsdTokenOut).toFixed(2)}`}
+          amountInToUsd={
+            priceToUsdTokenIn !== "0"
+              ? `~$${smallBalanceToFormat(priceToUsdTokenIn, 7)}`
+              : ""
+          }
+          amountOutToUsd={
+            priceToUsdTokenOut !== "0"
+              ? `~$${smallBalanceToFormat(priceToUsdTokenOut, 7)}`
+              : ""
+          }
           selectTokenIn={convertPayload.selectedTokenIn}
           selectTokenOut={convertPayload.selectedTokenOut}
         />

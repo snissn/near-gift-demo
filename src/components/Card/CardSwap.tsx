@@ -37,7 +37,7 @@ const CardSwap = ({
         >
           {`${amountIn} ${selectTokenIn.symbol}`}
         </Text>
-        <Text size="2" weight="medium" className="text-gray-600">
+        <Text size="2" weight="medium" className="text-gray-600 min-h-5">
           {amountInToUsd}
         </Text>
       </div>
@@ -71,7 +71,7 @@ const CardSwap = ({
         >
           {`${amountOut} ${selectTokenOut.symbol}`}
         </Text>
-        <Text size="2" weight="medium" className="text-gray-600">
+        <Text size="2" weight="medium" className="text-gray-600 min-h-5">
           {amountOutToUsd}
         </Text>
       </div>
