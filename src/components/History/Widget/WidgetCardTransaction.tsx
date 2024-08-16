@@ -77,7 +77,7 @@ const WidgetCardTransaction = ({
           }
           timestamp={timestamp}
           handleCloseIntent={callRequestRollbackIntent}
-          receiverId={details?.recoverDetails?.receiverId}
+          receiverId={details!.recoverDetails?.receiverId ?? ""}
         />
       )
 

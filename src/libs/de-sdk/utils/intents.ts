@@ -10,7 +10,12 @@ import {
 import { MapCreateIntentProps } from "@src/libs/de-sdk/utils/maps"
 import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
 import { swapSchema } from "@src/utils/schema"
-import { NearIntent1Create } from "@src/types/interfaces"
+import {
+  NearIntent1CreateCrossChain,
+  NearIntent1CreateSingleChain,
+  ContractIdEnum,
+} from "@src/types/interfaces"
+import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 
 const REFERRAL_ACCOUNT = process.env.REFERRAL_ACCOUNT ?? ""
 
@@ -86,7 +91,9 @@ export const prepareCreateIntent0 = (inputs: MapCreateIntentProps) => {
   }
 }
 
-export const prepareCreateIntent1 = (inputs: MapCreateIntentProps) => {
+export const prepareCreateIntent1CrossChain = (
+  inputs: MapCreateIntentProps
+) => {
   const receiverIdIn = inputs.selectedTokenIn.address
   const unitsSendAmount = parseUnits(
     inputs.tokenIn,
@@ -97,7 +104,7 @@ export const prepareCreateIntent1 = (inputs: MapCreateIntentProps) => {
     inputs.selectedTokenOut.decimals as number
   ).toString()
 
-  const msg: NearIntent1Create = {
+  const msg: NearIntent1CreateCrossChain = {
     type: "create",
     id: inputs.clientId as string,
     asset_out: {
@@ -132,6 +139,80 @@ export const prepareCreateIntent1 = (inputs: MapCreateIntentProps) => {
           gas: MAX_GAS_TRANSACTION,
           deposit: "1",
         },
+      },
+    ],
+  }
+}
+
+export const prepareCreateIntent1SingleChain = (
+  inputs: MapCreateIntentProps
+) => {
+  const receiverIdIn = inputs.selectedTokenIn.address
+  const unitsSendAmount = parseUnits(
+    inputs.tokenIn,
+    inputs.selectedTokenIn.decimals as number
+  ).toString()
+  const estimateUnitsBackAmount = parseUnits(
+    inputs.tokenOut,
+    inputs.selectedTokenOut.decimals as number
+  ).toString()
+
+  const result = parseDefuseAsset(inputs.selectedTokenOut.defuse_asset_id)
+  const contractId = result?.contractId ?? ""
+
+  const msg: NearIntent1CreateSingleChain = {
+    type: "create",
+    id: inputs.clientId as string,
+    asset_out: {
+      type: contractId === ContractIdEnum.Native ? "native" : "nep141",
+      token: contractId,
+      amount: estimateUnitsBackAmount,
+      account: inputs.accountTo
+        ? (inputs.accountTo as string)
+        : (inputs.accountId as string),
+    },
+    lockup_until: {
+      block_number: inputs.blockHeight + CREATE_INTENT_EXPIRATION_BLOCK_BOOST,
+    },
+    expiration: {
+      block_number: inputs.blockHeight + CREATE_INTENT_EXPIRATION_BLOCK_BOOST,
+    },
+    referral: REFERRAL_ACCOUNT,
+  }
+
+  const params = {}
+  if (contractId === ContractIdEnum.Native) {
+    Object.assign(params, {
+      methodName: "ft_transfer_call",
+      args: {
+        receiver_id: CONTRACTS_REGISTER[INDEXER.INTENT_1],
+        amount: unitsSendAmount,
+        memo: "Execute intent: NEP-141 to NEP-141",
+        msg: JSON.stringify(msg),
+      },
+      gas: MAX_GAS_TRANSACTION,
+      deposit: "1",
+    })
+  } else {
+    Object.assign(params, {
+      methodName: "native_on_transfer",
+      args: {
+        msg: JSON.stringify(msg),
+      },
+      gas: MAX_GAS_TRANSACTION,
+      deposit: unitsSendAmount,
+    })
+  }
+
+  return {
+    receiverId:
+      contractId === ContractIdEnum.Native
+        ? receiverIdIn
+        : CONTRACTS_REGISTER[INDEXER.INTENT_1],
+    actions: [
+      {
+        type: "FunctionCall",
+        params,
       },
     ],
   }

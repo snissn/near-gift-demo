@@ -1,7 +1,7 @@
 "use client"
 
 import { WalletSelector } from "@near-wallet-selector/core"
-import { parseUnits } from "viem"
+import { formatUnits, parseUnits } from "viem"
 import { BigNumber } from "ethers"
 import { useState } from "react"
 
@@ -9,6 +9,7 @@ import {
   CONTRACTS_REGISTER,
   FT_MINIMUM_STORAGE_BALANCE_LARGE,
   FT_STORAGE_DEPOSIT_GAS,
+  FT_WITHDRAW_GAS,
   INDEXER,
   MAX_GAS_TRANSACTION,
 } from "@src/constants/contracts"
@@ -17,6 +18,8 @@ import {
   NetworkToken,
   QueueTransactions,
   Result,
+  ContractIdEnum,
+  BlockchainEnum,
 } from "@src/types/interfaces"
 import useStorageDeposit from "@src/hooks/useStorageDeposit"
 import useNearSwapNearToWNear from "@src/hooks/useSwapNearToWNear"
@@ -26,6 +29,7 @@ import { useTransactionScan } from "@src/hooks/useTransactionScan"
 import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
 import { mapCreateIntentTransactionCall } from "@src/libs/de-sdk/utils/maps"
 import { isForeignNetworkToken } from "@src/utils/network"
+import { useAccountBalance } from "@src/hooks/useAccountBalance"
 
 type Props = {
   accountId: string | null
@@ -78,6 +82,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
     })
   const { getNearBlock } = useNearBlock()
   const { getTransactionScan } = useTransactionScan()
+  const { getAccountBalance } = useAccountBalance()
 
   const handleError = (e: unknown) => {
     console.error(e)
@@ -137,28 +142,23 @@ export const useSwap = ({ accountId, selector }: Props) => {
         }
       }
 
-      const { selectedTokenIn, selectedTokenOut } = inputs
+      const { selectedTokenIn, selectedTokenOut, tokenIn } = inputs
 
+      const [network, chain, address] =
+        selectedTokenIn.defuse_asset_id.split(":")
       if (
-        (selectedTokenIn.blockchain === "near" &&
-          selectedTokenIn.address === "native") ||
-        (selectedTokenOut.blockchain === "near" &&
-          selectedTokenOut.address === "native")
+        network === BlockchainEnum.Near &&
+        address === ContractIdEnum.Native
       ) {
-        const pair = [selectedTokenIn!.address, selectedTokenOut!.address]
-        if (pair.includes("native") && pair.includes("wrap.near")) {
-          const queueTransaction =
-            selectedTokenIn!.address === "native"
-              ? QueueTransactions.DEPOSIT
-              : QueueTransactions.WITHDRAW
-          return {
-            queueInTrack: 1,
-            queueTransactionsTrack: [queueTransaction],
-          }
+        const { balance } = await getAccountBalance()
+        const formattedAmountOut = formatUnits(
+          BigInt(balance),
+          selectedTokenIn?.decimals ?? 0
+        )
+        if (tokenIn > formattedAmountOut) {
+          queueTransaction.unshift(QueueTransactions.WITHDRAW)
+          queue++
         }
-        // TODO If Token to Native then use QueueTransactions.WITHDRAW
-        queueTransaction.unshift(QueueTransactions.DEPOSIT)
-        queue++
       }
 
       const isNativeTokenIn = selectedTokenIn!.address === "native"
@@ -189,12 +189,16 @@ export const useSwap = ({ accountId, selector }: Props) => {
         }
       }
 
+      const isNativeTokenOut = selectedTokenOut!.address === "native"
       // Estimate if user did storage before in order to transfer tokens for swap
       const storageBalanceTokenOut = await getStorageBalance(
         selectedTokenOut!.address as string,
         accountId as string
       )
-      if (!isForeignNetworkToken(selectedTokenOut.defuse_asset_id)) {
+      if (
+        !isForeignNetworkToken(selectedTokenOut.defuse_asset_id) &&
+        !isNativeTokenOut
+      ) {
         const storageBalanceTokenOutToString = BigNumber.from(
           storageBalanceTokenOut
         ).toString()
@@ -381,26 +385,53 @@ export const useSwap = ({ accountId, selector }: Props) => {
         return transactionResult
       }
 
-      const isNativeTokenIn = selectedTokenIn!.address === "native"
-      const tokenNearNative = LIST_NATIVE_TOKENS.find(
-        (token) => token.defuse_asset_id === "near:mainnet:native"
-      )
-
-      // Batches transactions and actions
-      // TODO Move single and batch to separate functions
-      const receiverIdIn = isNativeTokenIn
-        ? tokenNearNative!.routes
-          ? tokenNearNative!.routes[0]
-          : ""
-        : (selectedTokenIn!.address as string)
+      const receiverIdIn = selectedTokenIn!.address as string
       const receiverIdOut = selectedTokenOut!.address as string
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const transactions: { receiverId: string; actions: any }[] = []
       const mutateEstimateQueue = inputs.estimateQueue
       let tempQueueTransactionsTrack = []
 
+      const { balance } = await getAccountBalance()
+
       estimateQueue.queueTransactionsTrack.forEach((queueTransaction) => {
         switch (queueTransaction) {
+          case QueueTransactions.WITHDRAW:
+            if (selectedTokenIn?.address) {
+              const formattedAmountOut = formatUnits(
+                BigInt(balance),
+                selectedTokenIn?.decimals ?? 0
+              )
+              const leftAmountIn = Number(tokenIn) - Number(formattedAmountOut)
+              const unitsSendAmount = parseUnits(
+                leftAmountIn.toString(),
+                selectedTokenIn?.decimals as number
+              ).toString()
+              transactions.push({
+                receiverId: receiverIdIn,
+                actions: [
+                  {
+                    type: "FunctionCall",
+                    params: {
+                      methodName: "near_withdraw",
+                      args: {
+                        amount: unitsSendAmount,
+                      },
+                      gas: FT_WITHDRAW_GAS,
+                      deposit: "1",
+                    },
+                  },
+                ],
+              })
+              mutateEstimateQueue.queueInTrack--
+              tempQueueTransactionsTrack =
+                mutateEstimateQueue.queueTransactionsTrack.filter(
+                  (queue) => queue !== QueueTransactions.WITHDRAW
+                )
+              mutateEstimateQueue.queueTransactionsTrack =
+                tempQueueTransactionsTrack
+            }
+            break
           case QueueTransactions.DEPOSIT:
             if (selectedTokenIn?.address) {
               const unitsSendAmount = parseUnits(
@@ -545,7 +576,10 @@ export const useSwap = ({ accountId, selector }: Props) => {
                     id: inputs.id,
                   },
                   gas: MAX_GAS_TRANSACTION,
-                  deposit: inputs?.receiverId ? "1" : "0",
+                  deposit:
+                    inputs?.receiverId !== CONTRACTS_REGISTER[INDEXER.INTENT_0]
+                      ? "1"
+                      : "0",
                 },
               },
             ],

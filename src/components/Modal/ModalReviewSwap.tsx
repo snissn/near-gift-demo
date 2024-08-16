@@ -1,12 +1,16 @@
 "use client"
 
-import { Text } from "@radix-ui/themes"
+import { Blockquote, Text } from "@radix-ui/themes"
 import Image from "next/image"
 import React, { useEffect, useState } from "react"
 import { formatUnits, parseUnits } from "viem"
 
 import ModalDialog from "@src/components/Modal/ModalDialog"
-import { NetworkToken } from "@src/types/interfaces"
+import {
+  NetworkToken,
+  ContractIdEnum,
+  BlockchainEnum,
+} from "@src/types/interfaces"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import Button from "@src/components/Button/Button"
 import CardSwap from "@src/components/Card/CardSwap"
@@ -16,6 +20,8 @@ import { useTimeFormatMinutes } from "@src/hooks/useTimeFormat"
 import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
 import { smallBalanceToFormat } from "@src/utils/token"
 import { useCalculateTokenToUsd } from "@src/hooks/useCalculateTokenToUsd"
+import { useAccountBalance } from "@src/hooks/useAccountBalance"
+import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 
 export type ModalReviewSwapPayload = {
   tokenIn: string
@@ -47,6 +53,9 @@ const ModalReviewSwap = () => {
     priceToUsd: priceToUsdTokenOut,
     calculateTokenToUsd: calculateTokenToUsdTokenOut,
   } = useCalculateTokenToUsd()
+  const { getAccountBalance } = useAccountBalance()
+  const [isWNearConjunctionRequired, setIsWNearConjunctionRequired] =
+    useState(false)
 
   const recalculateEstimation = async () => {
     try {
@@ -57,6 +66,8 @@ const ModalReviewSwap = () => {
       ]
       // Not needed recalculation if ratio is 1:1
       if (pair.includes("native") && pair.includes("wrap.near")) return
+
+      handleCheckNativeBalance()
 
       const unitsTokenIn = parseUnits(
         convertPayload.tokenIn,
@@ -105,9 +116,32 @@ const ModalReviewSwap = () => {
   )
   const { formatTwoNumbers } = useTimeFormatMinutes()
 
+  const handleCheckNativeBalance = async (): Promise<void> => {
+    const result = parseDefuseAsset(
+      convertPayload.selectedTokenIn.defuse_asset_id
+    )
+    if (
+      result?.blockchain !== BlockchainEnum.Near ||
+      result?.contractId !== ContractIdEnum.Native
+    ) {
+      return
+    }
+    const { balance } = await getAccountBalance()
+    const formattedAmountOut = formatUnits(
+      BigInt(balance),
+      convertPayload.selectedTokenIn?.decimals ?? 0
+    )
+    const isLackOfBalance = convertPayload.tokenIn > formattedAmountOut
+    setIsWNearConjunctionRequired(isLackOfBalance)
+  }
+
   const handleConfirmSwap = async () => {
     setModalType(ModalType.MODAL_CONFIRM_SWAP, payload)
   }
+
+  useEffect(() => {
+    void handleCheckNativeBalance()
+  }, [])
 
   return (
     <ModalDialog>
@@ -183,6 +217,14 @@ const ModalReviewSwap = () => {
             </div>
           </div>
         </div>
+        {isWNearConjunctionRequired && (
+          <div className="flex flex-col w-full mb-6 gap-3">
+            <Blockquote color="cyan">
+              Wrapped Near will be used in conjunction with Near to boost your
+              current swap experience.
+            </Blockquote>
+          </div>
+        )}
         <Button
           size="lg"
           fullWidth

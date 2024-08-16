@@ -1,9 +1,10 @@
 import { INDEXER } from "@src/constants/contracts"
 import { CallRequestIntentProps } from "@src/hooks/useSwap"
 import {
-  prepareCreateIntent0,
-  prepareCreateIntent1,
+  prepareCreateIntent1CrossChain,
+  prepareCreateIntent1SingleChain,
 } from "@src/libs/de-sdk/utils/intents"
+import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 
 enum MapsEnum {
   NEAR_MAINNET = "near:mainnet",
@@ -42,11 +43,10 @@ export type MapCreateIntentResult = [number, any][]
 export const mapCreateIntentTransactionCall = (
   inputs: MapCreateIntentProps
 ): MapCreateIntentResult => {
-  const [networkFrom, idFrom] =
-    inputs.selectedTokenIn.defuse_asset_id.split(":")
-  const [networkTo, idTo] = inputs.selectedTokenOut.defuse_asset_id.split(":")
-  const fromNetworkId = `${networkFrom}:${idFrom}` as MapsEnum
-  const toNetworkId = `${networkTo}:${idTo}` as MapsEnum
+  const from = parseDefuseAsset(inputs.selectedTokenIn.defuse_asset_id)
+  const fromNetworkId = `${from?.blockchain}:${from?.network}` as MapsEnum
+  const to = parseDefuseAsset(inputs.selectedTokenOut.defuse_asset_id)
+  const toNetworkId = `${to?.blockchain}:${to?.network}` as MapsEnum
 
   switch (fromNetworkId) {
     case MapsEnum.NEAR_MAINNET:
@@ -54,16 +54,16 @@ export const mapCreateIntentTransactionCall = (
       //        as example here `[[INDEXER.INTENT_0, tx],...,[INDEXER.INTENT_N, tx_N]]`
       switch (toNetworkId) {
         case MapsEnum.NEAR_MAINNET:
-          return [[INDEXER.INTENT_0, prepareCreateIntent0(inputs)]]
+          return [[INDEXER.INTENT_1, prepareCreateIntent1SingleChain(inputs)]]
         case MapsEnum.ETH_BASE:
-          return [[INDEXER.INTENT_1, prepareCreateIntent1(inputs)]]
+          return [[INDEXER.INTENT_1, prepareCreateIntent1CrossChain(inputs)]]
         case MapsEnum.BTC_MAINNET:
-          return [[INDEXER.INTENT_1, prepareCreateIntent1(inputs)]]
+          return [[INDEXER.INTENT_1, prepareCreateIntent1CrossChain(inputs)]]
         default:
           return []
       }
     case MapsEnum.ETH_BASE:
-      return [[INDEXER.INTENT_1, prepareCreateIntent1(inputs)]]
+      return [[INDEXER.INTENT_1, prepareCreateIntent1CrossChain(inputs)]]
     default:
       return []
   }
