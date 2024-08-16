@@ -16,6 +16,7 @@ import {
   ContractIdEnum,
 } from "@src/types/interfaces"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
+import { TransactionMethod } from "@src/types/solver0"
 
 const REFERRAL_ACCOUNT = process.env.REFERRAL_ACCOUNT ?? ""
 
@@ -76,7 +77,7 @@ export const prepareCreateIntent0 = (inputs: MapCreateIntentProps) => {
       {
         type: "FunctionCall",
         params: {
-          methodName: "ft_transfer_call",
+          methodName: TransactionMethod.FT_TRANSFER_CALL,
           args: {
             receiver_id: CONTRACTS_REGISTER[INDEXER.INTENT_0],
             amount: unitsSendAmount,
@@ -129,7 +130,7 @@ export const prepareCreateIntent1CrossChain = (
       {
         type: "FunctionCall",
         params: {
-          methodName: "ft_transfer_call",
+          methodName: TransactionMethod.FT_TRANSFER_CALL,
           args: {
             receiver_id: CONTRACTS_REGISTER[INDEXER.INTENT_1],
             amount: unitsSendAmount,
@@ -185,7 +186,7 @@ export const prepareCreateIntent1SingleChain = (
   const params = {}
   if (contractIdTokenIn === ContractIdEnum.Native) {
     Object.assign(params, {
-      methodName: "native_on_transfer",
+      methodName: TransactionMethod.NATIVE_ON_TRANSFER,
       args: {
         msg: JSON.stringify(msg),
       },
@@ -194,7 +195,7 @@ export const prepareCreateIntent1SingleChain = (
     })
   } else {
     Object.assign(params, {
-      methodName: "ft_transfer_call",
+      methodName: TransactionMethod.FT_TRANSFER_CALL,
       args: {
         receiver_id: CONTRACTS_REGISTER[INDEXER.INTENT_1],
         amount: unitsSendAmount,

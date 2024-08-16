@@ -11,3 +11,12 @@ export interface Result<T> {
 }
 
 export type SupportedTokens = Result<{ tokens: Token[] }>
+
+export enum TransactionMethod {
+  NATIVE_ON_TRANSFER = "native_on_transfer",
+  FT_TRANSFER_CALL = "ft_transfer_call",
+  ROLLBACK_INTENT = "rollback_intent",
+  STORAGE_DEPOSIT = "storage_deposit",
+  NEAR_DEPOSIT = "near_deposit",
+  NEAR_WITHDRAW = "near_withdraw",
+}

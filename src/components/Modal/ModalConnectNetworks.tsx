@@ -68,7 +68,6 @@ const ModalConnectNetworks = () => {
         }
         break
       case BlockchainEnum.Btc:
-      case BlockchainEnum.Btc:
         try {
           bitcoin.address.toOutputScript(account)
           setErrorAccount("")
