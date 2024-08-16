@@ -33,3 +33,5 @@ export const NEAR_COLLECTOR_KEY = "__d_history_collector"
 export const CREATE_INTENT_EXPIRATION_BLOCK_BOOST = 350
 
 export const THEME_MODE_KEY = "theme"
+
+export const NEAR_STORAGE_COST_PRE_BYTE = 0.0001

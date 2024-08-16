@@ -5,8 +5,9 @@ import Image from "next/image"
 import { Text, Tooltip } from "@radix-ui/themes"
 import { InfoCircledIcon } from "@radix-ui/react-icons"
 import { ethers } from "ethers"
+import * as bitcoin from "bitcoinjs-lib"
 
-import { NetworkToken } from "@src/types/interfaces"
+import { BlockchainEnum, NetworkToken } from "@src/types/interfaces"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import Button from "@src/components/Button/Button"
 import ModalDialog from "@src/components/Modal/ModalDialog"
@@ -15,6 +16,8 @@ import NetworkNear from "@src/components/Network/NetworkNear"
 import { useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import Network from "@src/components/Network/Network"
+import { networkLabelAdapter } from "@src/utils/network"
+import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 
 export type ModalConnectNetworksPayload = {
   tokenIn: string
@@ -52,13 +55,26 @@ const ModalConnectNetworks = () => {
     account: string,
     setErrorAccount: (value: string) => void
   ) => {
-    const chainName = convertPayload.selectedTokenOut?.blockchain
-    if (chainName === "eth") {
-      if (!ethers.utils.isAddress(account)) {
-        setErrorAccount("Invalid wallet address.")
-      } else {
-        setErrorAccount("")
-      }
+    const result = parseDefuseAsset(
+      convertPayload.selectedTokenOut?.defuse_asset_id ?? ""
+    )
+    const blockchain = result?.blockchain ?? ""
+    switch (blockchain) {
+      case BlockchainEnum.Eth:
+        if (!ethers.utils.isAddress(account)) {
+          setErrorAccount("Invalid wallet address.")
+        } else {
+          setErrorAccount("")
+        }
+        break
+      case BlockchainEnum.Btc:
+        try {
+          bitcoin.address.toOutputScript(account)
+          setErrorAccount("")
+        } catch (e) {
+          setErrorAccount("Invalid Bitcoin address.")
+        }
+        break
     }
   }
 
@@ -86,7 +102,10 @@ const ModalConnectNetworks = () => {
             </Text>
             <div className="w-full absolute top-[30px] left-[50%] -translate-x-2/4 flex justify-center items-center gap-1 text-gray-600">
               <Text size="2" weight="medium">
-                Please connect your wallet on Ethereum
+                Please connect your wallet on{" "}
+                {networkLabelAdapter(
+                  convertPayload?.selectedTokenOut?.defuse_asset_id ?? ""
+                )}
               </Text>
               <Tooltip content="Please specify the wallet address on the specified network">
                 <InfoCircledIcon />

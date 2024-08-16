@@ -22,6 +22,7 @@ import { useTransactionScan } from "@src/hooks/useTransactionScan"
 import { swapSchema } from "@src/utils/schema"
 import { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
 import { adapterIntent0, adapterIntent1 } from "@src/libs/de-sdk/utils/adapters"
+import { TransactionMethod } from "@src/types/solver0"
 
 const SCHEDULER_30_SEC = 30000
 const SCHEDULER_5_SEC = 5000
@@ -73,7 +74,8 @@ export const useHistoryLatest = () => {
           history.details?.transaction?.actions[0].FunctionCall.method_name
         if (
           history.clientId === clientId &&
-          (method === "ft_transfer_call" || method === "native_on_transfer")
+          (method === TransactionMethod.FT_TRANSFER_CALL ||
+            method === TransactionMethod.NATIVE_ON_TRANSFER)
         ) {
           Object.assign(details, {
             tokenIn: history.details?.tokenIn,
@@ -127,10 +129,10 @@ export const useHistoryLatest = () => {
         }
 
         // Try to recover clientId and "Swap" data in case it was lost
-        const getMethodName =
+        const transactionMethodName =
           historyData.details?.transaction?.actions.length &&
           historyData.details?.transaction?.actions[0].FunctionCall.method_name
-        if (getMethodName && historyData.details?.transaction) {
+        if (transactionMethodName && historyData.details?.transaction) {
           let getHashedArgs = ""
           let argsJson = ""
           let args: unknown
@@ -138,8 +140,8 @@ export const useHistoryLatest = () => {
           let msgBuffer: Buffer
           let getIntentStatus: HistoryStatus | null
           let recoverData: unknown
-          switch (getMethodName) {
-            case "ft_transfer_call":
+          switch (transactionMethodName) {
+            case TransactionMethod.FT_TRANSFER_CALL:
               getHashedArgs =
                 historyData.details.transaction.actions[0].FunctionCall.args
               argsJson = Buffer.from(getHashedArgs ?? "", "base64").toString(
@@ -218,7 +220,7 @@ export const useHistoryLatest = () => {
               }
               break
 
-            case "rollback_intent":
+            case TransactionMethod.ROLLBACK_INTENT:
               getHashedArgs =
                 historyData.details.transaction.actions[0].FunctionCall.args
               argsJson = Buffer.from(getHashedArgs ?? "", "base64").toString(
@@ -235,7 +237,7 @@ export const useHistoryLatest = () => {
               })
               break
 
-            case "near_deposit":
+            case TransactionMethod.NEAR_DEPOSIT:
               getHashedArgs =
                 historyData.details.transaction.actions[0].FunctionCall.args
               argsJson = Buffer.from(getHashedArgs ?? "", "base64").toString(
@@ -255,7 +257,7 @@ export const useHistoryLatest = () => {
               })
               break
 
-            case "near_withdraw":
+            case TransactionMethod.NEAR_WITHDRAW:
               getHashedArgs =
                 historyData.details.transaction.actions[0].FunctionCall.args
               argsJson = Buffer.from(getHashedArgs ?? "", "base64").toString(
@@ -273,13 +275,13 @@ export const useHistoryLatest = () => {
               })
               break
 
-            case "storage_deposit":
+            case TransactionMethod.STORAGE_DEPOSIT:
               Object.assign(historyData, {
                 status: HistoryStatus.STORAGE_DEPOSIT,
               })
               break
 
-            case "native_on_transfer":
+            case TransactionMethod.NATIVE_ON_TRANSFER:
               getHashedArgs =
                 historyData.details.transaction.actions[0].FunctionCall.args
               argsJson = Buffer.from(getHashedArgs ?? "", "base64").toString(

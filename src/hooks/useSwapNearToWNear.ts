@@ -4,6 +4,7 @@ import {
   FT_STORAGE_DEPOSIT_GAS,
   FT_WITHDRAW_GAS,
 } from "@src/constants/contracts"
+import { TransactionMethod } from "@src/types/solver0"
 
 type Props = {
   accountId: string | null
@@ -24,7 +25,7 @@ const useSwapNearToWNear = ({ selector }: Props) => {
             {
               type: "FunctionCall",
               params: {
-                methodName: "near_deposit",
+                methodName: TransactionMethod.NEAR_DEPOSIT,
                 args: {},
                 gas: FT_STORAGE_DEPOSIT_GAS,
                 deposit,
@@ -49,7 +50,7 @@ const useSwapNearToWNear = ({ selector }: Props) => {
             {
               type: "FunctionCall",
               params: {
-                methodName: "near_withdraw",
+                methodName: TransactionMethod.NEAR_WITHDRAW,
                 args: {
                   amount,
                 },

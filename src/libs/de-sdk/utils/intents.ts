@@ -16,6 +16,7 @@ import {
   ContractIdEnum,
 } from "@src/types/interfaces"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
+import { TransactionMethod } from "@src/types/solver0"
 
 const REFERRAL_ACCOUNT = process.env.REFERRAL_ACCOUNT ?? ""
 
@@ -76,7 +77,7 @@ export const prepareCreateIntent0 = (inputs: MapCreateIntentProps) => {
       {
         type: "FunctionCall",
         params: {
-          methodName: "ft_transfer_call",
+          methodName: TransactionMethod.FT_TRANSFER_CALL,
           args: {
             receiver_id: CONTRACTS_REGISTER[INDEXER.INTENT_0],
             amount: unitsSendAmount,
@@ -129,7 +130,7 @@ export const prepareCreateIntent1CrossChain = (
       {
         type: "FunctionCall",
         params: {
-          methodName: "ft_transfer_call",
+          methodName: TransactionMethod.FT_TRANSFER_CALL,
           args: {
             receiver_id: CONTRACTS_REGISTER[INDEXER.INTENT_1],
             amount: unitsSendAmount,
@@ -157,15 +158,17 @@ export const prepareCreateIntent1SingleChain = (
     inputs.selectedTokenOut.decimals as number
   ).toString()
 
-  const result = parseDefuseAsset(inputs.selectedTokenOut.defuse_asset_id)
-  const contractId = result?.contractId ?? ""
+  const from = parseDefuseAsset(inputs.selectedTokenIn.defuse_asset_id)
+  const contractIdTokenIn = from?.contractId ?? ""
+  const to = parseDefuseAsset(inputs.selectedTokenOut.defuse_asset_id)
+  const contractIdTokenOut = to?.contractId ?? ""
 
   const msg: NearIntent1CreateSingleChain = {
     type: "create",
     id: inputs.clientId as string,
     asset_out: {
-      type: contractId === ContractIdEnum.Native ? "native" : "nep141",
-      token: contractId,
+      type: contractIdTokenOut === ContractIdEnum.Native ? "native" : "nep141",
+      token: contractIdTokenOut,
       amount: estimateUnitsBackAmount,
       account: inputs.accountTo
         ? (inputs.accountTo as string)
@@ -181,9 +184,18 @@ export const prepareCreateIntent1SingleChain = (
   }
 
   const params = {}
-  if (contractId === ContractIdEnum.Native) {
+  if (contractIdTokenIn === ContractIdEnum.Native) {
     Object.assign(params, {
-      methodName: "ft_transfer_call",
+      methodName: TransactionMethod.NATIVE_ON_TRANSFER,
+      args: {
+        msg: JSON.stringify(msg),
+      },
+      gas: MAX_GAS_TRANSACTION,
+      deposit: unitsSendAmount,
+    })
+  } else {
+    Object.assign(params, {
+      methodName: TransactionMethod.FT_TRANSFER_CALL,
       args: {
         receiver_id: CONTRACTS_REGISTER[INDEXER.INTENT_1],
         amount: unitsSendAmount,
@@ -193,22 +205,13 @@ export const prepareCreateIntent1SingleChain = (
       gas: MAX_GAS_TRANSACTION,
       deposit: "1",
     })
-  } else {
-    Object.assign(params, {
-      methodName: "native_on_transfer",
-      args: {
-        msg: JSON.stringify(msg),
-      },
-      gas: MAX_GAS_TRANSACTION,
-      deposit: unitsSendAmount,
-    })
   }
 
   return {
     receiverId:
-      contractId === ContractIdEnum.Native
-        ? receiverIdIn
-        : CONTRACTS_REGISTER[INDEXER.INTENT_1],
+      contractIdTokenIn === ContractIdEnum.Native
+        ? CONTRACTS_REGISTER[INDEXER.INTENT_1]
+        : receiverIdIn,
     actions: [
       {
         type: "FunctionCall",

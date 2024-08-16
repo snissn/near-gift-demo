@@ -30,6 +30,7 @@ import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
 import { mapCreateIntentTransactionCall } from "@src/libs/de-sdk/utils/maps"
 import { isForeignNetworkToken } from "@src/utils/network"
 import { useAccountBalance } from "@src/hooks/useAccountBalance"
+import { TransactionMethod } from "@src/types/solver0"
 
 type Props = {
   accountId: string | null
@@ -413,7 +414,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
                   {
                     type: "FunctionCall",
                     params: {
-                      methodName: "near_withdraw",
+                      methodName: TransactionMethod.NEAR_WITHDRAW,
                       args: {
                         amount: unitsSendAmount,
                       },
@@ -444,7 +445,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
                   {
                     type: "FunctionCall",
                     params: {
-                      methodName: "near_deposit",
+                      methodName: TransactionMethod.NEAR_DEPOSIT,
                       args: {},
                       gas: FT_STORAGE_DEPOSIT_GAS,
                       deposit: unitsSendAmount,
@@ -468,7 +469,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
                 {
                   type: "FunctionCall",
                   params: {
-                    methodName: "storage_deposit",
+                    methodName: TransactionMethod.STORAGE_DEPOSIT,
                     args: {
                       account_id: accountId as string,
                       registration_only: true,
@@ -494,7 +495,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
                 {
                   type: "FunctionCall",
                   params: {
-                    methodName: "storage_deposit",
+                    methodName: TransactionMethod.STORAGE_DEPOSIT,
                     args: {
                       account_id: accountId as string,
                       registration_only: true,
@@ -571,7 +572,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
               {
                 type: "FunctionCall",
                 params: {
-                  methodName: "rollback_intent",
+                  methodName: TransactionMethod.ROLLBACK_INTENT,
                   args: {
                     id: inputs.id,
                   },

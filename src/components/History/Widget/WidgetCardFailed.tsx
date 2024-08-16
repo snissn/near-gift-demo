@@ -7,13 +7,14 @@ import AssetComboIcon from "@src/components/Network/AssetComboIcon"
 import { NearTX, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import { smallBalanceToFormat } from "@src/utils/token"
 import WidgetCardLink from "@src/components/History/Widget/WidgetCardLink"
+import { TransactionMethod } from "@src/types/solver0"
 
 enum CardFailedStatusEnum {
   SWAP = "Swap",
 }
 
 enum CardFailedActionEnum {
-  FT_TRANSFER_CALL = "ft_transfer_call",
+  FT_TRANSFER_CALL = TransactionMethod.FT_TRANSFER_CALL,
 }
 
 type Props = {

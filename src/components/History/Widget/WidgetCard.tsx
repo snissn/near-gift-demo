@@ -19,6 +19,7 @@ import { useNetworkTokens } from "@src/hooks/useNetworkTokens"
 import { useSwap } from "@src/hooks/useSwap"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
+import { TransactionMethod } from "@src/types/solver0"
 
 const NEAR_EXPLORER = process?.env?.nearExplorer ?? ""
 const PLACEHOLDER = "XX"
@@ -172,21 +173,23 @@ const WidgetCard = ({
   const handleGetTypeOfQueueTransactions = (
     transaction: NearTX["transaction"]
   ): QueueTransactions | undefined => {
+    const transactionMethodName =
+      transaction.actions[0].FunctionCall.method_name
     if (
-      transaction.actions[0].FunctionCall.method_name === "ft_transfer_call" ||
-      transaction.actions[0].FunctionCall.method_name === "rollback_intent" ||
-      transaction.actions[0].FunctionCall.method_name === "native_on_transfer"
+      transactionMethodName === TransactionMethod.FT_TRANSFER_CALL ||
+      transactionMethodName === TransactionMethod.ROLLBACK_INTENT ||
+      transactionMethodName === TransactionMethod.NATIVE_ON_TRANSFER
     ) {
       return QueueTransactions.CREATE_INTENT
     }
-    if (transaction.actions[0].FunctionCall.method_name === "storage_deposit") {
+    if (transactionMethodName === TransactionMethod.STORAGE_DEPOSIT) {
       // No matter is IN or OUT as QueueTransactions.STORAGE_DEPOSIT_TOKEN_OUT
       return QueueTransactions.STORAGE_DEPOSIT_TOKEN_IN
     }
-    if (transaction.actions[0].FunctionCall.method_name === "near_deposit") {
+    if (transactionMethodName === TransactionMethod.NEAR_DEPOSIT) {
       return QueueTransactions.DEPOSIT
     }
-    if (transaction.actions[0].FunctionCall.method_name === "near_withdraw") {
+    if (transactionMethodName === TransactionMethod.NEAR_WITHDRAW) {
       return QueueTransactions.WITHDRAW
     }
   }
@@ -277,7 +280,7 @@ const WidgetCard = ({
         status !== HistoryStatus.FAILED &&
         status !== HistoryStatus.ROLLED_BACK &&
         details?.transaction?.actions[0].FunctionCall.method_name ===
-          "ft_transfer_call" ? (
+          TransactionMethod.FT_TRANSFER_CALL ? (
           <Button
             size="sm"
             variant="soft"
