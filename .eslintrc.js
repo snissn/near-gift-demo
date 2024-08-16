@@ -12,7 +12,7 @@ module.exports = {
   ],
   rules: {
     "@typescript-eslint/no-non-null-assertion": 2,
-    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-explicit-any": 2,
     "@typescript-eslint/explicit-member-accessibility": "error",
     "@typescript-eslint/no-non-null-assertion": "off",
     "react-hooks/exhaustive-deps": "off",
