@@ -16,6 +16,7 @@ enum CardRollbackStatusEnum {
 enum CardRollbackActionEnum {
   FT_TRANSFER_CALL = "ft_transfer_call",
   ROLLBACK_INTENT = "rollback_intent",
+  NATIVE_ON_TRANSFER = "native_on_transfer",
 }
 
 type Props = {
@@ -48,6 +49,7 @@ const WidgetCardRollback = ({
   let cardStatus: CardRollbackStatusEnum
   switch (handleGetActionMethodName(actions)) {
     case CardRollbackActionEnum.FT_TRANSFER_CALL:
+    case CardRollbackActionEnum.NATIVE_ON_TRANSFER:
       cardStatus = CardRollbackStatusEnum.SWAP
       break
     case CardRollbackActionEnum.ROLLBACK_INTENT:

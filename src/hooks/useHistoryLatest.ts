@@ -127,10 +127,10 @@ export const useHistoryLatest = () => {
         }
 
         // Try to recover clientId and "Swap" data in case it was lost
-        const getMethodName =
+        const transactionMethodName =
           historyData.details?.transaction?.actions.length &&
           historyData.details?.transaction?.actions[0].FunctionCall.method_name
-        if (getMethodName && historyData.details?.transaction) {
+        if (transactionMethodName && historyData.details?.transaction) {
           let getHashedArgs = ""
           let argsJson = ""
           let args: unknown
@@ -138,7 +138,7 @@ export const useHistoryLatest = () => {
           let msgBuffer: Buffer
           let getIntentStatus: HistoryStatus | null
           let recoverData: unknown
-          switch (getMethodName) {
+          switch (transactionMethodName) {
             case "ft_transfer_call":
               getHashedArgs =
                 historyData.details.transaction.actions[0].FunctionCall.args

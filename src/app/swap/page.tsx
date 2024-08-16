@@ -25,6 +25,7 @@ import BlockEvaluatePrice from "@src/components/Block/BlockEvaluatePrice"
 import { useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { useSwapGuard } from "@src/hooks/useSwapGuard"
+import { useMinimumNearBalance } from "@src/hooks/useMinimumNearBalance"
 
 type FormValues = {
   tokenIn: string
@@ -61,6 +62,7 @@ export default function Swap() {
   const { data: evaluateSwapEstimation, getEvaluateSwapEstimate } =
     useEvaluateSwapEstimation()
   const { handleSignIn } = useConnectWallet()
+  const { minNearBalance } = useMinimumNearBalance(accountId)
 
   const {
     handleSubmit,

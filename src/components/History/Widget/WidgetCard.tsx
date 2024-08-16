@@ -172,21 +172,23 @@ const WidgetCard = ({
   const handleGetTypeOfQueueTransactions = (
     transaction: NearTX["transaction"]
   ): QueueTransactions | undefined => {
+    const transactionMethodName =
+      transaction.actions[0].FunctionCall.method_name
     if (
-      transaction.actions[0].FunctionCall.method_name === "ft_transfer_call" ||
-      transaction.actions[0].FunctionCall.method_name === "rollback_intent" ||
-      transaction.actions[0].FunctionCall.method_name === "native_on_transfer"
+      transactionMethodName === "ft_transfer_call" ||
+      transactionMethodName === "rollback_intent" ||
+      transactionMethodName === "native_on_transfer"
     ) {
       return QueueTransactions.CREATE_INTENT
     }
-    if (transaction.actions[0].FunctionCall.method_name === "storage_deposit") {
+    if (transactionMethodName === "storage_deposit") {
       // No matter is IN or OUT as QueueTransactions.STORAGE_DEPOSIT_TOKEN_OUT
       return QueueTransactions.STORAGE_DEPOSIT_TOKEN_IN
     }
-    if (transaction.actions[0].FunctionCall.method_name === "near_deposit") {
+    if (transactionMethodName === "near_deposit") {
       return QueueTransactions.DEPOSIT
     }
-    if (transaction.actions[0].FunctionCall.method_name === "near_withdraw") {
+    if (transactionMethodName === "near_withdraw") {
       return QueueTransactions.WITHDRAW
     }
   }

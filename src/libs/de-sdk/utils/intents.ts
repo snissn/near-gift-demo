@@ -157,15 +157,17 @@ export const prepareCreateIntent1SingleChain = (
     inputs.selectedTokenOut.decimals as number
   ).toString()
 
-  const result = parseDefuseAsset(inputs.selectedTokenOut.defuse_asset_id)
-  const contractId = result?.contractId ?? ""
+  const from = parseDefuseAsset(inputs.selectedTokenIn.defuse_asset_id)
+  const contractIdTokenIn = from?.contractId ?? ""
+  const to = parseDefuseAsset(inputs.selectedTokenOut.defuse_asset_id)
+  const contractIdTokenOut = to?.contractId ?? ""
 
   const msg: NearIntent1CreateSingleChain = {
     type: "create",
     id: inputs.clientId as string,
     asset_out: {
-      type: contractId === ContractIdEnum.Native ? "native" : "nep141",
-      token: contractId,
+      type: contractIdTokenOut === ContractIdEnum.Native ? "native" : "nep141",
+      token: contractIdTokenOut,
       amount: estimateUnitsBackAmount,
       account: inputs.accountTo
         ? (inputs.accountTo as string)
@@ -181,7 +183,16 @@ export const prepareCreateIntent1SingleChain = (
   }
 
   const params = {}
-  if (contractId === ContractIdEnum.Native) {
+  if (contractIdTokenIn === ContractIdEnum.Native) {
+    Object.assign(params, {
+      methodName: "native_on_transfer",
+      args: {
+        msg: JSON.stringify(msg),
+      },
+      gas: MAX_GAS_TRANSACTION,
+      deposit: unitsSendAmount,
+    })
+  } else {
     Object.assign(params, {
       methodName: "ft_transfer_call",
       args: {
@@ -193,22 +204,13 @@ export const prepareCreateIntent1SingleChain = (
       gas: MAX_GAS_TRANSACTION,
       deposit: "1",
     })
-  } else {
-    Object.assign(params, {
-      methodName: "native_on_transfer",
-      args: {
-        msg: JSON.stringify(msg),
-      },
-      gas: MAX_GAS_TRANSACTION,
-      deposit: unitsSendAmount,
-    })
   }
 
   return {
     receiverId:
-      contractId === ContractIdEnum.Native
-        ? receiverIdIn
-        : CONTRACTS_REGISTER[INDEXER.INTENT_1],
+      contractIdTokenIn === ContractIdEnum.Native
+        ? CONTRACTS_REGISTER[INDEXER.INTENT_1]
+        : receiverIdIn,
     actions: [
       {
         type: "FunctionCall",
