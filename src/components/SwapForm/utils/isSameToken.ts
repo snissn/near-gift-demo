@@ -4,8 +4,5 @@ export default function isSameToken(
   token: NetworkToken,
   checkToken: NetworkToken
 ): boolean {
-  return (
-    token.address === checkToken?.address &&
-    token.chainId === checkToken?.chainId
-  )
+  return token.defuse_asset_id === checkToken.defuse_asset_id
 }
