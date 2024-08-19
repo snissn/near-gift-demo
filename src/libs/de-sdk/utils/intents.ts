@@ -105,6 +105,9 @@ export const prepareCreateIntent1CrossChain = (
     inputs.selectedTokenOut.decimals as number
   ).toString()
 
+  const from = parseDefuseAsset(inputs.selectedTokenIn.defuse_asset_id)
+  const contractIdTokenIn = from?.contractId ?? ""
+
   const msg: NearIntent1CreateCrossChain = {
     type: "create",
     id: inputs.clientId as string,
@@ -124,22 +127,39 @@ export const prepareCreateIntent1CrossChain = (
     referral: REFERRAL_ACCOUNT,
   }
 
+  const params = {}
+  if (contractIdTokenIn === ContractIdEnum.Native) {
+    Object.assign(params, {
+      methodName: TransactionMethod.NATIVE_ON_TRANSFER,
+      args: {
+        msg: JSON.stringify(msg),
+      },
+      gas: MAX_GAS_TRANSACTION,
+      deposit: unitsSendAmount,
+    })
+  } else {
+    Object.assign(params, {
+      methodName: TransactionMethod.FT_TRANSFER_CALL,
+      args: {
+        receiver_id: CONTRACTS_REGISTER[INDEXER.INTENT_1],
+        amount: unitsSendAmount,
+        memo: `Execute intent: ${inputs.selectedTokenIn.defuse_asset_id} to ${inputs.selectedTokenOut.defuse_asset_id}`,
+        msg: JSON.stringify(msg),
+      },
+      gas: MAX_GAS_TRANSACTION,
+      deposit: "1",
+    })
+  }
+
   return {
-    receiverId: receiverIdIn,
+    receiverId:
+      contractIdTokenIn === ContractIdEnum.Native
+        ? CONTRACTS_REGISTER[INDEXER.INTENT_1]
+        : receiverIdIn,
     actions: [
       {
         type: "FunctionCall",
-        params: {
-          methodName: TransactionMethod.FT_TRANSFER_CALL,
-          args: {
-            receiver_id: CONTRACTS_REGISTER[INDEXER.INTENT_1],
-            amount: unitsSendAmount,
-            memo: `Execute intent: ${inputs.selectedTokenIn.defuse_asset_id} to ${inputs.selectedTokenOut.defuse_asset_id}`,
-            msg: JSON.stringify(msg),
-          },
-          gas: MAX_GAS_TRANSACTION,
-          deposit: "1",
-        },
+        params,
       },
     ],
   }
