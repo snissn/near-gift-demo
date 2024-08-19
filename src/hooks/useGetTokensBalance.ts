@@ -16,6 +16,7 @@ import { useGetCoingeckoExchangesList } from "@src/api/hooks/exchanges/useGetCoi
 import { CoingeckoExchanges } from "@src/types/coingecko"
 import { useAccountBalance } from "@src/hooks/useAccountBalance"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
+import { useMinimumNearBalance } from "@src/hooks/useMinimumNearBalance"
 
 export const useGetTokensBalance = (
   tokensList: NetworkTokenWithSwapRoute[]
@@ -27,6 +28,7 @@ export const useGetTokensBalance = (
   const { activePreview } = useHistoryStore((state) => state)
   const { data: exchangesList, isFetched } = useGetCoingeckoExchangesList()
   const { getAccountBalance } = useAccountBalance()
+  const { minNearBalance } = useMinimumNearBalance(accountId)
 
   const isTokenNative = (address: string): boolean => {
     switch (address) {
@@ -48,7 +50,12 @@ export const useGetTokensBalance = (
       const { balance } = await getAccountBalance()
       if (balance) {
         const formattedAmountOut = formatUnits(BigInt(balance), decimals)
-        Object.assign(tokenBalance, { balance: parseFloat(formattedAmountOut) })
+        Object.assign(tokenBalance, {
+          balance:
+            parseFloat(formattedAmountOut) - minNearBalance > 0
+              ? parseFloat(formattedAmountOut) - minNearBalance
+              : 0,
+        })
       }
     } else if (accountId && !isTokenNative(address)) {
       const getBalance = await nep141Balance(accountId as string, address)
@@ -134,10 +141,10 @@ export const useGetTokensBalance = (
   }
 
   useEffect(() => {
-    if (tokensList || activePreview || isFetched) {
+    if (tokensList || activePreview || isFetched || minNearBalance) {
       getTokensBalance()
     }
-  }, [accountId, tokensList, activePreview, isFetched])
+  }, [accountId, tokensList, activePreview, isFetched, minNearBalance])
 
   useEffect(() => {
     if (!accountId) {
