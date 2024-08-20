@@ -20,8 +20,9 @@ import { useTimeFormatMinutes } from "@src/hooks/useTimeFormat"
 import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
 import { smallBalanceToFormat } from "@src/utils/token"
 import { useCalculateTokenToUsd } from "@src/hooks/useCalculateTokenToUsd"
-import { useAccountBalance } from "@src/hooks/useAccountBalance"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
+import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import { getBalanceNearAllowedToSwap } from "@src/components/SwapForm/service/getBalanceNearAllowedToSwap"
 
 export type ModalReviewSwapPayload = {
   tokenIn: string
@@ -53,9 +54,9 @@ const ModalReviewSwap = () => {
     priceToUsd: priceToUsdTokenOut,
     calculateTokenToUsd: calculateTokenToUsdTokenOut,
   } = useCalculateTokenToUsd()
-  const { getAccountBalance } = useAccountBalance()
   const [isWNearConjunctionRequired, setIsWNearConjunctionRequired] =
     useState(false)
+  const { accountId } = useWalletSelector()
 
   const recalculateEstimation = async () => {
     try {
@@ -81,13 +82,12 @@ const ModalReviewSwap = () => {
       })
       // ToDo: Here we need to handle the issue when all of a sudden there is no quotes
       if (bestEstimate === null) return
-      const formattedOut =
-        bestEstimate !== null
-          ? formatUnits(
-              BigInt(bestEstimate.amount_out),
-              convertPayload.selectedTokenOut.decimals!
-            )
-          : "0"
+      const formattedOut = bestEstimate
+        ? formatUnits(
+            BigInt(bestEstimate.amount_out),
+            convertPayload.selectedTokenOut.decimals!
+          )
+        : "0"
       setConvertPayload({ ...convertPayload, tokenOut: formattedOut })
     } catch (e) {
       console.error(
@@ -122,16 +122,13 @@ const ModalReviewSwap = () => {
     )
     if (
       result?.blockchain !== BlockchainEnum.Near ||
-      result?.contractId !== ContractIdEnum.Native
+      result?.contractId !== ContractIdEnum.Native ||
+      !accountId
     ) {
       return
     }
-    const { balance } = await getAccountBalance()
-    const formattedAmountOut = formatUnits(
-      BigInt(balance),
-      convertPayload.selectedTokenIn?.decimals ?? 0
-    )
-    const isLackOfBalance = convertPayload.tokenIn > formattedAmountOut
+    const balanceNear = await getBalanceNearAllowedToSwap(accountId)
+    const isLackOfBalance = Number(convertPayload.tokenIn) > balanceNear
     setIsWNearConjunctionRequired(isLackOfBalance)
   }
 

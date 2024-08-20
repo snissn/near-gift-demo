@@ -230,3 +230,13 @@ export enum NetworkEnum {
 export enum ContractIdEnum {
   Native = "native",
 }
+
+export interface NearViewAccount {
+  amount: string
+  block_hash: string
+  block_height: number
+  code_hash: string
+  locked: string
+  storage_paid_at: number
+  storage_usage: number
+}

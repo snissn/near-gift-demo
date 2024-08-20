@@ -23,17 +23,11 @@ import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { usePublishIntentSolver0 } from "@src/api/hooks/Intent/usePublishIntentSolver0"
 import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
 import { smallBalanceToFormat } from "@src/utils/token"
-import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
 import { PublishAtomicNearIntentProps } from "@src/api/intent"
 import { useNotificationStore } from "@src/providers/NotificationProvider"
 import { NotificationType } from "@src/stores/notificationStore"
 import { getNearBlockById } from "@src/api/transaction"
-import {
-  NearBlock,
-  NearTX,
-  NetworkTokenWithSwapRoute,
-  QueueTransactions,
-} from "@src/types/interfaces"
+import { NearBlock, NearTX, QueueTransactions } from "@src/types/interfaces"
 
 export interface ModalConfirmSwapPayload extends CallRequestIntentProps {}
 
@@ -155,20 +149,6 @@ const ModalConfirmSwap = () => {
         inputs.selectedTokenOut?.decimals as number
       ).toString(),
     } as PublishAtomicNearIntentProps)
-  }
-
-  const handleMutateTokenToNativeSupport = (
-    selectedToken: NetworkTokenWithSwapRoute
-  ) => {
-    const tokenNearNative = LIST_NATIVE_TOKENS.find(
-      (token) => token.defuse_asset_id === "near:mainnet:native"
-    )
-    return {
-      ...selectedToken,
-      defuse_asset_id: tokenNearNative?.routes
-        ? tokenNearNative?.routes[1]
-        : "",
-    }
   }
 
   const handleTrackSwap = async () => {

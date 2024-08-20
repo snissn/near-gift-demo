@@ -1,7 +1,7 @@
 "use client"
 
 import { WalletSelector } from "@near-wallet-selector/core"
-import { formatUnits, parseUnits } from "viem"
+import { parseUnits } from "viem"
 import { BigNumber } from "ethers"
 import { useState } from "react"
 
@@ -29,8 +29,8 @@ import { useTransactionScan } from "@src/hooks/useTransactionScan"
 import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
 import { mapCreateIntentTransactionCall } from "@src/libs/de-sdk/utils/maps"
 import { isForeignNetworkToken } from "@src/utils/network"
-import { useAccountBalance } from "@src/hooks/useAccountBalance"
 import { TransactionMethod } from "@src/types/solver0"
+import { getBalanceNearAllowedToSwap } from "@src/components/SwapForm/service/getBalanceNearAllowedToSwap"
 
 type Props = {
   accountId: string | null
@@ -67,8 +67,6 @@ export interface CallRequestIntentProps extends WithAccounts {
   solverId?: string
 }
 
-const REFERRAL_ACCOUNT = process.env.REFERRAL_ACCOUNT ?? ""
-
 export const useSwap = ({ accountId, selector }: Props) => {
   const [isProcessing, setIsProcessing] = useState(false)
   const [isError, setIsError] = useState("")
@@ -76,14 +74,12 @@ export const useSwap = ({ accountId, selector }: Props) => {
     accountId,
     selector,
   })
-  const { callRequestNearDeposit, callRequestNearWithdraw } =
-    useNearSwapNearToWNear({
-      accountId,
-      selector,
-    })
+  const { callRequestNearWithdraw } = useNearSwapNearToWNear({
+    accountId,
+    selector,
+  })
   const { getNearBlock } = useNearBlock()
   const { getTransactionScan } = useTransactionScan()
-  const { getAccountBalance } = useAccountBalance()
 
   const handleError = (e: unknown) => {
     console.error(e)
@@ -149,14 +145,11 @@ export const useSwap = ({ accountId, selector }: Props) => {
         selectedTokenIn.defuse_asset_id.split(":")
       if (
         network === BlockchainEnum.Near &&
-        address === ContractIdEnum.Native
+        address === ContractIdEnum.Native &&
+        accountId
       ) {
-        const { balance } = await getAccountBalance()
-        const formattedAmountOut = formatUnits(
-          BigInt(balance),
-          selectedTokenIn?.decimals ?? 0
-        )
-        if (tokenIn > formattedAmountOut) {
+        const balanceNear = await getBalanceNearAllowedToSwap(accountId)
+        if (Number(tokenIn) > balanceNear) {
           queueTransaction.unshift(QueueTransactions.WITHDRAW)
           queue++
         }
@@ -292,32 +285,31 @@ export const useSwap = ({ accountId, selector }: Props) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let transactionResult: any | void = undefined
 
-      if (estimateQueue?.queueTransactionsTrack?.length === 1) {
+      const isWithdrawInTrack = estimateQueue.queueTransactionsTrack.includes(
+        QueueTransactions.WITHDRAW
+      )
+
+      let balanceNear = 0
+      if (isWithdrawInTrack && accountId) {
+        balanceNear = await getBalanceNearAllowedToSwap(accountId)
+      }
+
+      if (
+        estimateQueue?.queueTransactionsTrack?.length === 1 ||
+        isWithdrawInTrack
+      ) {
         const currentQueue: QueueTransactions =
           estimateQueue!.queueTransactionsTrack[0]
 
         switch (currentQueue) {
-          case QueueTransactions.DEPOSIT:
-            if (selectedTokenIn?.address) {
-              const unitsSendAmount = parseUnits(
-                tokenIn.toString(),
-                selectedTokenIn?.decimals as number
-              ).toString()
-              transactionResult = await callRequestNearDeposit(
-                selectedTokenOut!.address as string,
-                unitsSendAmount
-              )
-            }
-            break
-
           case QueueTransactions.WITHDRAW:
-            if (selectedTokenIn?.address) {
+            if (selectedTokenIn?.address && accountId) {
               const unitsSendAmount = parseUnits(
-                tokenIn.toString(),
+                (Number(tokenIn) - balanceNear).toString(),
                 selectedTokenIn?.decimals as number
               ).toString()
               transactionResult = await callRequestNearWithdraw(
-                selectedTokenIn!.address as string,
+                "wrap.near",
                 unitsSendAmount
               )
             }
@@ -393,17 +385,11 @@ export const useSwap = ({ accountId, selector }: Props) => {
       const mutateEstimateQueue = inputs.estimateQueue
       let tempQueueTransactionsTrack = []
 
-      const { balance } = await getAccountBalance()
-
       estimateQueue.queueTransactionsTrack.forEach((queueTransaction) => {
         switch (queueTransaction) {
           case QueueTransactions.WITHDRAW:
-            if (selectedTokenIn?.address) {
-              const formattedAmountOut = formatUnits(
-                BigInt(balance),
-                selectedTokenIn?.decimals ?? 0
-              )
-              const leftAmountIn = Number(tokenIn) - Number(formattedAmountOut)
+            if (selectedTokenIn?.address && accountId) {
+              const leftAmountIn = Number(tokenIn) - balanceNear
               const unitsSendAmount = parseUnits(
                 leftAmountIn.toString(),
                 selectedTokenIn?.decimals as number
@@ -428,35 +414,6 @@ export const useSwap = ({ accountId, selector }: Props) => {
               tempQueueTransactionsTrack =
                 mutateEstimateQueue.queueTransactionsTrack.filter(
                   (queue) => queue !== QueueTransactions.WITHDRAW
-                )
-              mutateEstimateQueue.queueTransactionsTrack =
-                tempQueueTransactionsTrack
-            }
-            break
-          case QueueTransactions.DEPOSIT:
-            if (selectedTokenIn?.address) {
-              const unitsSendAmount = parseUnits(
-                tokenIn.toString(),
-                selectedTokenIn?.decimals as number
-              ).toString()
-              transactions.push({
-                receiverId: receiverIdIn,
-                actions: [
-                  {
-                    type: "FunctionCall",
-                    params: {
-                      methodName: TransactionMethod.NEAR_DEPOSIT,
-                      args: {},
-                      gas: FT_STORAGE_DEPOSIT_GAS,
-                      deposit: unitsSendAmount,
-                    },
-                  },
-                ],
-              })
-              mutateEstimateQueue.queueInTrack--
-              tempQueueTransactionsTrack =
-                mutateEstimateQueue.queueTransactionsTrack.filter(
-                  (queue) => queue !== QueueTransactions.DEPOSIT
                 )
               mutateEstimateQueue.queueTransactionsTrack =
                 tempQueueTransactionsTrack

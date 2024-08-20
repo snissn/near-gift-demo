@@ -62,7 +62,7 @@ const WidgetCard = ({
           case HistoryStatus.ROLLED_BACK:
           case HistoryStatus.INTENT_1_ROLLED_BACK:
             const tokensData = getTokensDataByIds([
-              details?.recoverDetails?.send.token_id ?? "",
+              details?.recoverDetails?.send?.token_id ?? "",
             ])
             if (!tokensData.length && !details?.tokenIn) {
               return {
@@ -93,8 +93,8 @@ const WidgetCard = ({
           default:
             if (!details?.tokenIn || !details?.tokenOut) {
               const tokensData = getTokensDataByIds([
-                details?.recoverDetails?.send.token_id ?? "",
-                details?.recoverDetails?.receive.token_id ?? "",
+                details?.recoverDetails?.send?.token_id ?? "",
+                details?.recoverDetails?.receive?.token_id ?? "",
               ])
               if (tokensData.length !== 2) {
                 return {

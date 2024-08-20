@@ -3,6 +3,8 @@ import { CodeResult } from "near-api-js/lib/providers/provider"
 import { setNearProvider, getNearProvider } from "@near-eth/client"
 import { BigNumber } from "ethers"
 
+import { NearViewAccount } from "@src/types/interfaces"
+
 const NEAR_NODE_URL =
   process?.env?.nearNodeUrl ?? "https://rpc.testnet.near.org"
 
@@ -29,18 +31,20 @@ export async function storageBalance(contractId: string, accountId: string) {
   }
 }
 
-export async function nearAccount(accountId: string) {
+export async function nearAccount(
+  accountId: string
+): Promise<NearViewAccount | null> {
   try {
     setNearProvider(new providers.JsonRpcProvider({ url: NEAR_NODE_URL }))
 
     const nearProvider = getNearProvider()
-    const result = await nearProvider.query<CodeResult>({
+    const result = await nearProvider.query({
       request_type: "view_account",
       finality: "final",
       account_id: accountId,
     })
-    console.log("Fetching near account result:", result)
-    return result
+    // console.log("Fetching near account result:", result)
+    return result as NearViewAccount
   } catch (e) {
     console.error("Failed to fetch account or it doesn't exist ")
     return null

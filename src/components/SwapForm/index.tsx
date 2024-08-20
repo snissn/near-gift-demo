@@ -1,5 +1,5 @@
 "use client"
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { FieldValues, useForm } from "react-hook-form"
 import { formatUnits, parseUnits } from "viem"
 
@@ -12,7 +12,10 @@ import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { ModalType } from "@src/stores/modalStore"
 import { NetworkToken, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
-import { ModalSelectAssetsPayload } from "@src/components/Modal/ModalSelectAssets"
+import {
+  ModalSelectAssetsPayload,
+  TokenListWithNotSelectableToken,
+} from "@src/components/Modal/ModalSelectAssets"
 import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
 import { useModalSearchParams } from "@src/hooks/useModalSearchParams"
 import { useCalculateTokenToUsd } from "@src/hooks/useCalculateTokenToUsd"
@@ -22,6 +25,7 @@ import BlockEvaluatePrice from "@src/components/Block/BlockEvaluatePrice"
 import { useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { debouncePromise } from "@src/utils/debouncePromise"
+import { tieNativeToWrapToken } from "@src/utils/tokenList"
 
 import {
   EvaluateResultEnum,
@@ -301,7 +305,10 @@ export default function Swap() {
     }
     // Do evaluate usd select tokens prices
     if (data.size && !isLoading) {
-      data.forEach((token) => {
+      const getAssetList: TokenListWithNotSelectableToken[] = []
+      data.forEach((value) => getAssetList.push(value))
+      const tieNativeToWrapAssetList = tieNativeToWrapToken(getAssetList)
+      tieNativeToWrapAssetList.forEach((token) => {
         if (selectTokenIn?.defuse_asset_id === token.defuse_asset_id) {
           setSelectTokenIn(token)
         }
