@@ -1,19 +1,16 @@
 import { formatUnits } from "viem"
 
 import { nearAccount } from "@src/utils/near"
-import {
-  NEAR_MIN_RESERVE_BALANCE,
-  NEAR_STORAGE_COST_PRE_BYTE,
-} from "@src/constants/contracts"
 
 export const minimumNearBalance = (storageUsed: number): number => {
-  const storageCostPerByte = NEAR_STORAGE_COST_PRE_BYTE
+  const storageCostPerByte = 0.00001 // See source here - https://github.com/near/nearcore/blob/master/core/parameters/res/runtime_configs/parameters.yaml#L28
+  const minReserveBalance = 0.35
   const calculateMinBalance = storageUsed * storageCostPerByte
   return storageUsed <= 770
     ? 0
-    : calculateMinBalance > NEAR_MIN_RESERVE_BALANCE
+    : calculateMinBalance > minReserveBalance
       ? calculateMinBalance
-      : NEAR_MIN_RESERVE_BALANCE
+      : minReserveBalance
 }
 
 export const getBalanceNear = async (accountId: string) => {

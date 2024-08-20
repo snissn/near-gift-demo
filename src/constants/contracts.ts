@@ -33,6 +33,3 @@ export const NEAR_COLLECTOR_KEY = "__d_history_collector"
 export const CREATE_INTENT_EXPIRATION_BLOCK_BOOST = 350
 
 export const THEME_MODE_KEY = "theme"
-
-export const NEAR_STORAGE_COST_PRE_BYTE = 0.00001 // See source here - https://github.com/near/nearcore/blob/master/core/parameters/res/runtime_configs/parameters.yaml#L28
-export const NEAR_MIN_RESERVE_BALANCE = 0.35
