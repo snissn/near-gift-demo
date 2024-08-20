@@ -26,6 +26,7 @@ import { useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { debouncePromise } from "@src/utils/debouncePromise"
 import { tieNativeToWrapToken } from "@src/utils/tokenList"
+import { smallNumberToString } from "@src/utils/token"
 
 import {
   EvaluateResultEnum,
@@ -424,6 +425,10 @@ export default function Swap() {
           balance={selectTokenIn?.balance?.toString()}
           selected={selectTokenIn as NetworkToken}
           handleSelect={() => handleSelect("tokenIn", selectTokenOut)}
+          handleSetMaxValue={() => {
+            const balance = smallNumberToString(selectTokenIn?.balance ?? 0)
+            setValue("tokenIn", balance)
+          }}
           className="border rounded-t-xl md:max-w-[472px]"
           required="This field is required"
           errors={errors}
