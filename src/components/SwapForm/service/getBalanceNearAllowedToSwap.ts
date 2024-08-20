@@ -13,18 +13,20 @@ export const minimumNearBalance = (storageUsed: number): number => {
       : minReserveBalance
 }
 
-export const getBalanceNear = async (accountId: string) => {
+export const getBalanceNearAllowedToSwap = async (
+  accountId: string
+): Promise<number> => {
   try {
     const viewAccount = await nearAccount(accountId)
     if (!viewAccount) {
       return 0
     }
     const formattedAmountOut = formatUnits(BigInt(viewAccount.amount), 24)
-
-    return (
+    const balanceAllowedToSwap =
       parseFloat(formattedAmountOut) -
       minimumNearBalance(viewAccount.storage_usage)
-    )
+
+    return balanceAllowedToSwap > 0 ? balanceAllowedToSwap : 0
   } catch (e) {
     console.error("Failed to get Near balance", e)
     return 0

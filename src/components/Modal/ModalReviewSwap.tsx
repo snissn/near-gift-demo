@@ -22,7 +22,7 @@ import { smallBalanceToFormat } from "@src/utils/token"
 import { useCalculateTokenToUsd } from "@src/hooks/useCalculateTokenToUsd"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import { getBalanceNear } from "@src/components/SwapForm/service/getBalanceNear"
+import { getBalanceNearAllowedToSwap } from "@src/components/SwapForm/service/getBalanceNearAllowedToSwap"
 
 export type ModalReviewSwapPayload = {
   tokenIn: string
@@ -127,7 +127,7 @@ const ModalReviewSwap = () => {
     ) {
       return
     }
-    const balanceNear = await getBalanceNear(accountId)
+    const balanceNear = await getBalanceNearAllowedToSwap(accountId)
     const isLackOfBalance = Number(convertPayload.tokenIn) > balanceNear
     setIsWNearConjunctionRequired(isLackOfBalance)
   }

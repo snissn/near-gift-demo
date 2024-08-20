@@ -30,7 +30,7 @@ import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
 import { mapCreateIntentTransactionCall } from "@src/libs/de-sdk/utils/maps"
 import { isForeignNetworkToken } from "@src/utils/network"
 import { TransactionMethod } from "@src/types/solver0"
-import { getBalanceNear } from "@src/components/SwapForm/service/getBalanceNear"
+import { getBalanceNearAllowedToSwap } from "@src/components/SwapForm/service/getBalanceNearAllowedToSwap"
 
 type Props = {
   accountId: string | null
@@ -148,7 +148,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
         address === ContractIdEnum.Native &&
         accountId
       ) {
-        const balanceNear = await getBalanceNear(accountId)
+        const balanceNear = await getBalanceNearAllowedToSwap(accountId)
         if (Number(tokenIn) > balanceNear) {
           queueTransaction.unshift(QueueTransactions.WITHDRAW)
           queue++
@@ -291,7 +291,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
 
       let balanceNear = 0
       if (isWithdrawInTrack && accountId) {
-        balanceNear = await getBalanceNear(accountId)
+        balanceNear = await getBalanceNearAllowedToSwap(accountId)
       }
 
       if (
