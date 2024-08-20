@@ -26,7 +26,7 @@ const Infrastructure = () => {
   const [containerWidth, setContainerWidth] = useState<number>(0)
 
   useEffect(() => {
-    setContainerWidth(divRef.current!.offsetWidth || 0)
+    setContainerWidth(divRef.current?.offsetWidth || 0)
   }, [divRef.current, width])
 
   return (
