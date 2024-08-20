@@ -28,7 +28,7 @@ const ModalDialog = ({ children }: PropsWithChildren) => {
   }, [handleCloseModal])
 
   useEffect(() => {
-    setContainerWidth(divRef.current!.offsetWidth || 0)
+    setContainerWidth(divRef.current?.offsetWidth || 0)
     return () => {
       setContainerWidth(0)
     }

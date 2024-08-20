@@ -25,6 +25,7 @@ interface Props<T extends FieldValues> {
   balance?: string | BigNumber
   selected?: NetworkToken
   handleSelect?: () => void
+  handleSetMaxValue?: () => void
   className?: string
   errors?: FieldErrors
   errorSelect?: string
@@ -43,6 +44,7 @@ const FieldComboInput = <T extends FieldValues>({
   balance,
   selected,
   handleSelect,
+  handleSetMaxValue,
   className,
   errors,
   withNativeSupport,
@@ -146,6 +148,7 @@ const FieldComboInput = <T extends FieldValues>({
             handleIncludeNativeToSwap ? handleIncludeNativeToSwap : () => {}
           }
           nativeSupportChecked={nativeSupportChecked ?? false}
+          handleClick={handleSetMaxValue || (() => {})}
         />
       )}
       {errorSelect && (

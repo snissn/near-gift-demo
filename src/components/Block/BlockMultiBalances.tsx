@@ -15,12 +15,14 @@ export interface BlockMultiBalancesProps {
   withNativeSupport?: boolean
   nativeSupportChecked?: CheckedState
   handleIncludeNativeToSwap?: (checked: CheckedState) => void
+  handleClick?: () => void
 }
 const BlockMultiBalances = ({
   balance,
   withNativeSupport,
   nativeSupportChecked = false,
   handleIncludeNativeToSwap,
+  handleClick,
 }: BlockMultiBalancesProps) => {
   return (
     <div className="absolute bottom-4 right-5 flex justify-center items-center gap-2">
@@ -40,11 +42,13 @@ const BlockMultiBalances = ({
         />
       )}
       <span
+        onClick={handleClick}
         className={clsx(
           "text-xs px-2 py-0.5 rounded-full",
           Number(balance) > 0
             ? "bg-red-100 text-red-400 dark:bg-red-200 dark:text-primary-400"
-            : "bg-white-200 text-gray-600"
+            : "bg-white-200 text-gray-600",
+          handleClick && "cursor-pointer"
         )}
       >
         {smallBalanceToFormat(balance?.toString() ?? "", 7)}
