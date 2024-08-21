@@ -23,7 +23,7 @@ interface HistoryFromLocal {
 }
 
 export enum UseQueryCollectorKeys {
-  CLIENT_ID = "clientId",
+  INTENT_ID = "intentId",
   TRANSACTION_HASHS = "transactionHashes",
   ERROR_MESSAGE = "errorMessage",
   ERROR_CODE = "errorCode",
@@ -68,13 +68,13 @@ export const useQueryCollector = (): CollectorHook => {
     ])
   }
 
-  const getTryToExtractDataFromLocal = (clientId: string): HistoryFromLocal => {
+  const getTryToExtractDataFromLocal = (intentId: string): HistoryFromLocal => {
     const getConfirmSwapFromLocal = localStorage.getItem(CONFIRM_SWAP_LOCAL_KEY)
     if (!getConfirmSwapFromLocal) return {}
     const parsedData: { data: ModalConfirmSwapPayload } = JSON.parse(
       getConfirmSwapFromLocal
     )
-    if (parsedData.data.clientId !== clientId) {
+    if (parsedData.data.intentId !== intentId) {
       return {}
     }
     return {
@@ -87,7 +87,7 @@ export const useQueryCollector = (): CollectorHook => {
 
   const getTransactions = useCallback(async (): Promise<HistoryData[]> => {
     try {
-      const clientId = searchParams.get(UseQueryCollectorKeys.CLIENT_ID)
+      const intentId = searchParams.get(UseQueryCollectorKeys.INTENT_ID)
       const transactionHashes = searchParams.get(
         UseQueryCollectorKeys.TRANSACTION_HASHS
       )
@@ -146,13 +146,13 @@ export const useQueryCollector = (): CollectorHook => {
           }
           if (txData) {
             result.push({
-              clientId: clientId as string,
+              intentId: intentId as string,
               hash: txData.hash as string,
               timestamp: txData.blockData ?? 0,
               details: {
                 receipts_outcome: txData.result?.receipts_outcome,
                 transaction: txData.result?.transaction,
-                ...getTryToExtractDataFromLocal(clientId as string),
+                ...getTryToExtractDataFromLocal(intentId as string),
               },
             })
           }

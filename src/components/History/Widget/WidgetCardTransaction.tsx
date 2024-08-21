@@ -20,7 +20,7 @@ type Props = {
 }
 
 const WidgetCardTransaction = ({
-  clientId,
+  intentId,
   hash,
   details,
   timestamp,
@@ -66,7 +66,7 @@ const WidgetCardTransaction = ({
         <WidgetCardSwap
           hash={hash}
           status={status}
-          clientId={clientId}
+          intentId={intentId}
           tokenIn={details!.tokenIn as string}
           tokenOut={details!.tokenOut as string}
           selectedTokenIn={

@@ -65,7 +65,7 @@ export const useHistoryLatest = () => {
   })
 
   const applyDataFromCreateIntent = (
-    clientId: string
+    intentId: string
   ): Partial<HistoryData["details"]> => {
     const details: Partial<HistoryData["details"]> = {}
     if (data.size) {
@@ -73,7 +73,7 @@ export const useHistoryLatest = () => {
         const method =
           history.details?.transaction?.actions[0].FunctionCall.method_name
         if (
-          history.clientId === clientId &&
+          history.intentId === intentId &&
           (method === TransactionMethod.FT_TRANSFER_CALL ||
             method === TransactionMethod.NATIVE_ON_TRANSFER)
         ) {
@@ -128,7 +128,7 @@ export const useHistoryLatest = () => {
           }
         }
 
-        // Try to recover clientId and "Swap" data in case it was lost
+        // Try to recover intentId and "Swap" data in case it was lost
         const transactionMethodName =
           historyData.details?.transaction?.actions.length &&
           historyData.details?.transaction?.actions[0].FunctionCall.method_name
@@ -162,7 +162,7 @@ export const useHistoryLatest = () => {
                 recoverData = msgBorshDeserialize
               }
 
-              const clientId =
+              const intentId =
                 (recoverData as NearIntentCreate)?.CreateIntent?.id ||
                 (recoverData as NearIntent1CreateCrossChain)?.id
               const recoverDetails =
@@ -190,7 +190,7 @@ export const useHistoryLatest = () => {
               }
 
               Object.assign(historyData, {
-                clientId,
+                intentId,
                 details: {
                   ...historyData.details,
                   recoverDetails: {
@@ -211,7 +211,7 @@ export const useHistoryLatest = () => {
 
               getIntentStatus = await getIntent(
                 (args as { receiver_id: string }).receiver_id,
-                historyData.clientId
+                historyData.intentId
               )
               if (getIntentStatus) {
                 Object.assign(historyData, {
@@ -232,7 +232,7 @@ export const useHistoryLatest = () => {
                   ...historyData.details,
                   ...applyDataFromCreateIntent((args as { id: string }).id),
                 },
-                clientId: (args as { id: string }).id,
+                intentId: (args as { id: string }).id,
                 status: HistoryStatus.ROLLED_BACK,
               })
               break
@@ -291,7 +291,7 @@ export const useHistoryLatest = () => {
               msgBase64 = (args as { msg: string }).msg
               recoverData = JSON.parse(msgBase64)
               Object.assign(historyData, {
-                clientId: (recoverData as NearIntent1CreateSingleChain)?.id,
+                intentId: (recoverData as NearIntent1CreateSingleChain)?.id,
                 details: {
                   ...historyData.details,
                   recoverDetails: {
@@ -309,7 +309,7 @@ export const useHistoryLatest = () => {
 
               getIntentStatus = await getIntent(
                 historyData.details.transaction.receiver_id,
-                historyData.clientId
+                historyData.intentId
               )
               if (getIntentStatus) {
                 Object.assign(historyData, {
@@ -334,7 +334,7 @@ export const useHistoryLatest = () => {
             const parsedData: { data: ModalConfirmSwapPayload } = JSON.parse(
               getConfirmSwapFromLocal
             )
-            if (parsedData.data.clientId === historyData.clientId) {
+            if (parsedData.data.intentId === historyData.intentId) {
               Object.assign(historyData, {
                 details: {
                   ...historyData.details,

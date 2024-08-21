@@ -84,14 +84,14 @@ const ModalConfirmSwap = () => {
   }
 
   const handleBatchCreateSwapQuery = ({
-    clientId,
+    intentId,
   }: {
-    clientId: string
+    intentId: string
   }): boolean => {
     try {
       const queryParams = new URLSearchParams(searchParams.toString())
       queryParams.set("modalType", ModalType.MODAL_CONFIRM_SWAP)
-      queryParams.set("clientId", clientId)
+      queryParams.set("intentId", intentId)
       const updatedQueryString = queryParams.toString()
       router.replace(pathname + "?" + updatedQueryString)
       return true
@@ -102,7 +102,7 @@ const ModalConfirmSwap = () => {
   }
 
   const handleEstimateQueueTransactions = async (
-    clientId: string
+    intentId: string
   ): Promise<EstimateQueueTransactions> => {
     const { queueInTrack, queueTransactionsTrack } =
       await getEstimateQueueTransactions({
@@ -110,7 +110,7 @@ const ModalConfirmSwap = () => {
         tokenOut: modalPayload.tokenOut,
         selectedTokenIn: modalPayload.selectedTokenIn,
         selectedTokenOut: modalPayload.selectedTokenOut,
-        clientId,
+        intentId,
       })
     setTransactionQueue(queueInTrack)
     return {
@@ -123,10 +123,10 @@ const ModalConfirmSwap = () => {
 
   const handlePublishIntentToSolver = (
     inputs: ModalConfirmSwapPayload,
-    receivedClientId: string | undefined,
+    receivedIntentId: string | undefined,
     receivedHash: string
   ): void => {
-    if (!receivedClientId) {
+    if (!receivedIntentId) {
       setNotification({
         id: v4(),
         message: "Intent hasn't been published!",
@@ -138,7 +138,7 @@ const ModalConfirmSwap = () => {
       hash: receivedHash,
       defuseAssetIdIn: inputs.selectedTokenIn.defuse_asset_id,
       accountId: accountId,
-      clientId: receivedClientId,
+      intentId: receivedIntentId,
       defuseAssetIdOut: inputs.selectedTokenOut.defuse_asset_id,
       unitsAmountIn: parseUnits(
         inputs.tokenIn,
@@ -164,8 +164,8 @@ const ModalConfirmSwap = () => {
         const receivedHash = searchParams.get(
           UseQueryCollectorKeys.TRANSACTION_HASHS
         )
-        const receivedClientId = searchParams.get(
-          UseQueryCollectorKeys.CLIENT_ID
+        const receivedIntentId = searchParams.get(
+          UseQueryCollectorKeys.INTENT_ID
         )
 
         const isBatchHashes = receivedHash?.split(",")
@@ -193,7 +193,7 @@ const ModalConfirmSwap = () => {
           tokenOut: data!.tokenOut,
           selectedTokenIn: data!.selectedTokenIn,
           selectedTokenOut: data!.selectedTokenOut,
-          clientId: data.clientId,
+          intentId: data.intentId,
           estimateQueue: value,
         }
 
@@ -201,7 +201,7 @@ const ModalConfirmSwap = () => {
           ongoingPublishingRef.current = true
           handlePublishIntentToSolver(
             inputs,
-            receivedClientId ?? data.clientId,
+            receivedIntentId ?? data.intentId,
             lastInTransactionHashes as string
           )
           return
@@ -215,27 +215,27 @@ const ModalConfirmSwap = () => {
         setIsReadingHistory(true)
 
         handleBatchCleanupQuery([
-          UseQueryCollectorKeys.CLIENT_ID,
+          UseQueryCollectorKeys.INTENT_ID,
           UseQueryCollectorKeys.TRANSACTION_HASHS,
         ])
 
         setSwapToLocal(inputs)
         handleBatchCreateSwapQuery({
-          clientId: data.clientId as string,
+          intentId: data.intentId as string,
         })
         await callRequestCreateIntent(inputs)
       }
       return
     }
 
-    const newClientId = await sha256(v4())
+    const newIntentId = await sha256(v4())
 
     if (
       handleBatchCreateSwapQuery({
-        clientId: newClientId,
+        intentId: newIntentId,
       })
     ) {
-      const estimateQueue = await handleEstimateQueueTransactions(newClientId)
+      const estimateQueue = await handleEstimateQueueTransactions(newIntentId)
 
       setIsReadingHistory(true)
 
@@ -244,7 +244,7 @@ const ModalConfirmSwap = () => {
         tokenOut: modalPayload.tokenOut,
         selectedTokenIn: modalPayload.selectedTokenIn,
         selectedTokenOut: modalPayload.selectedTokenOut,
-        clientId: newClientId,
+        intentId: newIntentId,
         estimateQueue,
         accountFrom: modalPayload?.accountFrom,
         accountTo: modalPayload?.accountTo,
@@ -282,7 +282,7 @@ const ModalConfirmSwap = () => {
       let resultSequence = 0
       for (const result of callResult) {
         updateOneHistory({
-          clientId: inputs.clientId as string,
+          intentId: inputs.intentId as string,
           hash: result.transaction.hash as string,
           timestamp: timestamps[resultSequence] ?? 0,
           details: {
@@ -316,7 +316,7 @@ const ModalConfirmSwap = () => {
               Object.assign(inputs, {
                 selectedTokenIn: modalPayload!.selectedTokenIn,
               }),
-              inputs.clientId,
+              inputs.intentId,
               result.transaction.hash as string
             )
           }
