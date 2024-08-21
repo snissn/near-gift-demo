@@ -32,7 +32,7 @@ import { NearBlock, NearTX, QueueTransactions } from "@src/types/interfaces"
 export interface ModalConfirmSwapPayload extends CallRequestIntentProps {}
 
 const ModalConfirmSwap = () => {
-  const [transactionQueue, setTransactionQueue] = useState(0)
+  const [transactionQueue, setTransactionQueue] = useState(1)
   const [dataFromLocal, setDataFromLocal] = useState<ModalConfirmSwapPayload>()
   const [isReadingHistory, setIsReadingHistory] = useState(false)
   const { selector, accountId } = useWalletSelector()
@@ -229,6 +229,7 @@ const ModalConfirmSwap = () => {
     }
 
     const newClientId = await sha256(v4())
+
     if (
       handleBatchCreateSwapQuery({
         clientId: newClientId,
@@ -253,56 +254,75 @@ const ModalConfirmSwap = () => {
       setSwapToLocal(inputs)
 
       ongoingPublishingRef.current = true
-      const callResult: NearTX[] | void = await callRequestCreateIntent(
-        inputs,
-        (mutate) => setSwapToLocal(mutate)
-      )
-      if (callResult?.length) {
-        const timestamps = await Promise.all(
-          callResult.map(async (result) => {
-            const { result: resultBlock } = (await getNearBlockById(
-              result.transaction.hash as string
-            )) as NearBlock
-            return (
-              resultBlock?.header?.timestamp ??
-              Number(`${new Date().getTime()}` + "0".repeat(6))
-            )
-          })
-        )
+      handleCallCreateIntent(inputs, estimateQueue)
+    }
+  }
 
-        callResult.forEach((result, i) => {
-          updateOneHistory({
-            clientId: inputs.clientId as string,
-            hash: result.transaction.hash as string,
-            timestamp: timestamps[i] ?? 0,
-            details: {
-              tokenIn: modalPayload.tokenIn,
-              tokenOut: modalPayload.tokenOut,
-              selectedTokenIn: modalPayload.selectedTokenIn,
-              selectedTokenOut: modalPayload.selectedTokenOut,
-            },
-          })
-          // Toggle preview for the main transaction in batch
-          if (i === callResult.length - 1) {
-            togglePreview(result.transaction.hash as string)
-            if (
-              estimateQueue.queueTransactionsTrack.includes(
-                QueueTransactions.CREATE_INTENT
-              )
-            ) {
-              handlePublishIntentToSolver(
-                Object.assign(inputs, {
-                  selectedTokenIn: modalPayload!.selectedTokenIn,
-                }),
-                inputs.clientId,
-                result.transaction.hash as string
-              )
-            } else {
-              onCloseModal()
-              router.replace(pathname)
-            }
-          }
+  const handleCallCreateIntent = async (
+    inputs: CallRequestIntentProps,
+    estimateQueue: CallRequestIntentProps["estimateQueue"]
+  ): Promise<void> => {
+    const callResult: NearTX[] | void = await callRequestCreateIntent(
+      inputs,
+      (mutate) => setSwapToLocal(mutate)
+    )
+    if (callResult?.length) {
+      const timestamps = await Promise.all(
+        callResult.map(async (result) => {
+          const { result: resultBlock } = (await getNearBlockById(
+            result.transaction.hash as string
+          )) as NearBlock
+          return (
+            resultBlock?.header?.timestamp ??
+            Number(`${new Date().getTime()}` + "0".repeat(6))
+          )
         })
+      )
+
+      let resultSequence = 0
+      for (const result of callResult) {
+        updateOneHistory({
+          clientId: inputs.clientId as string,
+          hash: result.transaction.hash as string,
+          timestamp: timestamps[resultSequence] ?? 0,
+          details: {
+            tokenIn: modalPayload.tokenIn,
+            tokenOut: modalPayload.tokenOut,
+            selectedTokenIn: modalPayload.selectedTokenIn,
+            selectedTokenOut: modalPayload.selectedTokenOut,
+          },
+        })
+
+        const { value, done } = await nextEstimateQueueTransactions({
+          estimateQueue: estimateQueue,
+          receivedHash: result.transaction.hash,
+        })
+
+        // Toggle preview for the main transaction in batch
+        if (resultSequence === callResult.length - 1) {
+          if (!done) {
+            handleCallCreateIntent(
+              {
+                ...inputs,
+                estimateQueue: value,
+              },
+              value
+            )
+            onCloseModal()
+            router.replace(pathname)
+          } else {
+            togglePreview(result.transaction.hash as string)
+            handlePublishIntentToSolver(
+              Object.assign(inputs, {
+                selectedTokenIn: modalPayload!.selectedTokenIn,
+              }),
+              inputs.clientId,
+              result.transaction.hash as string
+            )
+          }
+        }
+
+        resultSequence++
       }
     }
   }

@@ -13,7 +13,10 @@ export const smallBalanceToFormat = (balance: string, toFixed = 14): string => {
 }
 
 export const smallNumberToString = (balance: number): string => {
-  return parseFloat(balance.toString()).toFixed(8).toString()
+  if (parseFloat(balance.toString()) < 0.00001) {
+    return parseFloat(balance.toString()).toFixed(8).toString()
+  }
+  return balance.toString()
 }
 
 export const tokenBalanceToFormatUnits = ({
