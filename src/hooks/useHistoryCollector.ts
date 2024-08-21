@@ -37,12 +37,14 @@ export const useHistoryCollector = (collectorHooks: CollectorHook[]) => {
         const parsedData: { data: HistoryData[] } =
           JSON.parse(getHistoryFromLocal)
 
+        // TODO Could be removed in some period of time
         // Due to resolve backward compatible issue, temporary we have to check outdated history key `clientId`
         parsedData.data.forEach((el) => {
-          if ((el as { clientId: string })?.clientId) {
+          const _clientId = (el as unknown as { clientId: string })?.clientId
+          if (_clientId) {
             return {
-              intentId: (el as { clientId: string }).clientId,
               ...el,
+              intentId: _clientId,
             }
           }
           return {
