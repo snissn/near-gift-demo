@@ -8,14 +8,14 @@ import {
 import { Dialog } from "@radix-ui/themes"
 
 import { useModalStore } from "@src/providers/ModalStoreProvider"
-import useResize from "@src/hooks/useResize"
+import useScreenWidth from "@src/hooks/useScreenWidth"
 
 const ModalDialog = ({ children }: PropsWithChildren) => {
   const { onCloseModal } = useModalStore((state) => state)
   const [open, setOpen] = useState(true)
-  const [containerWidth, setContainerWidth] = useState<number>(0)
+  const containerWidthRef = useRef(0)
   const divRef = useRef<HTMLDivElement>(null)
-  const { width } = useResize(divRef)
+  const screenWidth = useScreenWidth()
 
   const defaultMaxWidth = "512px"
 
@@ -28,22 +28,20 @@ const ModalDialog = ({ children }: PropsWithChildren) => {
   }, [handleCloseModal])
 
   useEffect(() => {
-    setContainerWidth(divRef.current?.offsetWidth || 0)
-    return () => {
-      setContainerWidth(0)
+    const offsetWidth = divRef.current?.offsetWidth
+    if (offsetWidth) {
+      containerWidthRef.current = divRef.current.offsetWidth
     }
-  }, [divRef.current, width])
+    return () => {
+      containerWidthRef.current = 0
+    }
+  }, [divRef.current?.offsetWidth])
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
+      <Dialog.Title></Dialog.Title>
       <Dialog.Content
-        maxWidth={
-          containerWidth
-            ? containerWidth < 768
-              ? "100%"
-              : defaultMaxWidth
-            : defaultMaxWidth
-        }
+        maxWidth={screenWidth < 768 ? "100%" : defaultMaxWidth}
         className="p-0 dark:bg-black-800"
       >
         <div ref={divRef}>{children}</div>

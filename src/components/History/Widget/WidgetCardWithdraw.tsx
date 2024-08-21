@@ -4,10 +4,11 @@ import { useState } from "react"
 import { Text } from "@radix-ui/themes"
 
 import AssetComboIcon from "@src/components/Network/AssetComboIcon"
-import { NearTX, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
+import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import { smallBalanceToFormat } from "@src/utils/token"
 import WidgetCardLink from "@src/components/History/Widget/WidgetCardLink"
 import useShortAccountId from "@src/hooks/useShortAccountId"
+import { LIST_NETWORKS_TOKENS } from "@src/constants/tokens"
 
 type Props = {
   accountId: string
@@ -17,6 +18,10 @@ type Props = {
 }
 
 const NEAR_EXPLORER = process?.env?.nearExplorer ?? ""
+
+const nearToken = LIST_NETWORKS_TOKENS.find(
+  (token) => token.address === "wrap.near"
+)
 
 const WidgetCardWithdraw = ({
   accountId,
@@ -37,7 +42,7 @@ const WidgetCardWithdraw = ({
       className="relative flex flex-nowrap justify-between items-center p-2.5 gap-3 hover:bg-gray-950 cursor-pointer"
     >
       <div className="flex-none w-[40px] h-[36px]">
-        <AssetComboIcon {...selectedTokenOut} />
+        <AssetComboIcon {...selectedTokenOut} icon={nearToken?.icon ?? ""} />
       </div>
       <div className="shrink grow flex flex-col justify-between items-start">
         <Text size="2" weight="medium" className="text-black-400">
@@ -68,7 +73,7 @@ const WidgetCardWithdraw = ({
               +{smallBalanceToFormat(tokenOut, 7)}
             </Text>
             <Text size="1" weight="medium" className="text-green-400">
-              {selectedTokenOut.symbol}
+              NEAR
             </Text>
           </span>
         </div>

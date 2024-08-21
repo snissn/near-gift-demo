@@ -105,10 +105,14 @@ const WidgetCardTransaction = ({
       if (!details?.transaction || !hash || iTokenDetailMissing) {
         return <WidgetCardLoading />
       }
+      const recoverAmount = (
+        Number(details!.recoverDetails?.amount ?? "0") /
+        10 ** 24
+      ).toString()
       return (
         <WidgetCardWithdraw
           accountId={details?.transaction.signer_id as string}
-          tokenOut={details!.tokenOut as string}
+          tokenOut={recoverAmount ?? (details!.tokenOut as string)}
           selectedTokenOut={
             details!.selectedTokenOut as NetworkTokenWithSwapRoute
           }
