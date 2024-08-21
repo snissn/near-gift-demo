@@ -21,7 +21,7 @@ export enum HistoryStatus {
 }
 
 export type HistoryData = {
-  clientId: string
+  intentId: string
   hash: string
   timestamp: number
   status?: HistoryStatus

@@ -42,7 +42,7 @@ export const prepareCreateIntent0 = (inputs: MapCreateIntentProps) => {
 
   const msg = {
     CreateIntent: {
-      id: inputs.clientId,
+      id: inputs.intentId,
       IntentStruct: {
         initiator: inputs.accountId,
         send: {
@@ -110,7 +110,7 @@ export const prepareCreateIntent1CrossChain = (
 
   const msg: NearIntent1CreateCrossChain = {
     type: "create",
-    id: inputs.clientId as string,
+    id: inputs.intentId as string,
     asset_out: {
       type: "cross_chain",
       oracle: inputs.solverId as string,
@@ -185,7 +185,7 @@ export const prepareCreateIntent1SingleChain = (
 
   const msg: NearIntent1CreateSingleChain = {
     type: "create",
-    id: inputs.clientId as string,
+    id: inputs.intentId as string,
     asset_out: {
       type: contractIdTokenOut === ContractIdEnum.Native ? "native" : "nep141",
       token: contractIdTokenOut,

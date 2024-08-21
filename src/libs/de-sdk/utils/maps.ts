@@ -17,7 +17,7 @@ export interface MapCreateIntentProps {
   tokenOut: CallRequestIntentProps["tokenOut"]
   selectedTokenIn: CallRequestIntentProps["selectedTokenIn"]
   selectedTokenOut: CallRequestIntentProps["selectedTokenOut"]
-  clientId: CallRequestIntentProps["clientId"]
+  intentId: CallRequestIntentProps["intentId"]
   blockHeight: number
   accountId: string | null
   accountFrom?: string
@@ -31,7 +31,7 @@ export type MapCreateIntentResult = [number, any][]
 /**
  * Function prepares a transaction call data depends on inputs for different intents.
  *
- * @param {Type} inputs - Swap parameters within tokenIn, tokenOut, selectedTokenIn, selectedTokenOut and clientId.
+ * @param {Type} inputs - Swap parameters within tokenIn, tokenOut, selectedTokenIn, selectedTokenOut and intentId.
  * @returns {ReturnType} - Array with transaction call data.
  *
  * Additional Notes:

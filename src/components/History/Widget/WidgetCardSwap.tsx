@@ -18,7 +18,7 @@ enum CardSwapStatusEnum {
 
 type Props = {
   hash: string
-  clientId: string
+  intentId: string
   timestamp: number
   status: HistoryStatus
   tokenIn: string
@@ -33,7 +33,7 @@ const NEAR_EXPLORER = process?.env?.nearExplorer ?? ""
 
 const WidgetCardSwap = ({
   hash,
-  clientId,
+  intentId,
   timestamp,
   status,
   tokenIn,
@@ -117,7 +117,7 @@ const WidgetCardSwap = ({
                 color="red"
                 onClick={(e) => {
                   e.stopPropagation()
-                  handleCloseIntent({ id: clientId, receiverId })
+                  handleCloseIntent({ id: intentId, receiverId })
                 }}
                 className="relative w-[32px] h-[32px] cursor-pointer"
               >

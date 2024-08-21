@@ -31,7 +31,7 @@ type Props = {
 }
 
 const WidgetCard = ({
-  clientId,
+  intentId,
   hash,
   details,
   timestamp,
@@ -202,7 +202,7 @@ const WidgetCard = ({
   }
 
   const handleRollbackIntent = async () => {
-    await callRequestRollbackIntent({ id: clientId })
+    await callRequestRollbackIntent({ id: intentId })
   }
 
   useEffect(() => {

@@ -63,7 +63,7 @@ export interface CallRequestIntentProps extends WithAccounts {
   selectedTokenIn: NetworkToken
   selectedTokenOut: NetworkToken
   estimateQueue: EstimateQueueTransactions
-  clientId?: string
+  intentId?: string
   solverId?: string
 }
 
@@ -99,8 +99,8 @@ export const useSwap = ({ accountId, selector }: Props) => {
       console.log("Non valid contract address")
       return false
     }
-    if (!inputs?.clientId) {
-      console.log("Non valid clientId")
+    if (!inputs?.intentId) {
+      console.log("Non valid intentId")
       return false
     }
     return true
@@ -123,7 +123,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
         | "tokenOut"
         | "selectedTokenIn"
         | "selectedTokenOut"
-        | "clientId"
+        | "intentId"
       >,
       "estimateQueue"
     >
@@ -270,7 +270,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
         tokenOut,
         selectedTokenIn,
         selectedTokenOut,
-        clientId,
+        intentId,
         estimateQueue,
         accountFrom,
         accountTo,
@@ -354,7 +354,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
               tokenOut,
               selectedTokenIn,
               selectedTokenOut,
-              clientId,
+              intentId,
               blockHeight: getBlock.height,
               accountId,
               accountFrom,
@@ -477,7 +477,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
               tokenOut,
               selectedTokenIn,
               selectedTokenOut,
-              clientId,
+              intentId,
               blockHeight: getBlock.height,
               accountId,
               accountFrom,
