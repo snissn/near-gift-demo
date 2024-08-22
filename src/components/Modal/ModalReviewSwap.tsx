@@ -226,7 +226,12 @@ const ModalReviewSwap = () => {
           <div className="flex flex-col w-full mb-6 gap-3">
             <Blockquote color="cyan">
               Wrapped Near will be used in conjunction with Near to boost your
-              current swap experience.
+              current swap experience. All your wNear will be unwrapped and next
+              swap will be used only Near.
+            </Blockquote>
+            <Blockquote color="gray">
+              If you want to keep your wNear then please specify the swap amount
+              below.
             </Blockquote>
           </div>
         )}

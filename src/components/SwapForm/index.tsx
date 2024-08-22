@@ -54,6 +54,7 @@ enum ErrorEnum {
   INSUFFICIENT_BALANCE = "Insufficient Balance",
   NOT_AVAILABLE_SWAP = "Not Available Swap",
   NO_QUOTES = "No Quotes",
+  EXCEEDED_NEAR_PER_BYTE_USE = "Must have 0.2N or more left in wallet",
 }
 
 const ESTIMATE_BOT_AWAIT_MS = 500

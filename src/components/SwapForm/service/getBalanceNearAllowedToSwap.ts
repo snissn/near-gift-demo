@@ -4,7 +4,7 @@ import { nearAccount } from "@src/utils/near"
 
 export const minimumNearBalance = (storageUsed: number): number => {
   const storageCostPerByte = 0.00001 // See source here - https://github.com/near/nearcore/blob/master/core/parameters/res/runtime_configs/parameters.yaml#L28
-  const minReserveBalance = 0.35
+  const minReserveBalance = 1 // TODO Temp, this value should be removed and used only `calculateMinBalance` when we will estimate gas used per tx
   const calculateMinBalance = storageUsed * storageCostPerByte
   return storageUsed <= 770
     ? 0
