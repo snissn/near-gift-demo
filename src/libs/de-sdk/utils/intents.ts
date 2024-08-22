@@ -4,6 +4,7 @@ import * as borsh from "borsh"
 import {
   CONTRACTS_REGISTER,
   CREATE_INTENT_EXPIRATION_BLOCK_BOOST,
+  CREATE_INTENT_ROLLBACK_DELAY,
   INDEXER,
   MAX_GAS_TRANSACTION,
 } from "@src/constants/contracts"
@@ -119,7 +120,7 @@ export const prepareCreateIntent1CrossChain = (
       account: inputs.accountTo as string,
     },
     lockup_until: {
-      block_number: inputs.blockHeight + CREATE_INTENT_EXPIRATION_BLOCK_BOOST,
+      block_number: inputs.blockHeight + CREATE_INTENT_ROLLBACK_DELAY,
     },
     expiration: {
       block_number: inputs.blockHeight + CREATE_INTENT_EXPIRATION_BLOCK_BOOST,
@@ -195,7 +196,7 @@ export const prepareCreateIntent1SingleChain = (
         : (inputs.accountId as string),
     },
     lockup_until: {
-      block_number: inputs.blockHeight + CREATE_INTENT_EXPIRATION_BLOCK_BOOST,
+      block_number: inputs.blockHeight + CREATE_INTENT_ROLLBACK_DELAY,
     },
     expiration: {
       block_number: inputs.blockHeight + CREATE_INTENT_EXPIRATION_BLOCK_BOOST,
