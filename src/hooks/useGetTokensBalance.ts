@@ -142,7 +142,9 @@ export const useGetTokensBalance = (
   }
 
   useEffect(() => {
-    getTokensBalance()
+    if (tokensList || activePreview || isFetched || minNearBalance) {
+      getTokensBalance()
+    }
   }, [accountId, tokensList, activePreview, isFetched, minNearBalance])
 
   useEffect(() => {
