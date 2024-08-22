@@ -17,6 +17,7 @@ import { CoingeckoExchanges } from "@src/types/coingecko"
 import { useAccountBalance } from "@src/hooks/useAccountBalance"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 import { useMinimumNearBalance } from "@src/hooks/useMinimumNearBalance"
+import { W_NEAR_TOKEN_META } from "@src/constants/tokens"
 
 export const useGetTokensBalance = (
   tokensList: NetworkTokenWithSwapRoute[]
@@ -69,7 +70,7 @@ export const useGetTokensBalance = (
       exchangesList as CoingeckoExchanges
     )?.tickers?.findIndex((coin) => {
       return isTokenNative(address)
-        ? coin.base.toLowerCase() === "wrap.near"
+        ? coin.base.toLowerCase() === W_NEAR_TOKEN_META.address
         : coin.base.toLowerCase() === address.toLowerCase()
     })
 

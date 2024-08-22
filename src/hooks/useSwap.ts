@@ -309,10 +309,10 @@ export const useSwap = ({ accountId, selector }: Props) => {
                 accountId as string,
                 W_NEAR_TOKEN_META.address
               )
-              const amountToWithdraw = getBalanceWNear ?? ""
+              const amountToWithdraw = getBalanceWNear ?? "0"
               if (amountToWithdraw) {
                 transactionResult = await callRequestNearWithdraw(
-                  "wrap.near",
+                  W_NEAR_TOKEN_META.address,
                   amountToWithdraw
                 )
               }
@@ -399,7 +399,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
           accountId as string,
           W_NEAR_TOKEN_META.address
         )
-        amountToWithdraw = getBalanceWNear ?? ""
+        amountToWithdraw = getBalanceWNear ?? "0"
       }
 
       estimateQueue.queueTransactionsTrack.forEach((queueTransaction) => {

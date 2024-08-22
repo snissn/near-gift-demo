@@ -2,6 +2,7 @@ import { formatUnits } from "viem"
 
 import { swapEstimateRefFinanceProvider } from "@src/libs/de-sdk/providers/refFinanceProvider"
 import { NetworkToken } from "@src/types/interfaces"
+import { NEAR_TOKEN_META, W_NEAR_TOKEN_META } from "@src/constants/tokens"
 
 export enum EvaluateResultEnum {
   BEST,
@@ -10,7 +11,7 @@ export enum EvaluateResultEnum {
 
 const ESTIMATE_DIFFERENCE_PERCENTAGE = 2
 function prepareRefAddressData(address: string) {
-  if (address === "native") return "wrap.near"
+  if (address === NEAR_TOKEN_META.address) return W_NEAR_TOKEN_META.address
   return address
 }
 const getSwapEstimateFromRefFinance = async (

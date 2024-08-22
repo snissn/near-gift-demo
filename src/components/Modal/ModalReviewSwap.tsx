@@ -23,6 +23,7 @@ import { useCalculateTokenToUsd } from "@src/hooks/useCalculateTokenToUsd"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { getBalanceNearAllowedToSwap } from "@src/components/SwapForm/service/getBalanceNearAllowedToSwap"
+import { NEAR_TOKEN_META, W_NEAR_TOKEN_META } from "@src/constants/tokens"
 
 export type ModalReviewSwapPayload = {
   tokenIn: string
@@ -66,7 +67,11 @@ const ModalReviewSwap = () => {
         convertPayload.selectedTokenOut.address as string,
       ]
       // Not needed recalculation if ratio is 1:1
-      if (pair.includes("native") && pair.includes("wrap.near")) return
+      if (
+        pair.includes(NEAR_TOKEN_META.address) &&
+        pair.includes(W_NEAR_TOKEN_META.address)
+      )
+        return
 
       handleCheckNativeBalance()
 
