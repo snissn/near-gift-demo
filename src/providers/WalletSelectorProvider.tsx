@@ -84,38 +84,38 @@ export const WalletSelectorProvider: React.FC<{
       debug: true,
       modules: [
         setupMyNearWallet(),
-        setupLedger(),
         setupSender(),
-        setupBitgetWallet(),
-        setupMathWallet(),
-        setupNightly(),
         setupMeteorWallet(),
         setupNearSnap(),
-        setupNarwallets(),
-        setupWelldoneWallet(),
         setupHereWallet(),
-        setupCoin98Wallet(),
         setupNearFi(),
-        setupRamperWallet(),
-        setupNeth({
-          gas: "300000000000000",
-          bundle: false,
-        }),
-        setupXDEFI(),
-        setupWalletConnect({
-          projectId: WALLET_CONNECT_PROJECT_ID,
-          metadata: {
-            name: "Defuse Protocol",
-            description:
-              "Defuse: the premier platform for cross-chain liquidity and trading. Experience efficient, secure, and transparent swaps across multiple blockchains.",
-            url: "https://github.com/defuse-protocol",
-            icons: ["https://defuse.org/static/icons/Logo.svg"],
-          },
-        }),
-        setupNearMobileWallet(),
-        setupMintbaseWallet({
-          contractId: "",
-        }) as WalletModuleFactory<Wallet>,
+        // setupLedger(),
+        // setupBitgetWallet(),
+        // setupMathWallet(),
+        // setupNightly(),
+        // setupNarwallets(),
+        // setupWelldoneWallet(),
+        // setupCoin98Wallet(),
+        // setupRamperWallet(),
+        // setupNeth({
+        //   gas: "300000000000000",
+        //   bundle: false,
+        // }),
+        // setupXDEFI(),
+        // setupWalletConnect({
+        //   projectId: WALLET_CONNECT_PROJECT_ID,
+        //   metadata: {
+        //     name: "Defuse Protocol",
+        //     description:
+        //       "Defuse: the premier platform for cross-chain liquidity and trading. Experience efficient, secure, and transparent swaps across multiple blockchains.",
+        //     url: "https://github.com/defuse-protocol",
+        //     icons: ["https://defuse.org/static/icons/Logo.svg"],
+        //   },
+        // }),
+        // setupNearMobileWallet(),
+        // setupMintbaseWallet({
+        //   contractId: "",
+        // }) as WalletModuleFactory<Wallet>,
       ],
     })
     const _modal = setupModal(_selector, {
