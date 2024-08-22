@@ -199,17 +199,7 @@ export default function Swap() {
         setErrorMsg(ErrorEnum.INSUFFICIENT_BALANCE)
       }
 
-      if (
-        !(selectTokenIn as NetworkTokenWithSwapRoute).routes?.includes(
-          selectTokenOut.defuse_asset_id
-        )
-      ) {
-        setErrorMsg(ErrorEnum.NOT_AVAILABLE_SWAP)
-        isProgrammaticUpdate.current = true
-        setIsFetchingData(false)
-        setValue("tokenOut", "")
-        return
-      }
+      // TODO See comment below at [place-1]
 
       // Do not use any estimation of swap between Native and Token if ratio is 1:1
       const pair = [selectTokenIn.address, selectTokenOut.address]
@@ -262,6 +252,23 @@ export default function Swap() {
             : "0"
         setValue("tokenOut", formattedOut)
         trigger("tokenOut")
+
+        // TODO [place-1] Temporarily showing quote for tokens whose don't have routes,
+        //      allowing solvers to integrate new protocols, and after `if` scope
+        //      has to be returned to.
+        if (
+          !(selectTokenIn as NetworkTokenWithSwapRoute).routes?.includes(
+            selectTokenOut.defuse_asset_id
+          )
+        ) {
+          setErrorMsg(ErrorEnum.NOT_AVAILABLE_SWAP)
+          isProgrammaticUpdate.current = true
+          setIsFetchingData(false)
+          // setValue("tokenOut", "")
+          setValue("tokenOut", parseFloat(formattedOut) ? formattedOut : "")
+          return
+        }
+
         setIsFetchingData(false)
       }
     } catch (e) {
