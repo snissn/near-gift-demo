@@ -19,6 +19,7 @@ import { useNetworkTokens } from "@src/hooks/useNetworkTokens"
 import { useSwap } from "@src/hooks/useSwap"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
+import { TransactionMethod } from "@src/types/solver0"
 
 const NEAR_EXPLORER = process?.env?.nearExplorer ?? ""
 const PLACEHOLDER = "XX"
@@ -30,7 +31,7 @@ type Props = {
 }
 
 const WidgetCard = ({
-  clientId,
+  intentId,
   hash,
   details,
   timestamp,
@@ -59,8 +60,9 @@ const WidgetCard = ({
             }
 
           case HistoryStatus.ROLLED_BACK:
+          case HistoryStatus.INTENT_1_ROLLED_BACK:
             const tokensData = getTokensDataByIds([
-              details?.recoverDetails?.send.token_id ?? "",
+              details?.recoverDetails?.send?.token_id ?? "",
             ])
             if (!tokensData.length && !details?.tokenIn) {
               return {
@@ -79,7 +81,10 @@ const WidgetCard = ({
               subTitle: `You received back ${smallBalanceToFormat((details?.tokenIn || tokenIn) ?? "0") ?? PLACEHOLDER} ${(details?.selectedTokenIn?.symbol || tokensData[0]?.symbol) ?? PLACEHOLDER}.`,
             }
 
+          // to support new intent
+          // TODO : remove all stuff related to old Intents
           case HistoryStatus.COMPLETED:
+          case HistoryStatus.INTENT_1_EXECUTED:
             return {
               title: `Transaction complete!`,
               subTitle: `You received ${smallBalanceToFormat(details?.tokenOut ?? "0") ?? PLACEHOLDER} ${details?.selectedTokenOut?.symbol ?? PLACEHOLDER}.`,
@@ -88,8 +93,8 @@ const WidgetCard = ({
           default:
             if (!details?.tokenIn || !details?.tokenOut) {
               const tokensData = getTokensDataByIds([
-                details?.recoverDetails?.send.token_id ?? "",
-                details?.recoverDetails?.receive.token_id ?? "",
+                details?.recoverDetails?.send?.token_id ?? "",
+                details?.recoverDetails?.receive?.token_id ?? "",
               ])
               if (tokensData.length !== 2) {
                 return {
@@ -168,20 +173,23 @@ const WidgetCard = ({
   const handleGetTypeOfQueueTransactions = (
     transaction: NearTX["transaction"]
   ): QueueTransactions | undefined => {
+    const transactionMethodName =
+      transaction.actions[0].FunctionCall.method_name
     if (
-      transaction.actions[0].FunctionCall.method_name === "ft_transfer_call" ||
-      transaction.actions[0].FunctionCall.method_name === "rollback_intent"
+      transactionMethodName === TransactionMethod.FT_TRANSFER_CALL ||
+      transactionMethodName === TransactionMethod.ROLLBACK_INTENT ||
+      transactionMethodName === TransactionMethod.NATIVE_ON_TRANSFER
     ) {
       return QueueTransactions.CREATE_INTENT
     }
-    if (transaction.actions[0].FunctionCall.method_name === "storage_deposit") {
+    if (transactionMethodName === TransactionMethod.STORAGE_DEPOSIT) {
       // No matter is IN or OUT as QueueTransactions.STORAGE_DEPOSIT_TOKEN_OUT
       return QueueTransactions.STORAGE_DEPOSIT_TOKEN_IN
     }
-    if (transaction.actions[0].FunctionCall.method_name === "near_deposit") {
+    if (transactionMethodName === TransactionMethod.NEAR_DEPOSIT) {
       return QueueTransactions.DEPOSIT
     }
-    if (transaction.actions[0].FunctionCall.method_name === "near_withdraw") {
+    if (transactionMethodName === TransactionMethod.NEAR_WITHDRAW) {
       return QueueTransactions.WITHDRAW
     }
   }
@@ -194,7 +202,7 @@ const WidgetCard = ({
   }
 
   const handleRollbackIntent = async () => {
-    await callRequestRollbackIntent({ id: clientId })
+    await callRequestRollbackIntent({ id: intentId })
   }
 
   useEffect(() => {
@@ -218,6 +226,7 @@ const WidgetCard = ({
     <div className="max-w-full md:max-w-[260px] min-h-[152px] flex flex-col justify-between mx-5 my-2 p-3 card-history bg-white rounded-[8px] border overflow-hidden">
       <div className="flex justify-between items-center mb-3">
         {(status === HistoryStatus.COMPLETED ||
+          status === HistoryStatus.INTENT_1_EXECUTED ||
           status === HistoryStatus.ROLLED_BACK ||
           details?.transaction?.actions[0].FunctionCall.method_name ===
             "storage_deposit") && (
@@ -237,6 +246,7 @@ const WidgetCard = ({
           />
         )}
         {status !== HistoryStatus.COMPLETED &&
+          status !== HistoryStatus.INTENT_1_EXECUTED &&
           status !== HistoryStatus.FAILED &&
           status !== HistoryStatus.ROLLED_BACK &&
           details?.transaction?.actions[0].FunctionCall.method_name !==
@@ -266,10 +276,11 @@ const WidgetCard = ({
       </Text>
       <div className="flex justify-start items-center gap-3 cursor-pointer">
         {status !== HistoryStatus.COMPLETED &&
+        status !== HistoryStatus.INTENT_1_EXECUTED &&
         status !== HistoryStatus.FAILED &&
         status !== HistoryStatus.ROLLED_BACK &&
         details?.transaction?.actions[0].FunctionCall.method_name ===
-          "ft_transfer_call" ? (
+          TransactionMethod.FT_TRANSFER_CALL ? (
           <Button
             size="sm"
             variant="soft"

@@ -25,9 +25,11 @@ interface Props<T extends FieldValues> {
   balance?: string | BigNumber
   selected?: NetworkToken
   handleSelect?: () => void
+  handleSetMaxValue?: () => void
   className?: string
   errors?: FieldErrors
   errorSelect?: string
+  disabled?: boolean
 }
 
 export const FieldComboInputRegistryName = "FieldComboInput"
@@ -42,12 +44,14 @@ const FieldComboInput = <T extends FieldValues>({
   balance,
   selected,
   handleSelect,
+  handleSetMaxValue,
   className,
   errors,
   withNativeSupport,
   handleIncludeNativeToSwap,
   nativeSupportChecked,
   errorSelect,
+  disabled,
 }: Props<T> & BlockMultiBalancesProps) => {
   if (!register) {
     return null
@@ -116,8 +120,10 @@ const FieldComboInput = <T extends FieldValues>({
         onKeyDown={handleKeyDown}
         onPaste={handlePaste}
         placeholder={placeholder}
+        disabled={disabled}
         className={clsx(
-          "grow flex-1 bg-gray-50 max-w-[140px] md:max-w-[none] md:min-w-[calc(100%-210px)] text-3xl font-medium placeholder-black border-transparent focus:border-transparent focus:ring-0 dark:bg-black-900 dark:placeholder-white"
+          "grow flex-1 bg-gray-50 max-w-[140px] md:max-w-[none] md:min-w-[calc(100%-210px)] text-3xl font-medium placeholder-black border-transparent focus:border-transparent focus:ring-0 dark:bg-black-900 dark:placeholder-white",
+          disabled && "text-black-200 pointer-events-none placeholder-black-200"
         )}
       />
       {errors && errors[fieldName] ? (
@@ -125,7 +131,7 @@ const FieldComboInput = <T extends FieldValues>({
           {(errors[fieldName] as FieldError).message}
         </span>
       ) : null}
-      {price && errors && !errors[fieldName] ? (
+      {price && price !== "0" && errors && !errors[fieldName] ? (
         <span className="absolute flex flex-nowrap items-center gap-2 bottom-4 left-5 text-sm font-medium text-secondary">
           ~${parseFloat(price).toFixed(2)}
           {label && label}
@@ -142,6 +148,7 @@ const FieldComboInput = <T extends FieldValues>({
             handleIncludeNativeToSwap ? handleIncludeNativeToSwap : () => {}
           }
           nativeSupportChecked={nativeSupportChecked ?? false}
+          handleClick={handleSetMaxValue || (() => {})}
         />
       )}
       {errorSelect && (

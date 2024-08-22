@@ -2,6 +2,33 @@ import { NetworkToken, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 
 const environment = process.env.environment || "production"
 
+export const NEAR_TOKEN_META = {
+  defuse_asset_id: "near:mainnet:native",
+  blockchain: "near",
+  chainName: "NEAR",
+  chainId: "1313161554",
+  address: "native",
+  name: "NEAR",
+  symbol: "NEAR",
+  chainIcon: "/static/icons/network/near.svg",
+  icon: "https://assets.coingecko.com/coins/images/10365/standard/near.jpg?1696510367",
+  decimals: 24,
+  routes: ["wrap.near", "near:mainnet:wrap.near"],
+}
+
+export const W_NEAR_TOKEN_META = {
+  defuse_asset_id: "near:mainnet:wrap.near",
+  blockchain: "near",
+  chainId: "mainnet",
+  address: "wrap.near",
+  chainName: "NEAR",
+  name: "Wrapped NEAR fungible token",
+  symbol: "wNEAR",
+  chainIcon: "/static/icons/network/near.svg",
+  icon: "https://assets.coingecko.com/coins/images/10365/standard/near.jpg",
+  decimals: 24,
+}
+
 const listNetworksTokensTestnet = [
   {
     defuse_asset_id: "near:testnet:wrap.testnet",
@@ -115,18 +142,7 @@ const listNetworksTokensTestnet = [
 ]
 
 const listNetworksTokensMainnet = [
-  {
-    defuse_asset_id: "near:mainnet:wrap.near",
-    blockchain: "near",
-    chainId: "mainnet",
-    address: "wrap.near",
-    chainName: "NEAR",
-    name: "Wrapped NEAR fungible token",
-    symbol: "wNEAR",
-    chainIcon: "/static/icons/network/near.svg",
-    icon: "https://assets.coingecko.com/coins/images/10365/standard/near.jpg",
-    decimals: 24,
-  },
+  W_NEAR_TOKEN_META,
   {
     defuse_asset_id:
       "near:mainnet:aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near",
@@ -211,21 +227,7 @@ const listNativeTokensTestnet = [
     routes: ["wrap.testnet"],
   },
 ]
-const listNativeTokensMainnet = [
-  {
-    defuse_asset_id: "near:mainnet:native",
-    blockchain: "near",
-    chainName: "NEAR",
-    chainId: "1313161554",
-    address: "native",
-    name: "NEAR",
-    symbol: "NEAR",
-    chainIcon: "/static/icons/network/near.svg",
-    icon: "https://assets.coingecko.com/coins/images/10365/standard/near.jpg?1696510367",
-    decimals: 24,
-    routes: ["wrap.near", "near:mainnet:wrap.near"],
-  },
-]
+const listNativeTokensMainnet = [NEAR_TOKEN_META]
 
 export const LIST_NATIVE_TOKENS: NetworkTokenWithSwapRoute[] =
   environment === "development"

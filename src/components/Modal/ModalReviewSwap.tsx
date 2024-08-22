@@ -1,12 +1,16 @@
 "use client"
 
-import { Text } from "@radix-ui/themes"
+import { Blockquote, Text } from "@radix-ui/themes"
 import Image from "next/image"
-import React, { useState } from "react"
-import { parseUnits } from "viem"
+import React, { useEffect, useState } from "react"
+import { formatUnits, parseUnits } from "viem"
 
 import ModalDialog from "@src/components/Modal/ModalDialog"
-import { NetworkToken } from "@src/types/interfaces"
+import {
+  NetworkToken,
+  ContractIdEnum,
+  BlockchainEnum,
+} from "@src/types/interfaces"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import Button from "@src/components/Button/Button"
 import CardSwap from "@src/components/Card/CardSwap"
@@ -15,6 +19,11 @@ import { useTimer } from "@src/hooks/useTimer"
 import { useTimeFormatMinutes } from "@src/hooks/useTimeFormat"
 import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
 import { smallBalanceToFormat } from "@src/utils/token"
+import { useCalculateTokenToUsd } from "@src/hooks/useCalculateTokenToUsd"
+import parseDefuseAsset from "@src/utils/parseDefuseAsset"
+import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import { getBalanceNearAllowedToSwap } from "@src/components/SwapForm/service/getBalanceNearAllowedToSwap"
+import { NEAR_TOKEN_META, W_NEAR_TOKEN_META } from "@src/constants/tokens"
 
 export type ModalReviewSwapPayload = {
   tokenIn: string
@@ -22,6 +31,9 @@ export type ModalReviewSwapPayload = {
   selectedTokenIn: NetworkToken
   selectedTokenOut: NetworkToken
   isNativeInSwap: boolean
+  accountFrom?: string
+  accountTo?: string
+  solverId?: string
 }
 
 const RECALCULATE_ESTIMATION_TIME_SECS = 15
@@ -30,31 +42,78 @@ const ModalReviewSwap = () => {
   const { onCloseModal, setModalType, payload } = useModalStore(
     (state) => state
   )
-  const { getSwapEstimateBot, isFetching } = useSwapEstimateBot()
+  const [isFetching, setIsFetching] = useState(false)
+  const { getSwapEstimateBot } = useSwapEstimateBot()
   const [convertPayload, setConvertPayload] = useState<ModalReviewSwapPayload>(
     payload as ModalReviewSwapPayload
   )
+  const {
+    priceToUsd: priceToUsdTokenIn,
+    calculateTokenToUsd: calculateTokenToUsdTokenIn,
+  } = useCalculateTokenToUsd()
+  const {
+    priceToUsd: priceToUsdTokenOut,
+    calculateTokenToUsd: calculateTokenToUsdTokenOut,
+  } = useCalculateTokenToUsd()
+  const [isWNearConjunctionRequired, setIsWNearConjunctionRequired] =
+    useState(false)
+  const { accountId } = useWalletSelector()
 
   const recalculateEstimation = async () => {
-    const pair = [
-      convertPayload.selectedTokenIn.address as string,
-      convertPayload.selectedTokenOut.address as string,
-    ]
-    // Not needed recalculation if ratio is 1:1
-    if (pair.includes("native") && pair.includes("wrap.near")) return
+    try {
+      setIsFetching(true)
+      const pair = [
+        convertPayload.selectedTokenIn.address as string,
+        convertPayload.selectedTokenOut.address as string,
+      ]
+      // Not needed recalculation if ratio is 1:1
+      if (
+        pair.includes(NEAR_TOKEN_META.address) &&
+        pair.includes(W_NEAR_TOKEN_META.address)
+      )
+        return
 
-    const unitsTokenIn = parseUnits(
-      convertPayload.tokenIn,
-      convertPayload.selectedTokenIn.decimals as number
-    ).toString()
+      handleCheckNativeBalance()
 
-    const { bestOut } = await getSwapEstimateBot({
-      tokenIn: convertPayload.selectedTokenIn.address as string,
-      tokenOut: convertPayload.selectedTokenOut.address as string,
-      amountIn: unitsTokenIn,
-    })
-    setConvertPayload({ ...convertPayload, tokenOut: bestOut ?? "0" })
+      const unitsTokenIn = parseUnits(
+        convertPayload.tokenIn,
+        convertPayload.selectedTokenIn.decimals as number
+      ).toString()
+
+      const { bestEstimate } = await getSwapEstimateBot({
+        tokenIn: convertPayload.selectedTokenIn.defuse_asset_id,
+        tokenOut: convertPayload.selectedTokenOut.defuse_asset_id,
+        amountIn: unitsTokenIn,
+      })
+      // ToDo: Here we need to handle the issue when all of a sudden there is no quotes
+      if (bestEstimate === null) return
+      const formattedOut = bestEstimate
+        ? formatUnits(
+            BigInt(bestEstimate.amount_out),
+            convertPayload.selectedTokenOut.decimals!
+          )
+        : "0"
+      setConvertPayload({ ...convertPayload, tokenOut: formattedOut })
+    } catch (e) {
+      console.error(
+        "Failed to recalculate swap estimation in Modal Review Swap",
+        e
+      )
+    } finally {
+      setIsFetching(false)
+    }
   }
+
+  useEffect(() => {
+    calculateTokenToUsdTokenIn(
+      convertPayload.tokenIn,
+      convertPayload.selectedTokenIn
+    )
+    calculateTokenToUsdTokenOut(
+      convertPayload.tokenOut,
+      convertPayload.selectedTokenOut
+    )
+  }, [convertPayload])
 
   const { timeLeft } = useTimer(
     RECALCULATE_ESTIMATION_TIME_SECS,
@@ -62,16 +121,36 @@ const ModalReviewSwap = () => {
   )
   const { formatTwoNumbers } = useTimeFormatMinutes()
 
+  const handleCheckNativeBalance = async (): Promise<void> => {
+    const result = parseDefuseAsset(
+      convertPayload.selectedTokenIn.defuse_asset_id
+    )
+    if (
+      result?.blockchain !== BlockchainEnum.Near ||
+      result?.contractId !== ContractIdEnum.Native ||
+      !accountId
+    ) {
+      return
+    }
+    const balanceNear = await getBalanceNearAllowedToSwap(accountId)
+    const isLackOfBalance = Number(convertPayload.tokenIn) > balanceNear
+    setIsWNearConjunctionRequired(isLackOfBalance)
+  }
+
   const handleConfirmSwap = async () => {
     setModalType(ModalType.MODAL_CONFIRM_SWAP, payload)
   }
+
+  useEffect(() => {
+    void handleCheckNativeBalance()
+  }, [])
 
   return (
     <ModalDialog>
       <div className="flex flex-col min-h-[256px] max-h-[680px] h-full p-5">
         <div className="flex justify-between items-center mb-[44px]">
           <div className="relative w-full shrink text-center text-black-400">
-            <Text size="4" weight="bold">
+            <Text size="4" weight="bold" className="dark:text-gray-500">
               Review swap
             </Text>
             <div className="absolute top-[30px] left-[50%] -translate-x-2/4 text-gray-600">
@@ -92,8 +171,16 @@ const ModalReviewSwap = () => {
         <CardSwap
           amountIn={smallBalanceToFormat(convertPayload.tokenIn, 7)}
           amountOut={smallBalanceToFormat(convertPayload.tokenOut, 7)}
-          amountOutToUsd="~"
-          amountInToUsd="~"
+          amountInToUsd={
+            priceToUsdTokenIn !== "0"
+              ? `~$${smallBalanceToFormat(priceToUsdTokenIn, 7)}`
+              : ""
+          }
+          amountOutToUsd={
+            priceToUsdTokenOut !== "0"
+              ? `~$${smallBalanceToFormat(priceToUsdTokenOut, 7)}`
+              : ""
+          }
           selectTokenIn={convertPayload.selectedTokenIn}
           selectTokenOut={convertPayload.selectedTokenOut}
         />
@@ -140,6 +227,19 @@ const ModalReviewSwap = () => {
             </div>
           </div>
         </div>
+        {isWNearConjunctionRequired && (
+          <div className="flex flex-col w-full mb-6 gap-3">
+            <Blockquote color="cyan">
+              Wrapped Near will be used in conjunction with Near to boost your
+              current swap experience. All your wNear will be unwrapped and next
+              swap will be used only Near.
+            </Blockquote>
+            <Blockquote color="gray">
+              If you want to keep your wNear then please specify the swap amount
+              below.
+            </Blockquote>
+          </div>
+        )}
         <Button
           size="lg"
           fullWidth

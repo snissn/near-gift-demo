@@ -1,15 +1,9 @@
 "use client"
 
-import React, { useState } from "react"
+import React from "react"
 
 import { HistoryData, HistoryStatus } from "@src/stores/historyStore"
-import {
-  NearTX,
-  NetworkTokenWithSwapRoute,
-  QueueTransactions,
-} from "@src/types/interfaces"
-import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
-import { useNetworkTokens } from "@src/hooks/useNetworkTokens"
+import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import { useSwap } from "@src/hooks/useSwap"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import WidgetCardSwap from "@src/components/History/Widget/WidgetCardSwap"
@@ -26,7 +20,7 @@ type Props = {
 }
 
 const WidgetCardTransaction = ({
-  clientId,
+  intentId,
   hash,
   details,
   timestamp,
@@ -63,6 +57,8 @@ const WidgetCardTransaction = ({
 
     case HistoryStatus.AVAILABLE:
     case HistoryStatus.COMPLETED:
+    case HistoryStatus.INTENT_1_AVAILABLE:
+    case HistoryStatus.INTENT_1_EXECUTED:
       if (iTokenDetailMissing || !hash) {
         return <WidgetCardLoading />
       }
@@ -70,7 +66,7 @@ const WidgetCardTransaction = ({
         <WidgetCardSwap
           hash={hash}
           status={status}
-          clientId={clientId}
+          intentId={intentId}
           tokenIn={details!.tokenIn as string}
           tokenOut={details!.tokenOut as string}
           selectedTokenIn={
@@ -81,10 +77,12 @@ const WidgetCardTransaction = ({
           }
           timestamp={timestamp}
           handleCloseIntent={callRequestRollbackIntent}
+          receiverId={details!.recoverDetails?.receiverId ?? ""}
         />
       )
 
     case HistoryStatus.ROLLED_BACK:
+    case HistoryStatus.INTENT_1_ROLLED_BACK:
       if (!details?.transaction?.actions || !hash || iTokenDetailMissing) {
         return <WidgetCardLoading />
       }
@@ -107,10 +105,14 @@ const WidgetCardTransaction = ({
       if (!details?.transaction || !hash || iTokenDetailMissing) {
         return <WidgetCardLoading />
       }
+      const recoverAmount = (
+        Number(details!.recoverDetails?.amount ?? "0") /
+        10 ** 24
+      ).toString()
       return (
         <WidgetCardWithdraw
           accountId={details?.transaction.signer_id as string}
-          tokenOut={details!.tokenOut as string}
+          tokenOut={recoverAmount ?? (details!.tokenOut as string)}
           selectedTokenOut={
             details!.selectedTokenOut as NetworkTokenWithSwapRoute
           }

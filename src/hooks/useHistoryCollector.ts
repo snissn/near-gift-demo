@@ -4,9 +4,10 @@ import { useEffect, useState } from "react"
 
 import { useQueryCollector } from "@src/hooks/useQuery"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
-import { HistoryData, HistoryStatus } from "@src/stores/historyStore"
+import { HistoryData } from "@src/stores/historyStore"
 import { NEAR_COLLECTOR_KEY } from "@src/constants/contracts"
 import { useHistoryLatest } from "@src/hooks/useHistoryLatest"
+import { adapterIntent0, adapterIntent1 } from "@src/libs/de-sdk/utils/adapters"
 
 export interface CollectorHook {
   getTransactions: () => Promise<HistoryData[]>
@@ -35,6 +36,22 @@ export const useHistoryCollector = (collectorHooks: CollectorHook[]) => {
       if (!getHistoryFromStore.length && getHistoryFromLocal) {
         const parsedData: { data: HistoryData[] } =
           JSON.parse(getHistoryFromLocal)
+
+        // TODO Could be removed in some period of time
+        // Due to resolve backward compatible issue, temporary we have to check outdated history key `clientId`
+        parsedData.data.forEach((el) => {
+          const _clientId = (el as unknown as { clientId: string })?.clientId
+          if (_clientId) {
+            return {
+              ...el,
+              intentId: _clientId,
+            }
+          }
+          return {
+            ...el,
+          }
+        })
+
         if (Array.isArray(parsedData.data)) {
           getHistoryFromStore = [
             ...getHistoryFromStore,
@@ -46,12 +63,15 @@ export const useHistoryCollector = (collectorHooks: CollectorHook[]) => {
       // console.log("Data before store to the history: ", history)
       updateHistory(history)
 
+      const validHistoryStatuses: string[] = [
+        ...adapterIntent0.completedStatuses,
+        ...adapterIntent1.completedStatuses,
+      ]
+
       const isHistoryNotComplete = history.some(
         (history) =>
           !history?.errorMessage?.length &&
-          history.status !== HistoryStatus.COMPLETED &&
-          history.status !== HistoryStatus.ROLLED_BACK &&
-          history.status !== HistoryStatus.EXPIRED
+          !validHistoryStatuses.includes(history?.status ?? "")
       )
       if (isHistoryNotComplete) runHistoryUpdate(history)
 

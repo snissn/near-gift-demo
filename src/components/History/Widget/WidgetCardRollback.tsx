@@ -7,6 +7,7 @@ import AssetComboIcon from "@src/components/Network/AssetComboIcon"
 import { NearTX, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import { smallBalanceToFormat } from "@src/utils/token"
 import WidgetCardLink from "@src/components/History/Widget/WidgetCardLink"
+import { TransactionMethod } from "@src/types/solver0"
 
 enum CardRollbackStatusEnum {
   SWAP = "Swap",
@@ -14,8 +15,9 @@ enum CardRollbackStatusEnum {
 }
 
 enum CardRollbackActionEnum {
-  FT_TRANSFER_CALL = "ft_transfer_call",
-  ROLLBACK_INTENT = "rollback_intent",
+  FT_TRANSFER_CALL = TransactionMethod.FT_TRANSFER_CALL,
+  ROLLBACK_INTENT = TransactionMethod.ROLLBACK_INTENT,
+  NATIVE_ON_TRANSFER = TransactionMethod.NATIVE_ON_TRANSFER,
 }
 
 type Props = {
@@ -48,6 +50,7 @@ const WidgetCardRollback = ({
   let cardStatus: CardRollbackStatusEnum
   switch (handleGetActionMethodName(actions)) {
     case CardRollbackActionEnum.FT_TRANSFER_CALL:
+    case CardRollbackActionEnum.NATIVE_ON_TRANSFER:
       cardStatus = CardRollbackStatusEnum.SWAP
       break
     case CardRollbackActionEnum.ROLLBACK_INTENT:

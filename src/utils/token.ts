@@ -5,11 +5,18 @@ export const smallBalanceToFormat = (balance: string, toFixed = 14): string => {
   if (!parseFloat(balance)) {
     return balance
   }
-  const isSmallBalance = !parseFloat(balance.substring(0, 7))
+  const isSmallBalance = parseFloat(balance) < 0.00001
   if (isSmallBalance) {
     return "~0.00001"
   }
   return parseFloat(balance.substring(0, toFixed)).toString()
+}
+
+export const smallNumberToString = (balance: number): string => {
+  if (parseFloat(balance.toString()) < 0.00001) {
+    return parseFloat(balance.toString()).toFixed(8).toString()
+  }
+  return balance.toString()
 }
 
 export const tokenBalanceToFormatUnits = ({
@@ -29,5 +36,5 @@ export const tokenBalanceToFormatUnits = ({
     decimals
   ).toString()
 
-  return smallBalanceToFormat(balanceToUnits)
+  return smallBalanceToFormat(balanceToUnits, 7)
 }

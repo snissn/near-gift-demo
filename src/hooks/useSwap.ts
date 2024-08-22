@@ -1,16 +1,16 @@
 "use client"
 
 import { WalletSelector } from "@near-wallet-selector/core"
-import * as borsh from "borsh"
 import { parseUnits } from "viem"
 import { BigNumber } from "ethers"
 import { useState } from "react"
 
 import {
   CONTRACTS_REGISTER,
-  CREATE_INTENT_EXPIRATION_BLOCK_BOOST,
   FT_MINIMUM_STORAGE_BALANCE_LARGE,
   FT_STORAGE_DEPOSIT_GAS,
+  FT_WITHDRAW_GAS,
+  INDEXER,
   MAX_GAS_TRANSACTION,
 } from "@src/constants/contracts"
 import {
@@ -18,14 +18,20 @@ import {
   NetworkToken,
   QueueTransactions,
   Result,
+  ContractIdEnum,
+  BlockchainEnum,
 } from "@src/types/interfaces"
-import { swapSchema } from "@src/utils/schema"
 import useStorageDeposit from "@src/hooks/useStorageDeposit"
 import useNearSwapNearToWNear from "@src/hooks/useSwapNearToWNear"
 import { useNearBlock } from "@src/hooks/useNearBlock"
 import { getNearTransactionDetails } from "@src/api/transaction"
 import { useTransactionScan } from "@src/hooks/useTransactionScan"
-import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
+import { LIST_NATIVE_TOKENS, W_NEAR_TOKEN_META } from "@src/constants/tokens"
+import { mapCreateIntentTransactionCall } from "@src/libs/de-sdk/utils/maps"
+import { isForeignNetworkToken } from "@src/utils/network"
+import { TransactionMethod } from "@src/types/solver0"
+import { getBalanceNearAllowedToSwap } from "@src/components/SwapForm/service/getBalanceNearAllowedToSwap"
+import { nep141Balance } from "@src/utils/near"
 
 type Props = {
   accountId: string | null
@@ -47,20 +53,20 @@ export type NextEstimateQueueTransactionsResult = {
   done: boolean
 }
 
-export type CallRequestIntentProps = {
+type WithAccounts = {
+  accountFrom?: string
+  accountTo?: string
+}
+
+export interface CallRequestIntentProps extends WithAccounts {
   tokenIn: string
   tokenOut: string
   selectedTokenIn: NetworkToken
   selectedTokenOut: NetworkToken
   estimateQueue: EstimateQueueTransactions
-  clientId?: string
+  intentId?: string
+  solverId?: string
 }
-
-type WithSwapDepositRequest = {
-  useNative?: boolean
-}
-
-const REFERRAL_ACCOUNT = process.env.REFERRAL_ACCOUNT ?? ""
 
 export const useSwap = ({ accountId, selector }: Props) => {
   const [isProcessing, setIsProcessing] = useState(false)
@@ -69,11 +75,10 @@ export const useSwap = ({ accountId, selector }: Props) => {
     accountId,
     selector,
   })
-  const { callRequestNearDeposit, callRequestNearWithdraw } =
-    useNearSwapNearToWNear({
-      accountId,
-      selector,
-    })
+  const { callRequestNearWithdraw } = useNearSwapNearToWNear({
+    accountId,
+    selector,
+  })
   const { getNearBlock } = useNearBlock()
   const { getTransactionScan } = useTransactionScan()
 
@@ -95,8 +100,8 @@ export const useSwap = ({ accountId, selector }: Props) => {
       console.log("Non valid contract address")
       return false
     }
-    if (!inputs?.clientId) {
-      console.log("Non valid clientId")
+    if (!inputs?.intentId) {
+      console.log("Non valid intentId")
       return false
     }
     return true
@@ -119,11 +124,10 @@ export const useSwap = ({ accountId, selector }: Props) => {
         | "tokenOut"
         | "selectedTokenIn"
         | "selectedTokenOut"
-        | "clientId"
+        | "intentId"
       >,
       "estimateQueue"
-    > &
-      WithSwapDepositRequest
+    >
   ): Promise<EstimateQueueTransactions> => {
     try {
       let queue = 1
@@ -136,29 +140,20 @@ export const useSwap = ({ accountId, selector }: Props) => {
         }
       }
 
-      const {
-        tokenIn,
-        tokenOut,
-        selectedTokenIn,
-        selectedTokenOut,
-        useNative,
-      } = inputs
+      const { selectedTokenIn, selectedTokenOut, tokenIn } = inputs
 
-      if (useNative) {
-        const pair = [selectedTokenIn!.address, selectedTokenOut!.address]
-        if (pair.includes("native") && pair.includes("wrap.near")) {
-          const queueTransaction =
-            selectedTokenIn!.address === "native"
-              ? QueueTransactions.DEPOSIT
-              : QueueTransactions.WITHDRAW
-          return {
-            queueInTrack: 1,
-            queueTransactionsTrack: [queueTransaction],
-          }
+      const [network, chain, address] =
+        selectedTokenIn.defuse_asset_id.split(":")
+      if (
+        network === BlockchainEnum.Near &&
+        address === ContractIdEnum.Native &&
+        accountId
+      ) {
+        const balanceNear = await getBalanceNearAllowedToSwap(accountId)
+        if (Number(tokenIn) > balanceNear) {
+          queueTransaction.unshift(QueueTransactions.WITHDRAW)
+          queue++
         }
-        // TODO If Token to Native then use QueueTransactions.WITHDRAW
-        queueTransaction.unshift(QueueTransactions.DEPOSIT)
-        queue++
       }
 
       const isNativeTokenIn = selectedTokenIn!.address === "native"
@@ -175,33 +170,41 @@ export const useSwap = ({ accountId, selector }: Props) => {
         storageBalanceTokenInAddress as string,
         accountId as string
       )
-      const storageBalanceTokenInToString = BigNumber.from(
-        storageBalanceTokenIn
-      ).toString()
-      console.log(
-        "useSwap storageBalanceTokenIn: ",
-        storageBalanceTokenInToString
-      )
-      if (!parseFloat(storageBalanceTokenInToString)) {
-        queueTransaction.unshift(QueueTransactions.STORAGE_DEPOSIT_TOKEN_IN)
-        queue++
+      if (!isForeignNetworkToken(selectedTokenIn.defuse_asset_id)) {
+        const storageBalanceTokenInToString = BigNumber.from(
+          storageBalanceTokenIn
+        ).toString()
+        console.log(
+          "useSwap storageBalanceTokenIn: ",
+          storageBalanceTokenInToString
+        )
+        if (!parseFloat(storageBalanceTokenInToString)) {
+          queueTransaction.unshift(QueueTransactions.STORAGE_DEPOSIT_TOKEN_IN)
+          queue++
+        }
       }
 
+      const isNativeTokenOut = selectedTokenOut!.address === "native"
       // Estimate if user did storage before in order to transfer tokens for swap
       const storageBalanceTokenOut = await getStorageBalance(
         selectedTokenOut!.address as string,
         accountId as string
       )
-      const storageBalanceTokenOutToString = BigNumber.from(
-        storageBalanceTokenOut
-      ).toString()
-      console.log(
-        "useSwap storageBalanceTokenOut: ",
-        storageBalanceTokenOutToString
-      )
-      if (!parseFloat(storageBalanceTokenOutToString)) {
-        queueTransaction.unshift(QueueTransactions.STORAGE_DEPOSIT_TOKEN_OUT)
-        queue++
+      if (
+        !isForeignNetworkToken(selectedTokenOut.defuse_asset_id) &&
+        !isNativeTokenOut
+      ) {
+        const storageBalanceTokenOutToString = BigNumber.from(
+          storageBalanceTokenOut
+        ).toString()
+        console.log(
+          "useSwap storageBalanceTokenOut: ",
+          storageBalanceTokenOutToString
+        )
+        if (!parseFloat(storageBalanceTokenOutToString)) {
+          queueTransaction.unshift(QueueTransactions.STORAGE_DEPOSIT_TOKEN_OUT)
+          queue++
+        }
       }
 
       return {
@@ -268,84 +271,51 @@ export const useSwap = ({ accountId, selector }: Props) => {
         tokenOut,
         selectedTokenIn,
         selectedTokenOut,
-        clientId,
+        intentId,
         estimateQueue,
+        accountFrom,
+        accountTo,
+        solverId,
       } = inputs
 
       setIsProcessing(true)
 
-      const unitsSendAmount = parseUnits(
-        tokenIn,
-        selectedTokenIn?.decimals as number
-      ).toString()
-      const estimateUnitsBackAmount = parseUnits(
-        tokenOut,
-        selectedTokenOut?.decimals as number
-      ).toString()
       const getBlock = await getNearBlock()
-      const msg = {
-        CreateIntent: {
-          id: clientId,
-          IntentStruct: {
-            initiator: accountId,
-            send: {
-              token_id:
-                selectedTokenIn!.address === "native"
-                  ? "wrap.near"
-                  : selectedTokenIn!.address,
-              amount: unitsSendAmount,
-            },
-            receive: {
-              token_id:
-                selectedTokenOut!.address === "native"
-                  ? "wrap.near"
-                  : selectedTokenOut!.address,
-              amount: estimateUnitsBackAmount,
-            },
-            expiration: {
-              Block: getBlock.height + CREATE_INTENT_EXPIRATION_BLOCK_BOOST,
-            },
-            referral: {
-              Some: REFERRAL_ACCOUNT,
-            },
-          },
-        },
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const msgBorsh = borsh.serialize(swapSchema as any, msg)
 
       // TODO Update type to NearTX[] | void
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let transactionResult: any | void = undefined
 
-      if (estimateQueue?.queueTransactionsTrack?.length === 1) {
+      const isWithdrawInTrack = estimateQueue.queueTransactionsTrack.includes(
+        QueueTransactions.WITHDRAW
+      )
+
+      let balanceNear = 0
+      if (isWithdrawInTrack && accountId) {
+        balanceNear = await getBalanceNearAllowedToSwap(accountId)
+      }
+
+      if (
+        estimateQueue?.queueTransactionsTrack?.length === 1 ||
+        isWithdrawInTrack
+      ) {
         const currentQueue: QueueTransactions =
           estimateQueue!.queueTransactionsTrack[0]
 
         switch (currentQueue) {
-          case QueueTransactions.DEPOSIT:
-            if (selectedTokenIn?.address) {
-              const unitsSendAmount = parseUnits(
-                tokenIn.toString(),
-                selectedTokenIn?.decimals as number
-              ).toString()
-              transactionResult = await callRequestNearDeposit(
-                selectedTokenOut!.address as string,
-                unitsSendAmount
-              )
-            }
-            break
-
           case QueueTransactions.WITHDRAW:
-            if (selectedTokenIn?.address) {
-              const unitsSendAmount = parseUnits(
-                tokenIn.toString(),
-                selectedTokenIn?.decimals as number
-              ).toString()
-              transactionResult = await callRequestNearWithdraw(
-                selectedTokenIn!.address as string,
-                unitsSendAmount
+            if (selectedTokenIn?.address && accountId) {
+              const getBalanceWNear = await nep141Balance(
+                accountId as string,
+                W_NEAR_TOKEN_META.address
               )
+              const amountToWithdraw = getBalanceWNear ?? "0"
+              if (amountToWithdraw) {
+                transactionResult = await callRequestNearWithdraw(
+                  W_NEAR_TOKEN_META.address,
+                  amountToWithdraw
+                )
+              }
             }
             break
 
@@ -383,28 +353,27 @@ export const useSwap = ({ accountId, selector }: Props) => {
 
           case QueueTransactions.CREATE_INTENT:
             const wallet = await selector!.wallet()
+            const getIntentsTransactionCall = mapCreateIntentTransactionCall({
+              tokenIn,
+              tokenOut,
+              selectedTokenIn,
+              selectedTokenOut,
+              intentId,
+              blockHeight: getBlock.height,
+              accountId,
+              accountFrom,
+              accountTo,
+              solverId,
+            })
+            // TODO Concurrent mode for intents where selection is picked by criteria
+            const findFirst = getIntentsTransactionCall.find(
+              ([intentId, transaction]) => intentId === 0 || intentId === 1
+            )
+            if (!findFirst) {
+              throw new Error("getIntentsTransactionCall - intent is not found")
+            }
             transactionResult = await wallet.signAndSendTransactions({
-              transactions: [
-                {
-                  receiverId: selectedTokenIn!.address as string,
-                  actions: [
-                    {
-                      type: "FunctionCall",
-                      params: {
-                        methodName: "ft_transfer_call",
-                        args: {
-                          receiver_id: CONTRACTS_REGISTER.INTENT,
-                          amount: unitsSendAmount,
-                          memo: "Execute intent: NEP-141 to NEP-141",
-                          msg: Buffer.from(msgBorsh).toString("base64"),
-                        },
-                        gas: MAX_GAS_TRANSACTION,
-                        deposit: "1",
-                      },
-                    },
-                  ],
-                },
-              ],
+              transactions: [findFirst[1]],
             })
             break
         }
@@ -413,42 +382,42 @@ export const useSwap = ({ accountId, selector }: Props) => {
         return transactionResult
       }
 
-      const isNativeTokenIn = selectedTokenIn!.address === "native"
-      const tokenNearNative = LIST_NATIVE_TOKENS.find(
-        (token) => token.defuse_asset_id === "near:mainnet:native"
-      )
-
-      // Batches transactions and actions
-      // TODO Move single and batch to separate functions
-      const receiverIdIn = isNativeTokenIn
-        ? tokenNearNative!.routes
-          ? tokenNearNative!.routes[0]
-          : ""
-        : (selectedTokenIn!.address as string)
+      const receiverIdIn = selectedTokenIn!.address as string
       const receiverIdOut = selectedTokenOut!.address as string
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const transactions: { receiverId: string; actions: any }[] = []
       const mutateEstimateQueue = inputs.estimateQueue
       let tempQueueTransactionsTrack = []
 
+      let amountToWithdraw: string
+      if (
+        estimateQueue.queueTransactionsTrack.includes(
+          QueueTransactions.WITHDRAW
+        )
+      ) {
+        const getBalanceWNear = await nep141Balance(
+          accountId as string,
+          W_NEAR_TOKEN_META.address
+        )
+        amountToWithdraw = getBalanceWNear ?? "0"
+      }
+
       estimateQueue.queueTransactionsTrack.forEach((queueTransaction) => {
         switch (queueTransaction) {
-          case QueueTransactions.DEPOSIT:
-            if (selectedTokenIn?.address) {
-              const unitsSendAmount = parseUnits(
-                tokenIn.toString(),
-                selectedTokenIn?.decimals as number
-              ).toString()
+          case QueueTransactions.WITHDRAW:
+            if (selectedTokenIn?.address && accountId) {
               transactions.push({
                 receiverId: receiverIdIn,
                 actions: [
                   {
                     type: "FunctionCall",
                     params: {
-                      methodName: "near_deposit",
-                      args: {},
-                      gas: FT_STORAGE_DEPOSIT_GAS,
-                      deposit: unitsSendAmount,
+                      methodName: TransactionMethod.NEAR_WITHDRAW,
+                      args: {
+                        amount: amountToWithdraw,
+                      },
+                      gas: FT_WITHDRAW_GAS,
+                      deposit: "1",
                     },
                   },
                 ],
@@ -456,7 +425,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
               mutateEstimateQueue.queueInTrack--
               tempQueueTransactionsTrack =
                 mutateEstimateQueue.queueTransactionsTrack.filter(
-                  (queue) => queue !== QueueTransactions.DEPOSIT
+                  (queue) => queue !== QueueTransactions.WITHDRAW
                 )
               mutateEstimateQueue.queueTransactionsTrack =
                 tempQueueTransactionsTrack
@@ -469,7 +438,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
                 {
                   type: "FunctionCall",
                   params: {
-                    methodName: "storage_deposit",
+                    methodName: TransactionMethod.STORAGE_DEPOSIT,
                     args: {
                       account_id: accountId as string,
                       registration_only: true,
@@ -495,7 +464,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
                 {
                   type: "FunctionCall",
                   params: {
-                    methodName: "storage_deposit",
+                    methodName: TransactionMethod.STORAGE_DEPOSIT,
                     args: {
                       account_id: accountId as string,
                       registration_only: true,
@@ -515,25 +484,26 @@ export const useSwap = ({ accountId, selector }: Props) => {
               tempQueueTransactionsTrack
             break
           case QueueTransactions.CREATE_INTENT:
-            transactions.push({
-              receiverId: receiverIdIn,
-              actions: [
-                {
-                  type: "FunctionCall",
-                  params: {
-                    methodName: "ft_transfer_call",
-                    args: {
-                      receiver_id: CONTRACTS_REGISTER.INTENT,
-                      amount: unitsSendAmount,
-                      memo: "Execute intent: NEP-141 to NEP-141",
-                      msg: Buffer.from(msgBorsh).toString("base64"),
-                    },
-                    gas: MAX_GAS_TRANSACTION,
-                    deposit: "1",
-                  },
-                },
-              ],
+            const getIntentsTransactionCall = mapCreateIntentTransactionCall({
+              tokenIn,
+              tokenOut,
+              selectedTokenIn,
+              selectedTokenOut,
+              intentId,
+              blockHeight: getBlock.height,
+              accountId,
+              accountFrom,
+              accountTo,
+              solverId,
             })
+            // TODO Concurrent mode for intents where selection is picked by criteria
+            const findFirst = getIntentsTransactionCall.find(
+              ([intentId, transaction]) => intentId === 0 || intentId === 1
+            )
+            if (!findFirst) {
+              throw new Error("getIntentsTransactionCall - intent is not found")
+            }
+            transactions.push(findFirst[1])
             break
         }
       })
@@ -556,23 +526,30 @@ export const useSwap = ({ accountId, selector }: Props) => {
     }
   }
 
-  const callRequestRollbackIntent = async (inputs: { id: string }) => {
+  const callRequestRollbackIntent = async (inputs: {
+    id: string
+    receiverId?: string
+  }) => {
     try {
       const wallet = await selector!.wallet()
       await wallet.signAndSendTransactions({
         transactions: [
           {
-            receiverId: CONTRACTS_REGISTER.INTENT,
+            receiverId:
+              inputs?.receiverId ?? CONTRACTS_REGISTER[INDEXER.INTENT_0],
             actions: [
               {
                 type: "FunctionCall",
                 params: {
-                  methodName: "rollback_intent",
+                  methodName: TransactionMethod.ROLLBACK_INTENT,
                   args: {
                     id: inputs.id,
                   },
                   gas: MAX_GAS_TRANSACTION,
-                  deposit: "0",
+                  deposit:
+                    inputs?.receiverId !== CONTRACTS_REGISTER[INDEXER.INTENT_0]
+                      ? "1"
+                      : "0",
                 },
               },
             ],

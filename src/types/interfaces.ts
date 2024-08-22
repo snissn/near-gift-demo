@@ -1,9 +1,7 @@
 import type { AccountView } from "near-api-js/lib/providers/provider"
-import { BigNumber } from "ethers"
 
 import { HistoryStatus } from "@src/stores/historyStore"
 
-// defuse_asset_id - consist of: `blockchain + ":" + chainId + ":" + "token"`
 export type DefuseBaseIds = {
   defuse_asset_id: string
   blockchain: string
@@ -158,6 +156,48 @@ export interface NearIntentCreate {
   }
 }
 
+enum Status {
+  "Available",
+  "available",
+}
+
+export interface NearIntent1CreateCrossChain {
+  type: "create"
+  id: string
+  asset_out: {
+    type: "cross_chain"
+    oracle: string
+    asset: string
+    amount: string
+    account: string
+  }
+  lockup_until: {
+    block_number: number
+  }
+  expiration: {
+    block_number: number
+  }
+  referral: string
+}
+
+export interface NearIntent1CreateSingleChain {
+  type: "create"
+  id: string
+  asset_out: {
+    type: "nep141" | "native"
+    token: string
+    amount: string
+    account: string
+  }
+  lockup_until: {
+    block_number: number
+  }
+  expiration: {
+    block_number: number
+  }
+  referral: string
+}
+
 export interface RecoverDetails {
   initiator: string
   send: TransferToken
@@ -166,6 +206,7 @@ export interface RecoverDetails {
   referral: string
   msg?: string
   amount?: string
+  receiverId?: string
 }
 
 export type JobsDetails = {
@@ -173,4 +214,29 @@ export type JobsDetails = {
   applicationLink?: boolean
   position: string
   link: string
+}
+
+export enum BlockchainEnum {
+  Near = "near",
+  Eth = "eth",
+  Btc = "btc",
+}
+
+export enum NetworkEnum {
+  Mainnet = "mainnet",
+  Base = "8453",
+}
+
+export enum ContractIdEnum {
+  Native = "native",
+}
+
+export interface NearViewAccount {
+  amount: string
+  block_hash: string
+  block_height: number
+  code_hash: string
+  locked: string
+  storage_paid_at: number
+  storage_usage: number
 }
