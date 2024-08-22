@@ -23,6 +23,7 @@ import { useCalculateTokenToUsd } from "@src/hooks/useCalculateTokenToUsd"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { getBalanceNearAllowedToSwap } from "@src/components/SwapForm/service/getBalanceNearAllowedToSwap"
+import { NEAR_TOKEN_META, W_NEAR_TOKEN_META } from "@src/constants/tokens"
 
 export type ModalReviewSwapPayload = {
   tokenIn: string
@@ -66,7 +67,11 @@ const ModalReviewSwap = () => {
         convertPayload.selectedTokenOut.address as string,
       ]
       // Not needed recalculation if ratio is 1:1
-      if (pair.includes("native") && pair.includes("wrap.near")) return
+      if (
+        pair.includes(NEAR_TOKEN_META.address) &&
+        pair.includes(W_NEAR_TOKEN_META.address)
+      )
+        return
 
       handleCheckNativeBalance()
 
@@ -226,7 +231,12 @@ const ModalReviewSwap = () => {
           <div className="flex flex-col w-full mb-6 gap-3">
             <Blockquote color="cyan">
               Wrapped Near will be used in conjunction with Near to boost your
-              current swap experience.
+              current swap experience. All your wNear will be unwrapped and next
+              swap will be used only Near.
+            </Blockquote>
+            <Blockquote color="gray">
+              If you want to keep your wNear then please specify the swap amount
+              below.
             </Blockquote>
           </div>
         )}

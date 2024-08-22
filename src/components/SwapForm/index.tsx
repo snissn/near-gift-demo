@@ -27,6 +27,7 @@ import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { debouncePromise } from "@src/utils/debouncePromise"
 import { tieNativeToWrapToken } from "@src/utils/tokenList"
 import { smallNumberToString } from "@src/utils/token"
+import { NEAR_TOKEN_META, W_NEAR_TOKEN_META } from "@src/constants/tokens"
 
 import {
   EvaluateResultEnum,
@@ -54,6 +55,7 @@ enum ErrorEnum {
   INSUFFICIENT_BALANCE = "Insufficient Balance",
   NOT_AVAILABLE_SWAP = "Not Available Swap",
   NO_QUOTES = "No Quotes",
+  EXCEEDED_NEAR_PER_BYTE_USE = "Must have 0.2N or more left in wallet",
 }
 
 const ESTIMATE_BOT_AWAIT_MS = 500
@@ -203,7 +205,10 @@ export default function Swap() {
 
       // Do not use any estimation of swap between Native and Token if ratio is 1:1
       const pair = [selectTokenIn.address, selectTokenOut.address]
-      if (pair.includes("native") && pair.includes("wrap.near")) {
+      if (
+        pair.includes(NEAR_TOKEN_META.address) &&
+        pair.includes(W_NEAR_TOKEN_META.address)
+      ) {
         isProgrammaticUpdate.current = true
         setIsFetchingData(false)
         return setValue(

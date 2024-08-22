@@ -26,11 +26,12 @@ import useNearSwapNearToWNear from "@src/hooks/useSwapNearToWNear"
 import { useNearBlock } from "@src/hooks/useNearBlock"
 import { getNearTransactionDetails } from "@src/api/transaction"
 import { useTransactionScan } from "@src/hooks/useTransactionScan"
-import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
+import { LIST_NATIVE_TOKENS, W_NEAR_TOKEN_META } from "@src/constants/tokens"
 import { mapCreateIntentTransactionCall } from "@src/libs/de-sdk/utils/maps"
 import { isForeignNetworkToken } from "@src/utils/network"
 import { TransactionMethod } from "@src/types/solver0"
 import { getBalanceNearAllowedToSwap } from "@src/components/SwapForm/service/getBalanceNearAllowedToSwap"
+import { nep141Balance } from "@src/utils/near"
 
 type Props = {
   accountId: string | null
@@ -304,14 +305,17 @@ export const useSwap = ({ accountId, selector }: Props) => {
         switch (currentQueue) {
           case QueueTransactions.WITHDRAW:
             if (selectedTokenIn?.address && accountId) {
-              const unitsSendAmount = parseUnits(
-                (Number(tokenIn) - balanceNear).toString(),
-                selectedTokenIn?.decimals as number
-              ).toString()
-              transactionResult = await callRequestNearWithdraw(
-                "wrap.near",
-                unitsSendAmount
+              const getBalanceWNear = await nep141Balance(
+                accountId as string,
+                W_NEAR_TOKEN_META.address
               )
+              const amountToWithdraw = getBalanceWNear ?? "0"
+              if (amountToWithdraw) {
+                transactionResult = await callRequestNearWithdraw(
+                  W_NEAR_TOKEN_META.address,
+                  amountToWithdraw
+                )
+              }
             }
             break
 
@@ -385,15 +389,23 @@ export const useSwap = ({ accountId, selector }: Props) => {
       const mutateEstimateQueue = inputs.estimateQueue
       let tempQueueTransactionsTrack = []
 
+      let amountToWithdraw: string
+      if (
+        estimateQueue.queueTransactionsTrack.includes(
+          QueueTransactions.WITHDRAW
+        )
+      ) {
+        const getBalanceWNear = await nep141Balance(
+          accountId as string,
+          W_NEAR_TOKEN_META.address
+        )
+        amountToWithdraw = getBalanceWNear ?? "0"
+      }
+
       estimateQueue.queueTransactionsTrack.forEach((queueTransaction) => {
         switch (queueTransaction) {
           case QueueTransactions.WITHDRAW:
             if (selectedTokenIn?.address && accountId) {
-              const leftAmountIn = Number(tokenIn) - balanceNear
-              const unitsSendAmount = parseUnits(
-                leftAmountIn.toString(),
-                selectedTokenIn?.decimals as number
-              ).toString()
               transactions.push({
                 receiverId: receiverIdIn,
                 actions: [
@@ -402,7 +414,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
                     params: {
                       methodName: TransactionMethod.NEAR_WITHDRAW,
                       args: {
-                        amount: unitsSendAmount,
+                        amount: amountToWithdraw,
                       },
                       gas: FT_WITHDRAW_GAS,
                       deposit: "1",
