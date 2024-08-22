@@ -38,7 +38,11 @@ const WidgetCardWithdraw = ({
       className="relative flex flex-nowrap justify-between items-center p-2.5 gap-3 hover:bg-gray-950 cursor-pointer"
     >
       <div className="flex-none w-[40px] h-[36px]">
-        <AssetComboIcon {...selectedTokenOut} icon={W_NEAR_TOKEN_META.icon} />
+        <AssetComboIcon
+          {...selectedTokenOut}
+          icon={W_NEAR_TOKEN_META.icon}
+          chainIcon={W_NEAR_TOKEN_META.chainIcon}
+        />
       </div>
       <div className="shrink grow flex flex-col justify-between items-start">
         <Text size="2" weight="medium" className="text-black-400">
