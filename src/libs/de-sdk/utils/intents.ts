@@ -97,14 +97,8 @@ export const prepareCreateIntent1CrossChain = (
   inputs: MapCreateIntentProps
 ) => {
   const receiverIdIn = inputs.selectedTokenIn.address
-  const unitsSendAmount = parseUnits(
-    inputs.tokenIn,
-    inputs.selectedTokenIn.decimals as number
-  ).toString()
-  const estimateUnitsBackAmount = parseUnits(
-    inputs.tokenOut,
-    inputs.selectedTokenOut.decimals as number
-  ).toString()
+  const unitsSendAmount = inputs.tokenIn
+  const estimateUnitsBackAmount = inputs.tokenOut
 
   const from = parseDefuseAsset(inputs.selectedTokenIn.defuse_asset_id)
   const contractIdTokenIn = from?.contractId ?? ""
@@ -170,14 +164,8 @@ export const prepareCreateIntent1SingleChain = (
   inputs: MapCreateIntentProps
 ) => {
   const receiverIdIn = inputs.selectedTokenIn.address
-  const unitsSendAmount = parseUnits(
-    inputs.tokenIn,
-    inputs.selectedTokenIn.decimals as number
-  ).toString()
-  const estimateUnitsBackAmount = parseUnits(
-    inputs.tokenOut,
-    inputs.selectedTokenOut.decimals as number
-  ).toString()
+  const unitsSendAmount = inputs.tokenIn
+  const estimateUnitsBackAmount = inputs.tokenOut
 
   const from = parseDefuseAsset(inputs.selectedTokenIn.defuse_asset_id)
   const contractIdTokenIn = from?.contractId ?? ""

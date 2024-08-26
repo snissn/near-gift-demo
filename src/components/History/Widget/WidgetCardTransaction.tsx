@@ -13,6 +13,7 @@ import WidgetCardFailed from "@src/components/History/Widget/WidgetCardFailed"
 import WidgetCardWithdraw from "@src/components/History/Widget/WidgetCardWithdraw"
 import WidgetCardDeposit from "@src/components/History/Widget/WidgetCardDeposit"
 import WidgetCardStorageDeposit from "@src/components/History/Widget/WidgetCardStorageDeposit"
+import { safeBalanceToDecimal } from "@src/components/SwapForm/service/balanceTo"
 
 type Props = {
   onCloseHistory?: () => void
@@ -35,6 +36,15 @@ const WidgetCardTransaction = ({
     !details.selectedTokenIn ||
     !details.selectedTokenOut
 
+  const tokenInValue = safeBalanceToDecimal(
+    details?.tokenIn ?? "0",
+    details?.selectedTokenIn?.decimals ?? 0
+  )
+  const tokenOutValue = safeBalanceToDecimal(
+    details?.tokenOut ?? "0",
+    details?.selectedTokenOut?.decimals ?? 0
+  )
+
   switch (status) {
     case HistoryStatus.FAILED:
       if (!details?.transaction?.actions || !hash || iTokenDetailMissing) {
@@ -43,8 +53,8 @@ const WidgetCardTransaction = ({
       return (
         <WidgetCardFailed
           actions={details!.transaction!.actions}
-          tokenIn={details!.tokenIn as string}
-          tokenOut={details!.tokenOut as string}
+          tokenIn={tokenInValue}
+          tokenOut={tokenOutValue}
           selectedTokenIn={
             details!.selectedTokenIn as NetworkTokenWithSwapRoute
           }
@@ -67,8 +77,8 @@ const WidgetCardTransaction = ({
           hash={hash}
           status={status}
           intentId={intentId}
-          tokenIn={details!.tokenIn as string}
-          tokenOut={details!.tokenOut as string}
+          tokenIn={tokenInValue}
+          tokenOut={tokenOutValue}
           selectedTokenIn={
             details!.selectedTokenIn as NetworkTokenWithSwapRoute
           }
@@ -89,8 +99,8 @@ const WidgetCardTransaction = ({
       return (
         <WidgetCardRollback
           actions={details!.transaction!.actions}
-          tokenIn={details!.tokenIn as string}
-          tokenOut={details!.tokenOut as string}
+          tokenIn={tokenInValue}
+          tokenOut={tokenOutValue}
           selectedTokenIn={
             details!.selectedTokenIn as NetworkTokenWithSwapRoute
           }
@@ -112,7 +122,7 @@ const WidgetCardTransaction = ({
       return (
         <WidgetCardWithdraw
           accountId={details?.transaction.signer_id as string}
-          tokenOut={recoverAmount ?? (details!.tokenOut as string)}
+          tokenOut={recoverAmount ?? tokenOutValue}
           selectedTokenOut={
             details!.selectedTokenOut as NetworkTokenWithSwapRoute
           }
@@ -127,7 +137,7 @@ const WidgetCardTransaction = ({
       return (
         <WidgetCardDeposit
           accountId={details?.transaction.signer_id as string}
-          tokenIn={details!.tokenIn as string}
+          tokenIn={tokenInValue}
           selectedTokenIn={
             details!.selectedTokenIn as NetworkTokenWithSwapRoute
           }
@@ -142,7 +152,7 @@ const WidgetCardTransaction = ({
       return (
         <WidgetCardStorageDeposit
           receiverId={details?.transaction.receiver_id as string}
-          tokenIn={details!.tokenIn as string}
+          tokenIn={tokenInValue}
           selectedTokenIn={
             details!.selectedTokenIn as NetworkTokenWithSwapRoute
           }

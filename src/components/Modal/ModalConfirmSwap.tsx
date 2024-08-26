@@ -28,6 +28,7 @@ import { useNotificationStore } from "@src/providers/NotificationProvider"
 import { NotificationType } from "@src/stores/notificationStore"
 import { getNearBlockById } from "@src/api/transaction"
 import { NearBlock, NearTX, QueueTransactions } from "@src/types/interfaces"
+import { balanceToDecimal } from "@src/components/SwapForm/service/balanceTo"
 
 export interface ModalConfirmSwapPayload extends CallRequestIntentProps {}
 
@@ -366,6 +367,19 @@ const ModalConfirmSwap = () => {
     return null
   }
 
+  const tokenInValue = balanceToDecimal(
+    (modalPayload?.tokenIn || dataFromLocal?.tokenIn) ?? "0",
+    (modalPayload?.selectedTokenIn.decimals ||
+      dataFromLocal?.selectedTokenIn.decimals) ??
+      0
+  )
+  const tokenOutValue = balanceToDecimal(
+    (modalPayload?.tokenOut || dataFromLocal?.tokenOut) ?? "0",
+    (modalPayload?.selectedTokenOut.decimals ||
+      dataFromLocal?.selectedTokenOut.decimals) ??
+      0
+  )
+
   return (
     <ModalDialog>
       <div className="flex flex-col min-h-[256px] max-h-[680px] h-full p-5">
@@ -411,7 +425,7 @@ const ModalConfirmSwap = () => {
         <div className="flex justify-center">
           <div className="flex justify-center items-center gap-1 px-2.5 py-1 bg-gray-950 rounded-full">
             <Text size="2" weight="medium" className="text-black-400">
-              {`${smallBalanceToFormat(modalPayload?.tokenIn || dataFromLocal?.tokenIn || "", 7)} ${modalPayload?.selectedTokenIn?.symbol || dataFromLocal?.selectedTokenIn?.symbol || ""}`}
+              {`${smallBalanceToFormat(tokenInValue, 7)} ${modalPayload?.selectedTokenIn?.symbol || dataFromLocal?.selectedTokenIn?.symbol || ""}`}
             </Text>
             <Image
               src="/static/icons/arrow-right.svg"
@@ -420,7 +434,7 @@ const ModalConfirmSwap = () => {
               height={24}
             />
             <Text size="2" weight="medium" className="text-black-400">
-              {`${smallBalanceToFormat(modalPayload?.tokenOut || dataFromLocal?.tokenOut || "", 7)} ${modalPayload?.selectedTokenOut?.symbol || dataFromLocal?.selectedTokenOut?.symbol || ""}`}
+              {`${smallBalanceToFormat(tokenOutValue, 7)} ${modalPayload?.selectedTokenOut?.symbol || dataFromLocal?.selectedTokenOut?.symbol || ""}`}
             </Text>
           </div>
         </div>

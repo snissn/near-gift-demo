@@ -16,8 +16,8 @@ export enum TokenConvertEnum {
 }
 
 export type TokenBalance = {
-  balance?: number
-  balanceToUsd?: number
+  balance?: string
+  balanceUsd?: number
   convertedLast?: {
     [key in TokenConvertEnum]: number
   }
@@ -31,7 +31,7 @@ export interface TokenInfo extends TokenBalance {
   icon?: string
 }
 
-export interface NetworkToken extends Partial<TokenInfo>, DefuseBaseIds {
+export interface NetworkToken extends TokenInfo, DefuseBaseIds {
   chainId?: string
   chainIcon?: string
   chainName?: string
