@@ -1,6 +1,6 @@
 import { Settings } from "@src/libs/de-sdk/types/interfaces"
 
-import { swapEstimateSolver0Provider } from "./solver_0Provider"
+import { swapEstimateSolver0Provider } from "./solver0Provider"
 
 const IS_DISABLE_QUOTING_FROM_SOLVER_0 =
   process?.env?.NEXT_PUBLIC_DISABLE_QUOTING_FROM_SOLVER_0 === "true"

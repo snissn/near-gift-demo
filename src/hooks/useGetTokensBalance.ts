@@ -12,7 +12,7 @@ import {
   BlockchainEnum,
 } from "@src/types/interfaces"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
-import { useGetCoingeckoExchangesList } from "@src/api/hooks/exchanges/useGetCoingeckoExchangesList"
+import { useGetCoingeckoExchangeList } from "@src/api/hooks/exchange/useGetCoingeckoExchangeList"
 import { CoingeckoExchanges } from "@src/types/coingecko"
 import { useAccountBalance } from "@src/hooks/useAccountBalance"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
@@ -29,7 +29,7 @@ export const useGetTokensBalance = (
   const [data, setData] = useState<NetworkTokenWithSwapRoute[]>([])
   const { accountId } = useWalletSelector()
   const { activePreview } = useHistoryStore((state) => state)
-  const { data: exchangesList, isFetched } = useGetCoingeckoExchangesList()
+  const { data: exchangesList, isFetched } = useGetCoingeckoExchangeList()
   const { getAccountBalance } = useAccountBalance()
   const { minNearBalance } = useMinimumNearBalance(accountId)
 
@@ -81,12 +81,13 @@ export const useGetTokensBalance = (
           convertedLast: { usd: convertedLastUsd },
         })
         if (tokenBalance?.balance) {
-          const balanceUsd = balanceToDecimal(
-            BigNumber.from(tokenBalance.balance)
-              .mul(convertedLastUsd)
-              .toString(),
-            decimals
-          )
+          const balanceUsd =
+            Number(
+              balanceToDecimal(
+                BigNumber.from(tokenBalance.balance).toString(),
+                decimals
+              )
+            ) * convertedLastUsd
           Object.assign(tokenBalance, {
             balanceUsd,
           })

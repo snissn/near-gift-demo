@@ -43,3 +43,19 @@ export const tieNativeToWrapToken = (
     return acc
   }, [])
 }
+
+export const sortByTopBalances = (
+  tokenA: NetworkTokenWithSwapRoute,
+  tokenB: NetworkTokenWithSwapRoute
+) => {
+  const balanceA = BigNumber.from(tokenA?.balance ?? "0")
+  const balanceB = BigNumber.from(tokenB?.balance ?? "0")
+
+  if (balanceA.lt(balanceB)) {
+    return 1
+  }
+  if (balanceA.gt(balanceB)) {
+    return -1
+  }
+  return 0
+}
