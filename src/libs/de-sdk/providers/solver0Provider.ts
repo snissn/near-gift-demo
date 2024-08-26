@@ -6,7 +6,7 @@ import {
   SwapEstimateProviderResponse,
 } from "@src/libs/de-sdk/types/interfaces"
 
-const REGISTRAR_ID = "solver_0"
+const REGISTRAR_ID = "solver0"
 
 interface SolverBaseResponse {
   id: number
@@ -17,13 +17,16 @@ interface SolverResult<T> {
   result: T
 }
 
-interface SolverTokenList {
-  tokens: {
-    defuse_asset_id: string
-    decimals: number
-    asset_name: string
-    metadata_link: string
-  }[]
+export interface SolverToken {
+  defuse_asset_id: string
+  decimals: number
+  asset_name: string
+  metadata_link: string
+  routes_to: string[]
+}
+
+export interface SolverTokenList {
+  tokens: SolverToken[]
 }
 
 interface SolverQuoteRequest {
