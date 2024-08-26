@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { formatUnits } from "viem"
+import { BigNumber } from "ethers"
 
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { nep141Balance } from "@src/utils/near"
@@ -18,6 +18,8 @@ import { useAccountBalance } from "@src/hooks/useAccountBalance"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 import { useMinimumNearBalance } from "@src/hooks/useMinimumNearBalance"
 import { W_NEAR_TOKEN_META } from "@src/constants/tokens"
+import { balanceToDecimal } from "@src/components/SwapForm/service/balanceTo"
+import { getBalanceNearAllowedToSwap } from "@src/components/SwapForm/service/getBalanceNearAllowedToSwap"
 
 export const useGetTokensBalance = (
   tokensList: NetworkTokenWithSwapRoute[]
@@ -45,23 +47,19 @@ export const useGetTokensBalance = (
     decimals: number
   ): Promise<TokenBalance> => {
     const tokenBalance: TokenBalance = {}
-    let balance: number | undefined = undefined
+
+    await getBalanceNearAllowedToSwap(accountId as string)
 
     if (accountId && isTokenNative(address)) {
       const { balance } = await getAccountBalance()
       if (balance) {
-        const formattedAmountOut = formatUnits(BigInt(balance), decimals)
         Object.assign(tokenBalance, {
-          balance:
-            parseFloat(formattedAmountOut) - minNearBalance > 0
-              ? parseFloat(formattedAmountOut) - minNearBalance
-              : 0,
+          balance,
         })
       }
     } else if (accountId && !isTokenNative(address)) {
-      const getBalance = await nep141Balance(accountId as string, address)
-      if (getBalance) {
-        balance = Number(formatUnits(BigInt(getBalance as string), decimals))
+      const balance = await nep141Balance(accountId, address)
+      if (balance) {
         Object.assign(tokenBalance, { balance })
       }
     }
@@ -83,9 +81,14 @@ export const useGetTokensBalance = (
           convertedLast: { usd: convertedLastUsd },
         })
         if (tokenBalance?.balance) {
-          const balanceToUsd = tokenBalance?.balance * convertedLastUsd
+          const balanceUsd = balanceToDecimal(
+            BigNumber.from(tokenBalance.balance)
+              .mul(convertedLastUsd)
+              .toString(),
+            decimals
+          )
           Object.assign(tokenBalance, {
-            balanceToUsd,
+            balanceUsd,
           })
         }
       }
@@ -136,7 +139,7 @@ export const useGetTokensBalance = (
 
   const clearTokensBalance = () => {
     const dataCleanBalances = data.map(
-      ({ balance, balanceToUsd, convertedLast, ...rest }) => ({ ...rest })
+      ({ balance, balanceUsd, convertedLast, ...rest }) => ({ ...rest })
     )
     setData(dataCleanBalances)
   }

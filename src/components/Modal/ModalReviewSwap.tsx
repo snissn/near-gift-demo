@@ -4,6 +4,7 @@ import { Blockquote, Text } from "@radix-ui/themes"
 import Image from "next/image"
 import React, { useEffect, useState } from "react"
 import { formatUnits, parseUnits } from "viem"
+import { BigNumber } from "ethers"
 
 import ModalDialog from "@src/components/Modal/ModalDialog"
 import {
@@ -24,6 +25,7 @@ import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { getBalanceNearAllowedToSwap } from "@src/components/SwapForm/service/getBalanceNearAllowedToSwap"
 import { NEAR_TOKEN_META, W_NEAR_TOKEN_META } from "@src/constants/tokens"
+import { balanceToDecimal } from "@src/components/SwapForm/service/balanceTo"
 
 export type ModalReviewSwapPayload = {
   tokenIn: string
@@ -133,7 +135,9 @@ const ModalReviewSwap = () => {
       return
     }
     const balanceNear = await getBalanceNearAllowedToSwap(accountId)
-    const isLackOfBalance = Number(convertPayload.tokenIn) > balanceNear
+    const isLackOfBalance = BigNumber.from(convertPayload.tokenIn).gt(
+      balanceNear
+    )
     setIsWNearConjunctionRequired(isLackOfBalance)
   }
 
@@ -169,8 +173,20 @@ const ModalReviewSwap = () => {
           </button>
         </div>
         <CardSwap
-          amountIn={smallBalanceToFormat(convertPayload.tokenIn, 7)}
-          amountOut={smallBalanceToFormat(convertPayload.tokenOut, 7)}
+          amountIn={smallBalanceToFormat(
+            balanceToDecimal(
+              convertPayload.tokenIn,
+              convertPayload.selectedTokenIn.decimals
+            ),
+            7
+          )}
+          amountOut={smallBalanceToFormat(
+            balanceToDecimal(
+              convertPayload.tokenOut,
+              convertPayload.selectedTokenOut.decimals
+            ),
+            7
+          )}
           amountInToUsd={
             priceToUsdTokenIn !== "0"
               ? `~$${smallBalanceToFormat(priceToUsdTokenIn, 7)}`
@@ -217,8 +233,18 @@ const ModalReviewSwap = () => {
               =
               <Text size="2" weight="medium">
                 {(
-                  Number(convertPayload.tokenOut) /
-                  Number(convertPayload.tokenIn)
+                  Number(
+                    balanceToDecimal(
+                      convertPayload.tokenOut,
+                      convertPayload.selectedTokenOut.decimals
+                    )
+                  ) /
+                  Number(
+                    balanceToDecimal(
+                      convertPayload.tokenIn,
+                      convertPayload.selectedTokenIn.decimals
+                    )
+                  )
                 ).toFixed(4)}
               </Text>
               <Text size="2" weight="medium">

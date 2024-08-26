@@ -62,8 +62,8 @@ const WalletTabs = () => {
 
     data.forEach((token) => {
       temp.push(token)
-      if (token?.balanceToUsd && token?.balanceToUsd > 0) {
-        balanceInUsd = Number(balanceInUsd) + Number(token!.balanceToUsd)
+      if (token?.balanceUsd && token?.balanceUsd > 0) {
+        balanceInUsd = Number(balanceInUsd) + Number(token!.balanceUsd)
         if (token.defuse_asset_id === "near:mainnet:wrap.near") {
           wNearConvertedLastUsd = token.convertedLast!.usd
         }
@@ -88,7 +88,7 @@ const WalletTabs = () => {
 
   useEffect(() => {
     if (data.size && isFetched) {
-      getBalanceToUsd()
+      void getBalanceToUsd()
     }
   }, [data.size, isFetched])
 

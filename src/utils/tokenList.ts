@@ -1,3 +1,5 @@
+import { BigNumber } from "ethers"
+
 import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import { NEAR_TOKEN_META, W_NEAR_TOKEN_META } from "@src/constants/tokens"
 
@@ -19,14 +21,20 @@ export const tieNativeToWrapToken = (
         (token) => token.defuse_asset_id === W_NEAR_TOKEN_META.defuse_asset_id
       )
       if (findWNear) {
+        const balanceNear = token?.balance ?? 0
+        const balanceNearUsd = token?.balanceUsd ?? 0
         const balanceWNear = findWNear?.balance ?? 0
-        const balanceWNearToUsd = findWNear?.balanceToUsd ?? 0
-        const totalBalance = (token?.balance ?? 0) + balanceWNear
-        const totalBalanceToUsd = (token?.balanceToUsd ?? 0) + balanceWNearToUsd
+        const balanceWNearUsd = findWNear?.balanceUsd ?? 0
+
+        const totalBalance = BigNumber.from(balanceNear)
+          .add(balanceWNear)
+          .toString()
+        const totalBalanceUsd = balanceNearUsd + balanceWNearUsd
+
         acc.push({
           ...token,
           balance: totalBalance,
-          balanceToUsd: totalBalanceToUsd,
+          balanceUsd: totalBalanceUsd,
         })
         return acc
       }

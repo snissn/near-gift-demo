@@ -20,7 +20,7 @@ export interface EmptyTokenBalance {
   symbol: string
   balance: string
   icon?: string
-  balanceToUsd?: string
+  balanceUsd?: string
   chainId?: string
 }
 

@@ -1,32 +1,34 @@
-import { formatUnits } from "viem"
+import { BigNumber } from "ethers"
 
 import { nearAccount } from "@src/utils/near"
 
-export const minimumNearBalance = (storageUsed: number): number => {
-  const storageCostPerByte = 0.00001 // See source here - https://github.com/near/nearcore/blob/master/core/parameters/res/runtime_configs/parameters.yaml#L28
-  const minReserveBalance = 1 // TODO Temp, this value should be removed and used only `calculateMinBalance` when we will estimate gas used per tx
-  const calculateMinBalance = storageUsed * storageCostPerByte
-  return calculateMinBalance > minReserveBalance
-    ? calculateMinBalance
-    : minReserveBalance
+// See source here - https://github.com/near/nearcore/blob/master/core/parameters/res/runtime_configs/parameters.yaml#L28
+const STORAGE_COST_PER_BYTE = "10000000000000000000" // Equal to 0.00001
+
+export const minimumNearBalance = (storageUsed: number): BigNumber => {
+  if (storageUsed <= 770) {
+    return BigNumber.from("0")
+  }
+  const storageUsedBigNumber = BigNumber.from(storageUsed)
+  const storageCostPerByteBigNumber = BigNumber.from(STORAGE_COST_PER_BYTE)
+  return storageUsedBigNumber.mul(storageCostPerByteBigNumber)
 }
 
 export const getBalanceNearAllowedToSwap = async (
   accountId: string
-): Promise<number> => {
+): Promise<string> => {
   try {
     const viewAccount = await nearAccount(accountId)
     if (!viewAccount) {
-      return 0
+      return "0"
     }
-    const formattedAmountOut = formatUnits(BigInt(viewAccount.amount), 24)
-    const balanceAllowedToSwap =
-      parseFloat(formattedAmountOut) -
+    const bigNumberBalance = BigNumber.from(viewAccount.amount)
+    const balanceAllowedToSwap = bigNumberBalance.sub(
       minimumNearBalance(viewAccount.storage_usage)
-
-    return balanceAllowedToSwap > 0 ? balanceAllowedToSwap : 0
+    )
+    return balanceAllowedToSwap.gte("0") ? balanceAllowedToSwap.toString() : "0"
   } catch (e) {
     console.error("Failed to get Near balance", e)
-    return 0
+    return "0"
   }
 }

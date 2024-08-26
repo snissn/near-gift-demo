@@ -141,7 +141,6 @@ export const useSwap = ({ accountId, selector }: Props) => {
       }
 
       const { selectedTokenIn, selectedTokenOut, tokenIn } = inputs
-
       const [network, chain, address] =
         selectedTokenIn.defuse_asset_id.split(":")
       if (
@@ -150,7 +149,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
         accountId
       ) {
         const balanceNear = await getBalanceNearAllowedToSwap(accountId)
-        if (Number(tokenIn) > balanceNear) {
+        if (BigNumber.from(tokenIn).gt(BigNumber.from(balanceNear))) {
           queueTransaction.unshift(QueueTransactions.WITHDRAW)
           queue++
         }
@@ -289,11 +288,6 @@ export const useSwap = ({ accountId, selector }: Props) => {
       const isWithdrawInTrack = estimateQueue.queueTransactionsTrack.includes(
         QueueTransactions.WITHDRAW
       )
-
-      let balanceNear = 0
-      if (isWithdrawInTrack && accountId) {
-        balanceNear = await getBalanceNearAllowedToSwap(accountId)
-      }
 
       if (
         estimateQueue?.queueTransactionsTrack?.length === 1 ||
