@@ -12,9 +12,7 @@ import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
 const IS_DISABLED_ALL_TABS = true
 
 const WalletTabBox = ({ children }: PropsWithChildren) => {
-  return (
-    <div className="pt-[22px] pb-[26px] flex flex-col gap-2">{children}</div>
-  )
+  return <div className="flex flex-col gap-2">{children}</div>
 }
 
 const TabTotalBalance = ({
@@ -26,8 +24,15 @@ const TabTotalBalance = ({
 }) => {
   return (
     <WalletTabBox>
+      <Text
+        size="1"
+        weight="medium"
+        className="text-gray-600 dark:text-gray-500"
+      >
+        Total balance
+      </Text>
       {isLoading ? (
-        <div className="h-[36px]">
+        <div className="flex h-[36px] items-center">
           <Spinner loading={isLoading} />
         </div>
       ) : (
@@ -35,13 +40,6 @@ const TabTotalBalance = ({
           ${totalBalanceInUsd ? totalBalanceInUsd?.toFixed(2) : "0.00"}
         </Text>
       )}
-      <Text
-        size="2"
-        weight="medium"
-        className="text-gray-600 dark:text-gray-500"
-      >
-        Total balance
-      </Text>
     </WalletTabBox>
   )
 }
