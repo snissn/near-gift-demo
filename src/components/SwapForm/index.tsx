@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useRef, useState } from "react"
 import { FieldValues, useForm } from "react-hook-form"
 import { parseUnits } from "viem"
 import { Text } from "@radix-ui/themes"
-import { BigNumber } from "ethers"
 
 import Paper from "@src/components/Paper"
 import Form from "@src/components/Form"
@@ -192,12 +191,10 @@ export default function Swap() {
       clearErrors()
       lastInputValue.current = tokenIn
 
-      const parsedTokenInBigNumber = BigNumber.from(
+      const parsedTokenInBigNumber = BigInt(
         balanceToBignumberString(tokenIn, selectTokenIn?.decimals ?? 0)
       )
-      const balanceTokenInBigNumber = BigNumber.from(
-        selectTokenIn?.balance ?? "0"
-      )
+      const balanceTokenInBigNumber = BigInt(selectTokenIn?.balance ?? "0")
 
       // Empty input
       if (
@@ -216,14 +213,14 @@ export default function Swap() {
         accountId
       ) {
         const balanceAllowed = await getBalanceNearAllowedToSwap(accountId)
-        const balanceAllowedBigNumber = BigNumber.from(balanceAllowed)
-        if (parsedTokenInBigNumber.gt(balanceAllowedBigNumber)) {
+        const balanceAllowedBigNumber = BigInt(balanceAllowed)
+        if (parsedTokenInBigNumber > balanceAllowedBigNumber) {
           setErrorMsg(ErrorEnum.EXCEEDED_NEAR_PER_BYTE_USE)
           allowableNearAmountRef.current = balanceAllowedBigNumber.toString()
         }
       }
 
-      if (parsedTokenInBigNumber.gt(balanceTokenInBigNumber)) {
+      if (parsedTokenInBigNumber > balanceTokenInBigNumber) {
         setErrorMsg(ErrorEnum.INSUFFICIENT_BALANCE)
       }
 

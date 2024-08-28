@@ -8,9 +8,10 @@ export const getCoingeckoExchangeListKey = [
   "get-coingecko-exchange-list",
 ]
 
-export const useGetCoingeckoExchangeList = (options = {}) =>
+export const useGetCoingeckoExchangeList = (id?: string, options = {}) =>
   useQuery({
-    queryKey: getCoingeckoExchangeListKey,
-    queryFn: () => getTrendingList("ref_finance"),
+    queryKey: [...getCoingeckoExchangeListKey, id],
+    queryFn: () => getTrendingList(id),
     ...options,
+    staleTime: 60 * 5000, // 5 min
   })

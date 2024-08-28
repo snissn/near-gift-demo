@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react"
-import { BigNumber } from "ethers"
 import { Checkbox, Text, Tooltip } from "@radix-ui/themes"
 import { CheckedState } from "@radix-ui/react-checkbox"
 import { InfoCircledIcon } from "@radix-ui/react-icons"
@@ -11,7 +10,7 @@ import clsx from "clsx"
 import { smallBalanceToFormat } from "@src/utils/token"
 
 export interface BlockMultiBalancesProps {
-  balance?: string | BigNumber
+  balance?: string | bigint
   withNativeSupport?: boolean
   nativeSupportChecked?: CheckedState
   handleIncludeNativeToSwap?: (checked: CheckedState) => void

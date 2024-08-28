@@ -1,9 +1,7 @@
-import { BigNumber } from "ethers"
 import { formatUnits, parseUnits } from "viem"
 
 export const balanceToDecimal = (balance: string, decimal: number): string => {
-  const bigNumberBalance = BigNumber.from(balance)
-  return formatUnits(BigInt(bigNumberBalance.toString()), decimal)
+  return formatUnits(BigInt(balance.toString()), decimal)
 }
 
 export const balanceToBignumberString = (

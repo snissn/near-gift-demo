@@ -1,8 +1,6 @@
 "use client"
 
 import { WalletSelector } from "@near-wallet-selector/core"
-import { parseUnits } from "viem"
-import { BigNumber } from "ethers"
 import { useState } from "react"
 
 import {
@@ -149,7 +147,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
         accountId
       ) {
         const balanceNear = await getBalanceNearAllowedToSwap(accountId)
-        if (BigNumber.from(tokenIn).gt(BigNumber.from(balanceNear))) {
+        if (BigInt(tokenIn) > BigInt(balanceNear)) {
           queueTransaction.unshift(QueueTransactions.WITHDRAW)
           queue++
         }
@@ -170,9 +168,9 @@ export const useSwap = ({ accountId, selector }: Props) => {
         accountId as string
       )
       if (!isForeignNetworkToken(selectedTokenIn.defuse_asset_id)) {
-        const storageBalanceTokenInToString = BigNumber.from(
-          storageBalanceTokenIn
-        ).toString()
+        const storageBalanceTokenInToString = storageBalanceTokenIn
+          ? storageBalanceTokenIn.toString()
+          : "0"
         console.log(
           "useSwap storageBalanceTokenIn: ",
           storageBalanceTokenInToString
@@ -193,9 +191,9 @@ export const useSwap = ({ accountId, selector }: Props) => {
         !isForeignNetworkToken(selectedTokenOut.defuse_asset_id) &&
         !isNativeTokenOut
       ) {
-        const storageBalanceTokenOutToString = BigNumber.from(
-          storageBalanceTokenOut
-        ).toString()
+        const storageBalanceTokenOutToString = storageBalanceTokenOut
+          ? storageBalanceTokenOut.toString()
+          : "0"
         console.log(
           "useSwap storageBalanceTokenOut: ",
           storageBalanceTokenOutToString

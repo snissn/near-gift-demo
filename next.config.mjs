@@ -33,6 +33,9 @@ const nextConfig = {
     NEAR_ENV: process.env.NEAR_ENV,
     SOLVER_RELAY_0_URL: process.env.SOLVER_RELAY_0_URL,
     REFERRAL_ACCOUNT: process.env.REFERRAL_ACCOUNT,
+    BASE_RPC: process.env.BASE_QUICKNODE_URL,
+    BITCOIN_INFO_URL: process.env.BITCOIN_INFO_URL,
+    COINGECKO_API_URL: process.env.COINGECKO_API_URL,
   },
   images: {
     remotePatterns: [

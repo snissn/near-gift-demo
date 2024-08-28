@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react"
 import Image from "next/image"
 import { Text, Tooltip } from "@radix-ui/themes"
 import { InfoCircledIcon } from "@radix-ui/react-icons"
-import { ethers } from "ethers"
+import { isAddress } from "ethers"
 import * as bitcoin from "bitcoinjs-lib"
 
 import { BlockchainEnum, NetworkToken } from "@src/types/interfaces"
@@ -61,7 +61,7 @@ const ModalConnectNetworks = () => {
     const blockchain = result?.blockchain ?? ""
     switch (blockchain) {
       case BlockchainEnum.Eth:
-        if (!ethers.utils.isAddress(account)) {
+        if (!isAddress(account)) {
           setErrorAccount("Invalid wallet address.")
         } else {
           setErrorAccount("")
