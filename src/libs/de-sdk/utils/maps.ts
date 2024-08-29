@@ -6,7 +6,7 @@ import {
 } from "@src/libs/de-sdk/utils/intents"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 
-enum MapsEnum {
+export enum MapsEnum {
   NEAR_MAINNET = "near:mainnet",
   ETH_BASE = "eth:8453",
   BTC_MAINNET = "btc:mainnet",

@@ -34,6 +34,7 @@ import {
 } from "@src/components/SwapForm/service/balanceTo"
 import { getBalanceNearAllowedToSwap } from "@src/components/SwapForm/service/getBalanceNearAllowedToSwap"
 import { smallBalanceToFormat } from "@src/utils/token"
+import isWalletConnected from "@src/components/SwapForm/utils/isWalletConnected"
 
 import {
   EvaluateResultEnum,
@@ -124,12 +125,13 @@ export default function Swap() {
 
     if (hasUnsetTokens) return
 
-    const modalType = isForeignChainSwap(
-      selectTokenIn?.defuse_asset_id as string,
-      selectTokenOut?.defuse_asset_id as string
-    )
-      ? ModalType.MODAL_CONNECT_NETWORKS
-      : ModalType.MODAL_REVIEW_SWAP
+    const modalType =
+      isForeignChainSwap(
+        selectTokenIn?.defuse_asset_id as string,
+        selectTokenOut?.defuse_asset_id as string
+      ) && !isWalletConnected(selectTokenOut?.defuse_asset_id as string)
+        ? ModalType.MODAL_CONNECT_NETWORKS
+        : ModalType.MODAL_REVIEW_SWAP
 
     const modalPayload = {
       tokenIn: balanceToBignumberString(

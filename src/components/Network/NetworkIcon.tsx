@@ -15,9 +15,10 @@ const NetworkIcon = ({
     <div className="relative inline-block">
       <div
         className={clsx(
-          "relative overflow-hidden w-[36px] h-[36px] flex justify-center items-center border border-silver-100 rounded-full",
+          "relative overflow-hidden w-[36px] h-[36px] flex justify-center items-center border border-silver-100 rounded-full dark:border-white",
           chainName === "near" && "bg-black",
-          chainName === "eth" && "bg-blue-600"
+          chainName === "eth" && "bg-blue-600",
+          chainName === "btc" && "bg-white"
         )}
       >
         <Image

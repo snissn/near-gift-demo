@@ -1,21 +1,18 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { Popover, Spinner, Switch, Text } from "@radix-ui/themes"
-import { useTheme } from "next-themes"
+import { Button, Popover, Spinner, Switch, Text } from "@radix-ui/themes"
 import clsx from "clsx"
-import { EnterIcon, CopyIcon, CountdownTimerIcon } from "@radix-ui/react-icons"
+import { CountdownTimerIcon } from "@radix-ui/react-icons"
 
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import type { Account } from "@src/types/interfaces"
 import { useGetAccount } from "@src/hooks/useGetAccount"
-import Themes from "@src/types/themes"
 import useShortAccountId from "@src/hooks/useShortAccountId"
 import WalletTabs from "@src/components/Wallet/WalletTabs"
-import { THEME_MODE_KEY } from "@src/constants/contracts"
-import CopyToClipboard from "@src/components/CopyToClipboard"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { useConnectWallet } from "@src/hooks/useConnectWallet"
+import WalletConnections from "@src/components/Wallet/WalletConnections"
 
 const TURN_OFF_APPS = process?.env?.turnOffApps === "true" ?? true
 
@@ -24,25 +21,9 @@ const ConnectWallet = () => {
   const { getAccount } = useGetAccount({ accountId, selector })
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [account, setAccount] = useState<Account | null>(null)
-  const { theme, setTheme } = useTheme()
   const { shortAccountId } = useShortAccountId(accountId as string)
   const { openWidget } = useHistoryStore((state) => state)
   const { handleSignIn, handleSignOut } = useConnectWallet()
-
-  useEffect(() => {
-    const getThemeFromLocal = localStorage.getItem(THEME_MODE_KEY)
-    if (!getThemeFromLocal) {
-      setTheme(Themes.LIGHT)
-      return
-    }
-    if (getThemeFromLocal === "light" || getThemeFromLocal === "dark") {
-      setTheme(getThemeFromLocal)
-    }
-  }, [])
-
-  const onChangeTheme = () => {
-    setTheme(theme === Themes.DARK ? Themes.LIGHT : Themes.DARK)
-  }
 
   useEffect(() => {
     if (!accountId) {
@@ -89,47 +70,23 @@ const ConnectWallet = () => {
             {shortAccountId}
           </button>
         </Popover.Trigger>
-        <Popover.Content className="min-w-[330px] mt-1 md:mr-[48px] dark:bg-black-800">
-          <WalletTabs />
-          <div className="flex flex-col items-start gap-4 mt-[10px] mb-[22px]">
-            <div className="flex justify-between items-center gap-4">
-              <Text size="2" weight="medium">
-                Dark Mode
-              </Text>
-              <Switch
-                className="cursor-pointer"
-                size="1"
-                onClick={onChangeTheme}
-                color="orange"
-                defaultChecked={theme === Themes.DARK}
-              />
-            </div>
-            <button
+        <Popover.Content className="min-w-[330px] mt-1 md:mr-[48px] dark:bg-black-800 rounded-2xl">
+          <div className="flex flex-col gap-5">
+            <WalletTabs />
+            <WalletConnections />
+            <Button
               onClick={handleTradeHistory}
-              className="flex justify-start items-center gap-2"
+              size="2"
+              variant="soft"
+              radius="full"
+              color="gray"
+              className="w-full text-black dark:text-white cursor-pointer"
             >
               <CountdownTimerIcon width={16} height={16} />
               <Text size="2" weight="medium">
                 Transactions
               </Text>
-            </button>
-            <CopyToClipboard value={account.account_id}>
-              <div className="flex justify-start items-center gap-2">
-                <CopyIcon width={16} height={16} />
-                <Text size="2" weight="medium">
-                  Copy address
-                </Text>
-              </div>
-            </CopyToClipboard>
-            <button
-              onClick={handleSignOut}
-              className="flex justify-start items-center gap-2"
-            >
-              <EnterIcon width={16} height={16} />
-              <Text size="2" weight="medium">
-                Disconnect wallet
-              </Text>
-            </button>
+            </Button>
           </div>
         </Popover.Content>
       </Popover.Root>
