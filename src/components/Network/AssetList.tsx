@@ -9,7 +9,7 @@ import { TokenListWithNotSelectableToken } from "@src/components/Modal/ModalSele
 import {
   balanceToDecimal,
   balanceToCurrency,
-} from "@src/components/SwapForm/service/balanceTo"
+} from "@src/app/swap/SwapForm/service/balanceTo"
 
 type Props = {
   title?: string

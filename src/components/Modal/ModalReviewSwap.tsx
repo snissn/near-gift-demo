@@ -22,9 +22,9 @@ import { smallBalanceToFormat } from "@src/utils/token"
 import { useCalculateTokenToUsd } from "@src/hooks/useCalculateTokenToUsd"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import { getBalanceNearAllowedToSwap } from "@src/components/SwapForm/service/getBalanceNearAllowedToSwap"
+import { getBalanceNearAllowedToSwap } from "@src/app/swap/SwapForm/service/getBalanceNearAllowedToSwap"
 import { NEAR_TOKEN_META, W_NEAR_TOKEN_META } from "@src/constants/tokens"
-import { balanceToDecimal } from "@src/components/SwapForm/service/balanceTo"
+import { balanceToDecimal } from "@src/app/swap/SwapForm/service/balanceTo"
 
 export type ModalReviewSwapPayload = {
   tokenIn: string

@@ -23,7 +23,7 @@ import { TransactionMethod } from "@src/types/solver0"
 import {
   balanceToDecimal,
   safeBalanceToDecimal,
-} from "@src/components/SwapForm/service/balanceTo"
+} from "@src/app/swap/SwapForm/service/balanceTo"
 
 const NEAR_EXPLORER = process?.env?.nearExplorer ?? ""
 const PLACEHOLDER = "XX"

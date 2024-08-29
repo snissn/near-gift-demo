@@ -31,10 +31,10 @@ import { NEAR_TOKEN_META } from "@src/constants/tokens"
 import {
   balanceToBignumberString,
   balanceToDecimal,
-} from "@src/components/SwapForm/service/balanceTo"
-import { getBalanceNearAllowedToSwap } from "@src/components/SwapForm/service/getBalanceNearAllowedToSwap"
+} from "@src/app/swap/SwapForm/service/balanceTo"
+import { getBalanceNearAllowedToSwap } from "@src/app/swap/SwapForm/service/getBalanceNearAllowedToSwap"
 import { smallBalanceToFormat } from "@src/utils/token"
-import isWalletConnected from "@src/components/SwapForm/utils/isWalletConnected"
+import isWalletConnected from "@src/app/swap/SwapForm/utils/isWalletConnected"
 
 import {
   EvaluateResultEnum,
