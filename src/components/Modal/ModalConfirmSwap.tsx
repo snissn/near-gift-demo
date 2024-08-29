@@ -141,14 +141,8 @@ const ModalConfirmSwap = () => {
       accountId: accountId,
       intentId: receivedIntentId,
       defuseAssetIdOut: inputs.selectedTokenOut.defuse_asset_id,
-      unitsAmountIn: parseUnits(
-        inputs.tokenIn,
-        inputs.selectedTokenIn?.decimals as number
-      ).toString(),
-      unitsAmountOut: parseUnits(
-        inputs.tokenOut,
-        inputs.selectedTokenOut?.decimals as number
-      ).toString(),
+      unitsAmountIn: inputs.tokenIn,
+      unitsAmountOut: inputs.tokenOut,
     } as PublishAtomicNearIntentProps)
   }
 
