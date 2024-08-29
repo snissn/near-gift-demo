@@ -27,7 +27,8 @@ const ModalStoreNetwork = () => {
     payload as ModalStoreNetworkPayload
   )
 
-  const handleContinue = async () => {
+  const handleConnect = () => {
+    localStorage.setItem(convertPayload.storeKey, account)
     onCloseModal()
   }
 
@@ -37,7 +38,7 @@ const ModalStoreNetwork = () => {
         <div className="flex justify-between items-center mb-[44px]">
           <div className="relative w-full shrink text-center text-black-400">
             <Text size="4" weight="bold" className="dark:text-gray-500">
-              Before we continue...
+              Connect you wallet
             </Text>
             <div className="w-full absolute top-[30px] left-[50%] -translate-x-2/4 flex justify-center items-center gap-1 text-gray-600">
               <Text size="2" weight="medium">
@@ -59,7 +60,7 @@ const ModalStoreNetwork = () => {
           </button>
         </div>
         <div className="w-full flex flex-col mb-6 relative">
-          <div className="relative flex-1 p-[18px] border-[1px] border-gray-100 rounded-t-xl bg-gray dark:bg-black-900 dark:border-black-950">
+          <div className="relative flex-1 p-[18px] border-[1px] border-gray-100 rounded-xl bg-gray dark:bg-black-900 dark:border-black-950">
             <Network
               chainIcon={convertPayload.chainIcon}
               chainName={convertPayload.chainName}
@@ -83,10 +84,10 @@ const ModalStoreNetwork = () => {
         <Button
           size="lg"
           fullWidth
-          onClick={handleContinue}
+          onClick={handleConnect}
           disabled={!account || !!errorAccount}
         >
-          Continue
+          Connect
         </Button>
       </div>
     </ModalDialog>

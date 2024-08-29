@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { EnterIcon, CopyIcon } from "@radix-ui/react-icons"
 import { Button, Separator, Text } from "@radix-ui/themes"
 import { CopyToClipboard } from "react-copy-to-clipboard"
@@ -12,6 +12,13 @@ import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { getChainIconFromId } from "@src/hooks/useTokensListAdapter"
 import NetworkIcon from "@src/components/Network/NetworkIcon"
 import useShortAccountId from "@src/hooks/useShortAccountId"
+import { useModalStore } from "@src/providers/ModalStoreProvider"
+import { ModalType } from "@src/stores/modalStore"
+import {
+  CONFIRM_SWAP_LOCAL_KEY,
+  CONNECTOR_BTC_MAINNET,
+  CONNECTOR_ETH_BASE,
+} from "@src/constants/contracts"
 
 type WalletConnectionState = {
   chainIcon: string
@@ -107,6 +114,25 @@ const WalletConnections = () => {
   const { accountId } = useWalletSelector()
   const { handleSignOut } = useConnectWallet()
   const [copyWalletAddress, setCopyWalletAddress] = useState<MapsEnum>()
+  const { setModalType } = useModalStore((state) => state)
+  const [isProcessing, setIsProcessing] = useState(false)
+
+  const handleGetConnector = (connectorKey: string): string => {
+    const getWalletFromLocal = localStorage.getItem(connectorKey)
+    if (!getWalletFromLocal) return ""
+    return getWalletFromLocal
+  }
+
+  const handleDisconnectSideWallet = (connectorKey: string) => {
+    localStorage.removeItem(connectorKey)
+    // To force a rerender the component we update the state
+    setIsProcessing(true)
+  }
+
+  useEffect(() => {
+    // Finalize state update after forced re-render
+    if (isProcessing) setIsProcessing(false)
+  }, [isProcessing])
 
   return (
     <div className="flex flex-col">
@@ -118,6 +144,11 @@ const WalletConnections = () => {
         Connections
       </Text>
       {connections.map((connector, i) => {
+        let defuse_asset_id = ""
+        let chainIcon = ""
+        let chainName = ""
+        let accountIdFromLocal = ""
+        let storeKey = ""
         switch (connector) {
           case MapsEnum.NEAR_MAINNET:
             return (
@@ -134,29 +165,55 @@ const WalletConnections = () => {
               />
             )
           case MapsEnum.ETH_BASE:
+            defuse_asset_id = `${MapsEnum.ETH_BASE}:0`
+            accountIdFromLocal = handleGetConnector(CONNECTOR_ETH_BASE)
+            chainIcon = getChainIconFromId(defuse_asset_id)
+            chainName = "eth"
+            storeKey = CONNECTOR_ETH_BASE
             return (
               <WalletConnectionsConnector
-                accountId=""
+                accountId={accountIdFromLocal}
                 chainLabel="Base"
-                chainName="eth"
-                chainIcon={getChainIconFromId(`${MapsEnum.ETH_BASE}:0`)}
+                chainName={chainName}
+                chainIcon={chainIcon}
                 onCopy={() => setCopyWalletAddress(MapsEnum.ETH_BASE)}
                 isCopied={copyWalletAddress === MapsEnum.ETH_BASE}
-                onDisconnect={handleSignOut}
+                onDisconnect={() => handleDisconnectSideWallet(storeKey)}
+                onConnect={() =>
+                  setModalType(ModalType.MODAL_STORE_NETWORK, {
+                    storeKey,
+                    defuse_asset_id,
+                    chainIcon,
+                    chainName,
+                  })
+                }
                 key={connector}
                 index={i}
               />
             )
           case MapsEnum.BTC_MAINNET:
+            defuse_asset_id = `${MapsEnum.BTC_MAINNET}:0`
+            accountIdFromLocal = handleGetConnector(CONNECTOR_BTC_MAINNET)
+            chainIcon = getChainIconFromId(defuse_asset_id)
+            chainName = "btc"
+            storeKey = CONNECTOR_BTC_MAINNET
             return (
               <WalletConnectionsConnector
-                accountId=""
+                accountId={accountIdFromLocal}
                 chainLabel="Bitcoin"
-                chainName="btc"
-                chainIcon={getChainIconFromId(`${MapsEnum.BTC_MAINNET}:0`)}
+                chainName={chainName}
+                chainIcon={chainIcon}
                 onCopy={() => setCopyWalletAddress(MapsEnum.BTC_MAINNET)}
                 isCopied={copyWalletAddress === MapsEnum.BTC_MAINNET}
-                onDisconnect={handleSignOut}
+                onDisconnect={() => handleDisconnectSideWallet(storeKey)}
+                onConnect={() =>
+                  setModalType(ModalType.MODAL_STORE_NETWORK, {
+                    storeKey,
+                    defuse_asset_id,
+                    chainIcon,
+                    chainName,
+                  })
+                }
                 key={connector}
                 index={i}
               />
