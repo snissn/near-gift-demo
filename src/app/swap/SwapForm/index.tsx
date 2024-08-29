@@ -130,11 +130,15 @@ export default function Swap() {
 
     if (hasUnsetTokens) return
 
+    const accountTo = isWalletConnected(
+      selectTokenOut?.defuse_asset_id as string
+    )
+
     const modalType =
       isForeignChainSwap(
         selectTokenIn?.defuse_asset_id as string,
         selectTokenOut?.defuse_asset_id as string
-      ) && !isWalletConnected(selectTokenOut?.defuse_asset_id as string)
+      ) && !accountTo
         ? ModalType.MODAL_CONNECT_NETWORKS
         : ModalType.MODAL_REVIEW_SWAP
 
@@ -150,6 +154,7 @@ export default function Swap() {
       selectedTokenIn: selectTokenIn,
       selectedTokenOut: selectTokenOut,
       solverId: bestEstimate?.solver_id || "",
+      accountTo,
     }
 
     setModalType(modalType, modalPayload)

@@ -49,6 +49,7 @@ export type NextEstimateQueueTransactionsProps = {
 export type NextEstimateQueueTransactionsResult = {
   value: EstimateQueueTransactions
   done: boolean
+  failure?: boolean
 }
 
 type WithAccounts = {
@@ -230,6 +231,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
 
       if (isFailure) {
         return {
+          failure: true,
           value: estimateQueue,
           done: false,
         }

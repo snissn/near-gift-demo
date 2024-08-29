@@ -36,6 +36,7 @@ const ModalConfirmSwap = () => {
   const [dataFromLocal, setDataFromLocal] = useState<ModalConfirmSwapPayload>()
   const [isReadingHistory, setIsReadingHistory] = useState(false)
   const { selector, accountId } = useWalletSelector()
+  const [isErrorTransaction, setIsErrorTransaction] = useState(false)
   const {
     callRequestCreateIntent,
     nextEstimateQueueTransactions,
@@ -177,10 +178,15 @@ const ModalConfirmSwap = () => {
             QueueTransactions.CREATE_INTENT
           )
 
-        const { value, done } = await nextEstimateQueueTransactions({
+        const { value, done, failure } = await nextEstimateQueueTransactions({
           estimateQueue: data.estimateQueue,
           receivedHash: lastInTransactionHashes as string,
         })
+
+        if (failure) {
+          setIsErrorTransaction(true)
+          return
+        }
 
         const inputs = {
           tokenIn: data!.tokenIn,
@@ -287,13 +293,15 @@ const ModalConfirmSwap = () => {
           },
         })
 
-        const { value, done } = await nextEstimateQueueTransactions({
+        const { value, done, failure } = await nextEstimateQueueTransactions({
           estimateQueue: estimateQueue,
           receivedHash: result.transaction.hash,
         })
 
         // Toggle preview for the main transaction in batch
-        if (resultSequence === callResult.length - 1) {
+        if (failure) {
+          setIsErrorTransaction(true)
+        } else if (resultSequence === callResult.length - 1) {
           if (!done) {
             handleCallCreateIntent(
               {
@@ -333,7 +341,7 @@ const ModalConfirmSwap = () => {
       ongoingPublishingRef.current = false
       router.replace(pathname)
     }
-    if (isError) {
+    if (isError || isErrorTransaction) {
       ongoingPublishingRef.current = false
       setNotification({
         id: v4(),
@@ -341,7 +349,7 @@ const ModalConfirmSwap = () => {
         type: NotificationType.ERROR,
       })
     }
-  }, [isSuccess, isError])
+  }, [isSuccess, isError, isErrorTransaction])
 
   useEffect(() => {
     if (isErrorSwap) {
