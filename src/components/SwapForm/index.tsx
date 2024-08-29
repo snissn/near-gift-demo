@@ -129,7 +129,7 @@ export default function Swap() {
       isForeignChainSwap(
         selectTokenIn?.defuse_asset_id as string,
         selectTokenOut?.defuse_asset_id as string
-      ) & !isWalletConnected(selectTokenOut?.defuse_asset_id as string)
+      ) && !isWalletConnected(selectTokenOut?.defuse_asset_id as string)
         ? ModalType.MODAL_CONNECT_NETWORKS
         : ModalType.MODAL_REVIEW_SWAP
 
