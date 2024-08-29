@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { BigNumber } from "ethers"
 
 import { useGetViewAccount } from "@src/api/hooks/account/useGetViewAccount"
 import { minimumNearBalance } from "@src/components/SwapForm/service/getBalanceNearAllowedToSwap"
@@ -11,7 +10,7 @@ export const useMinimumNearBalance = (accountId: string | null) => {
   useEffect(() => {
     if (isFetched && data?.result?.storage_usage) {
       const minNearBalance = minimumNearBalance(data.result.storage_usage)
-      setMinNearBalance(BigNumber.from(minNearBalance).toString())
+      setMinNearBalance(minNearBalance.toString())
     }
   }, [data, isFetched])
 

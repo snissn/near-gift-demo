@@ -4,7 +4,6 @@ import { Blockquote, Text } from "@radix-ui/themes"
 import Image from "next/image"
 import React, { useEffect, useState } from "react"
 import { formatUnits, parseUnits } from "viem"
-import { BigNumber } from "ethers"
 
 import ModalDialog from "@src/components/Modal/ModalDialog"
 import {
@@ -135,9 +134,7 @@ const ModalReviewSwap = () => {
       return
     }
     const balanceNear = await getBalanceNearAllowedToSwap(accountId)
-    const isLackOfBalance = BigNumber.from(convertPayload.tokenIn).gt(
-      balanceNear
-    )
+    const isLackOfBalance = BigInt(convertPayload.tokenIn) > BigInt(balanceNear)
     setIsWNearConjunctionRequired(isLackOfBalance)
   }
 

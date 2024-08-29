@@ -1,5 +1,3 @@
-import { BigNumber } from "ethers"
-
 import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import { NEAR_TOKEN_META, W_NEAR_TOKEN_META } from "@src/constants/tokens"
 
@@ -26,9 +24,9 @@ export const tieNativeToWrapToken = (
         const balanceWNear = findWNear?.balance ?? 0
         const balanceWNearUsd = findWNear?.balanceUsd ?? 0
 
-        const totalBalance = BigNumber.from(balanceNear)
-          .add(balanceWNear)
-          .toString()
+        const totalBalance = (
+          BigInt(balanceNear) + BigInt(balanceWNear)
+        ).toString()
         const totalBalanceUsd = balanceNearUsd + balanceWNearUsd
 
         acc.push({
@@ -48,13 +46,13 @@ export const sortByTopBalances = (
   tokenA: NetworkTokenWithSwapRoute,
   tokenB: NetworkTokenWithSwapRoute
 ) => {
-  const balanceA = BigNumber.from(tokenA?.balance ?? "0")
-  const balanceB = BigNumber.from(tokenB?.balance ?? "0")
+  const balanceA = BigInt(tokenA?.balance ?? "0")
+  const balanceB = BigInt(tokenB?.balance ?? "0")
 
-  if (balanceA.lt(balanceB)) {
+  if (balanceA < balanceB) {
     return 1
   }
-  if (balanceA.gt(balanceB)) {
+  if (balanceA > balanceB) {
     return -1
   }
   return 0

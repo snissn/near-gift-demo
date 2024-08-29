@@ -7,7 +7,6 @@ import {
   UseFormRegister,
 } from "react-hook-form"
 import clsx from "clsx"
-import { BigNumber } from "ethers"
 
 import AssetsSelect from "@src/components/Network/SelectAssets"
 import { NetworkToken } from "@src/types/interfaces"
@@ -22,7 +21,7 @@ interface Props<T extends FieldValues> {
   placeholder?: string
   label?: string | React.ReactNode
   price?: string
-  balance?: string | BigNumber
+  balance?: string | bigint
   selected?: NetworkToken
   handleSelect?: () => void
   handleSetMaxValue?: () => void

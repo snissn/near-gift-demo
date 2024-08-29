@@ -1,4 +1,3 @@
-import { BigNumber } from "ethers"
 import { formatUnits } from "viem"
 
 import { SolverToken } from "@src/libs/de-sdk/providers/solver0Provider"
@@ -28,16 +27,14 @@ export const tokenBalanceToFormatUnits = ({
   balance,
   decimals,
 }: {
-  balance: string | BigNumber | undefined
+  balance: string | undefined
   decimals: number
 }): string => {
-  const balanceToString =
-    balance !== undefined ? BigNumber.from(balance || "0").toString() : "0"
-  if (!parseFloat(balanceToString)) {
+  if (!parseFloat(balance?.toString() ?? "0")) {
     return "0"
   }
   const balanceToUnits = formatUnits(
-    BigInt(balanceToString),
+    BigInt(balance!.toString()),
     decimals
   ).toString()
 

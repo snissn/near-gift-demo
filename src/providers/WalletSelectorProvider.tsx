@@ -37,7 +37,8 @@ import {
   useMemo,
 } from "react"
 import { distinctUntilChanged, map } from "rxjs"
-import { WalletModuleFactory } from "@near-wallet-selector/core/src/lib/wallet/wallet.types"
+
+import { Loading } from "@src/components/Loading"
 
 declare global {
   interface Window {
@@ -52,9 +53,6 @@ interface WalletSelectorContextValue {
   accounts: Array<AccountState>
   accountId: string | null
 }
-
-import { Loading } from "@src/components/Loading"
-import { CONTRACTS_REGISTER, INDEXER } from "@src/constants/contracts"
 
 const NEAR_ENV = process.env.NEAR_ENV ?? "testnet"
 const NEAR_NODE_URL = process.env.nearNodeUrl ?? "https://rpc.mainnet.near.org"

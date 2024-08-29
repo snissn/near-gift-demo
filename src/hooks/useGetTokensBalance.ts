@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { BigNumber } from "ethers"
 
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { nep141Balance } from "@src/utils/near"
@@ -17,9 +16,17 @@ import { CoingeckoExchanges } from "@src/types/coingecko"
 import { useAccountBalance } from "@src/hooks/useAccountBalance"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 import { useMinimumNearBalance } from "@src/hooks/useMinimumNearBalance"
-import { W_NEAR_TOKEN_META } from "@src/constants/tokens"
+import { W_BASE_TOKEN_META, W_NEAR_TOKEN_META } from "@src/constants/tokens"
 import { balanceToDecimal } from "@src/components/SwapForm/service/balanceTo"
 import { getBalanceNearAllowedToSwap } from "@src/components/SwapForm/service/getBalanceNearAllowedToSwap"
+import {
+  ethereumERC20Balance,
+  ethereumNativeBalance,
+} from "@src/utils/ethereum"
+import { bitcoinNativeBalance } from "@src/utils/bitcoin"
+import { getBitcoinPriceInUsd } from "@src/api/token"
+
+const baseRpc = process.env.BASE_RPC || ""
 
 export const useGetTokensBalance = (
   tokensList: NetworkTokenWithSwapRoute[]
@@ -29,7 +36,12 @@ export const useGetTokensBalance = (
   const [data, setData] = useState<NetworkTokenWithSwapRoute[]>([])
   const { accountId } = useWalletSelector()
   const { activePreview } = useHistoryStore((state) => state)
-  const { data: exchangesList, isFetched } = useGetCoingeckoExchangeList()
+
+  const { data: exchangesListNear, isFetched: isFetchedListNear } =
+    useGetCoingeckoExchangeList("ref_finance")
+  const { data: exchangesListBase, isFetched: isFetchedListBase } =
+    useGetCoingeckoExchangeList("uniswap-v3-base")
+
   const { getAccountBalance } = useAccountBalance()
   const { minNearBalance } = useMinimumNearBalance(accountId)
 
@@ -39,6 +51,38 @@ export const useGetTokensBalance = (
         return true
       default:
         return false
+    }
+  }
+
+  const assignConversionsContext = async (
+    tokenBalance: TokenBalance,
+    exchangesList: CoingeckoExchanges,
+    wTokenAddress: string,
+    address: string,
+    decimals: number
+  ) => {
+    const getCoinIndex = exchangesList?.tickers?.findIndex((coin) => {
+      return isTokenNative(address)
+        ? coin.base.toLowerCase() === wTokenAddress
+        : coin.base.toLowerCase() === address.toLowerCase()
+    })
+
+    if (getCoinIndex !== -1) {
+      const convertedLastUsd =
+        exchangesList?.tickers[getCoinIndex].converted_last.usd
+      if (convertedLastUsd) {
+        Object.assign(tokenBalance, {
+          convertedLast: { usd: convertedLastUsd },
+        })
+        if (tokenBalance?.balance) {
+          const balanceUsd =
+            Number(balanceToDecimal(tokenBalance.balance, decimals)) *
+            convertedLastUsd
+          Object.assign(tokenBalance, {
+            balanceUsd,
+          })
+        }
+      }
     }
   }
 
@@ -64,34 +108,86 @@ export const useGetTokensBalance = (
       }
     }
 
-    const getCoinIndex = (
-      exchangesList as CoingeckoExchanges
-    )?.tickers?.findIndex((coin) => {
-      return isTokenNative(address)
-        ? coin.base.toLowerCase() === W_NEAR_TOKEN_META.address
-        : coin.base.toLowerCase() === address.toLowerCase()
-    })
+    if (exchangesListBase) {
+      const wTokenAddress = W_NEAR_TOKEN_META.address
+      await assignConversionsContext(
+        tokenBalance,
+        exchangesListNear as CoingeckoExchanges,
+        wTokenAddress,
+        address,
+        decimals
+      )
+    }
 
-    if (getCoinIndex !== -1) {
-      const convertedLastUsd = (exchangesList as CoingeckoExchanges)?.tickers[
-        getCoinIndex
-      ].converted_last.usd
-      if (convertedLastUsd) {
+    return tokenBalance
+  }
+
+  const getBaseTokenBalance = async (
+    address: string,
+    decimals: number
+  ): Promise<TokenBalance> => {
+    const tokenBalance: TokenBalance = {}
+
+    // TODO Get Ethereum accountId from wallet store
+    const accountId = "0xd9f9fcf89743C6a6E7F19bc1AB7Ffe20b24771AA"
+    if (accountId && isTokenNative(address)) {
+      const balance = await ethereumNativeBalance(accountId, baseRpc)
+      if (balance) {
         Object.assign(tokenBalance, {
-          convertedLast: { usd: convertedLastUsd },
+          balance,
         })
-        if (tokenBalance?.balance) {
-          const balanceUsd =
-            Number(
-              balanceToDecimal(
-                BigNumber.from(tokenBalance.balance).toString(),
-                decimals
-              )
-            ) * convertedLastUsd
-          Object.assign(tokenBalance, {
-            balanceUsd,
-          })
-        }
+      }
+    } else if (accountId && !isTokenNative(address)) {
+      const balance = await ethereumERC20Balance(accountId, address, baseRpc)
+      if (balance) {
+        Object.assign(tokenBalance, { balance })
+      }
+    }
+
+    if (exchangesListBase) {
+      const wTokenAddress = W_BASE_TOKEN_META.address
+      await assignConversionsContext(
+        tokenBalance,
+        exchangesListBase as CoingeckoExchanges,
+        wTokenAddress,
+        address,
+        decimals
+      )
+    }
+
+    return tokenBalance
+  }
+
+  const getBitcoinTokenBalance = async (
+    address: string,
+    decimals: number
+  ): Promise<TokenBalance> => {
+    const tokenBalance: TokenBalance = {}
+
+    // TODO Get Bitcoin accountId from wallet store
+    const accountId = "1EqTDpr1c54Teeu4TjYRXjz9CsBtrb4nsz"
+    if (accountId && isTokenNative(address)) {
+      const balance = await bitcoinNativeBalance(accountId)
+      if (balance) {
+        Object.assign(tokenBalance, {
+          balance,
+        })
+      }
+    }
+
+    const result = await getBitcoinPriceInUsd()
+    const convertedLastUsd = result.bitcoin.usd
+    if (convertedLastUsd) {
+      Object.assign(tokenBalance, {
+        convertedLast: { usd: convertedLastUsd },
+      })
+      if (tokenBalance?.balance) {
+        const balanceUsd =
+          Number(balanceToDecimal(tokenBalance.balance, decimals)) *
+          convertedLastUsd
+        Object.assign(tokenBalance, {
+          balanceUsd,
+        })
       }
     }
 
@@ -123,6 +219,33 @@ export const useGetTokensBalance = (
                   return token
               }
               break
+            case BlockchainEnum.Eth:
+              switch (result.network) {
+                case NetworkEnum.Base:
+                  return {
+                    ...token,
+                    ...(await getBaseTokenBalance(
+                      result.contractId,
+                      token?.decimals ?? 0
+                    )),
+                  }
+                default:
+                  return token
+              }
+              break
+            case BlockchainEnum.Btc:
+              switch (result.network) {
+                case NetworkEnum.Mainnet:
+                  return {
+                    ...token,
+                    ...(await getBitcoinTokenBalance(
+                      result.contractId,
+                      token?.decimals ?? 0
+                    )),
+                  }
+                default:
+                  return token
+              }
             default:
               return token
           }
@@ -146,10 +269,17 @@ export const useGetTokensBalance = (
   }
 
   useEffect(() => {
-    if (tokensList || activePreview || isFetched || minNearBalance) {
-      getTokensBalance()
+    if (accountId && tokensList && isFetchedListNear && isFetchedListBase) {
+      void getTokensBalance()
     }
-  }, [accountId, tokensList, activePreview, isFetched, minNearBalance])
+  }, [
+    accountId,
+    tokensList,
+    activePreview,
+    minNearBalance,
+    isFetchedListNear,
+    isFetchedListBase,
+  ])
 
   useEffect(() => {
     if (!accountId) {
