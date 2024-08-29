@@ -1,8 +1,9 @@
 "use client"
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { FieldValues, useForm } from "react-hook-form"
-import { parseUnits } from "viem"
+import { parseUnits } from "ethers"
 import { Text } from "@radix-ui/themes"
+import { v4 } from "uuid"
 
 import Paper from "@src/components/Paper"
 import Form from "@src/components/Form"
@@ -35,6 +36,8 @@ import {
 import { getBalanceNearAllowedToSwap } from "@src/app/swap/SwapForm/service/getBalanceNearAllowedToSwap"
 import { smallBalanceToFormat } from "@src/utils/token"
 import isWalletConnected from "@src/app/swap/SwapForm/utils/isWalletConnected"
+import { NotificationType } from "@src/stores/notificationStore"
+import { useNotificationStore } from "@src/providers/NotificationProvider"
 
 import {
   EvaluateResultEnum,
@@ -59,7 +62,6 @@ type EstimateSwap = {
 
 enum ErrorEnum {
   INSUFFICIENT_BALANCE = "Insufficient Balance",
-  NOT_AVAILABLE_SWAP = "Not Available Swap",
   NO_QUOTES = "No Quotes",
   EXCEEDED_NEAR_PER_BYTE_USE = "Not enough Near in wallet for gas fee",
 }
@@ -67,8 +69,10 @@ enum ErrorEnum {
 const ESTIMATE_BOT_AWAIT_MS = 500
 
 export default function Swap() {
-  const [selectTokenIn, setSelectTokenIn] = useState<SelectToken>()
-  const [selectTokenOut, setSelectTokenOut] = useState<SelectToken>()
+  const [selectTokenIn, setSelectTokenIn] =
+    useState<NetworkTokenWithSwapRoute>()
+  const [selectTokenOut, setSelectTokenOut] =
+    useState<NetworkTokenWithSwapRoute>()
   const [errorSelectTokenIn, setErrorSelectTokenIn] = useState("")
   const [errorSelectTokenOut, setErrorSelectTokenOut] = useState("")
   const { accountId } = useWalletSelector()
@@ -105,6 +109,7 @@ export default function Swap() {
   const [errorMsg, setErrorMsg] = useState<ErrorEnum>()
   const [isFetchingData, setIsFetchingData] = useState(false)
   const allowableNearAmountRef = useRef<null | string>(null)
+  const { setNotification } = useNotificationStore((state) => state)
 
   const onSubmit = async (values: FieldValues) => {
     if (errorMsg) {
@@ -158,6 +163,16 @@ export default function Swap() {
     setErrorMsg(undefined)
     setPriceEvaluation(null)
     const tempTokenInCopy = Object.assign({}, selectTokenIn)
+
+    if (!selectTokenOut?.routes?.length) {
+      setNotification({
+        id: v4(),
+        message: "This switch not available!",
+        type: NotificationType.ERROR,
+      })
+      return
+    }
+
     setSelectTokenIn(selectTokenOut)
     setSelectTokenOut(tempTokenInCopy)
 
@@ -266,17 +281,6 @@ export default function Swap() {
             : "0"
         setValue("tokenOut", formattedOut)
         trigger("tokenOut")
-
-        // TODO Temporarily showing quote for tokens whose don't have routes,
-        //      allowing solvers to integrate new protocols
-        if (
-          !(selectTokenIn as NetworkTokenWithSwapRoute).routes?.includes(
-            selectTokenOut.defuse_asset_id
-          )
-        ) {
-          setErrorMsg(ErrorEnum.NOT_AVAILABLE_SWAP)
-          isProgrammaticUpdate.current = true
-        }
 
         setIsFetchingData(false)
       }

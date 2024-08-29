@@ -2,7 +2,7 @@
 
 import { Box, Text, Tabs, Spinner } from "@radix-ui/themes"
 import { PropsWithChildren, useEffect, useState } from "react"
-import { formatUnits } from "viem"
+import { formatUnits } from "ethers"
 
 import LabelComingSoon from "@src/components/LabelComingSoon"
 import { useTokensStore } from "@src/providers/TokensStoreProvider"

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react"
 import { Spinner, Text, TextArea } from "@radix-ui/themes"
-import { formatUnits } from "viem"
+import { formatUnits } from "ethers"
 
 import CardBalance from "@src/app/wallet/CardBalance"
 import CardTokenList from "@src/app/wallet/CardTokenList"

@@ -1,4 +1,4 @@
-import { formatUnits } from "viem"
+import { formatUnits } from "ethers"
 
 import { swapEstimateRefFinanceProvider } from "@src/libs/de-sdk/providers/refFinanceProvider"
 import { NetworkToken } from "@src/types/interfaces"

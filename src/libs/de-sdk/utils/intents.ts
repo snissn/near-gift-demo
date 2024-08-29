@@ -1,4 +1,4 @@
-import { parseUnits } from "viem"
+import { parseUnits } from "ethers"
 import * as borsh from "borsh"
 
 import {

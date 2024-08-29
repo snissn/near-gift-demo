@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from "react"
 import { Spinner, Text } from "@radix-ui/themes"
 import Image from "next/image"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { parseUnits } from "viem"
 import { v4 } from "uuid"
 
 import ModalDialog from "@src/components/Modal/ModalDialog"

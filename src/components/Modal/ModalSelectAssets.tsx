@@ -103,16 +103,16 @@ const ModalSelectAssets = () => {
     const getAssetList: TokenListWithNotSelectableToken[] = []
     const getAssetListWithBalances: TokenListWithNotSelectableToken[] = []
     data.forEach((value) => {
+      // Filtration by routes should happen only at "tokenIn" and for including in search it is enough to have only one route available.
+      // We do not filter "tokenOut" allow solver router to find a proposition to swap
+      if (fieldName === "tokenIn" && !value?.routes?.length) {
+        return
+      }
+
       let isNotSelectable = false
-      // We do not filter "tokenIn" as give full access to tokens in first step
-      // Filtration by routes should happen only at "tokenOut"
       const isAlreadySelected =
         selectToken && value.defuse_asset_id === selectToken.defuse_asset_id
-      const isTokenOutAndNotSelectable =
-        selectToken &&
-        fieldName === "tokenOut" &&
-        !selectToken?.routes?.includes(value.defuse_asset_id)
-      if (isAlreadySelected || isTokenOutAndNotSelectable) {
+      if (isAlreadySelected) {
         isNotSelectable = true
       }
 

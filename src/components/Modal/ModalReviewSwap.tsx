@@ -3,7 +3,7 @@
 import { Blockquote, Text } from "@radix-ui/themes"
 import Image from "next/image"
 import React, { useEffect, useState } from "react"
-import { formatUnits, parseUnits } from "viem"
+import { formatUnits, parseUnits } from "ethers"
 
 import ModalDialog from "@src/components/Modal/ModalDialog"
 import {
