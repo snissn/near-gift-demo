@@ -13,7 +13,7 @@ import WidgetCardFailed from "@src/components/History/Widget/WidgetCardFailed"
 import WidgetCardWithdraw from "@src/components/History/Widget/WidgetCardWithdraw"
 import WidgetCardDeposit from "@src/components/History/Widget/WidgetCardDeposit"
 import WidgetCardStorageDeposit from "@src/components/History/Widget/WidgetCardStorageDeposit"
-import { safeBalanceToDecimal } from "@src/components/SwapForm/service/balanceTo"
+import { safeBalanceToDecimal } from "@src/app/swap/SwapForm/service/balanceTo"
 
 type Props = {
   onCloseHistory?: () => void

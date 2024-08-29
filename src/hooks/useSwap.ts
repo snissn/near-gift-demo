@@ -28,7 +28,7 @@ import { LIST_NATIVE_TOKENS, W_NEAR_TOKEN_META } from "@src/constants/tokens"
 import { mapCreateIntentTransactionCall } from "@src/libs/de-sdk/utils/maps"
 import { isForeignNetworkToken } from "@src/utils/network"
 import { TransactionMethod } from "@src/types/solver0"
-import { getBalanceNearAllowedToSwap } from "@src/components/SwapForm/service/getBalanceNearAllowedToSwap"
+import { getBalanceNearAllowedToSwap } from "@src/app/swap/SwapForm/service/getBalanceNearAllowedToSwap"
 import { nep141Balance } from "@src/utils/near"
 
 type Props = {

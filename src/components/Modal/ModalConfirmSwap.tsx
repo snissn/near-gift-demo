@@ -28,7 +28,7 @@ import { useNotificationStore } from "@src/providers/NotificationProvider"
 import { NotificationType } from "@src/stores/notificationStore"
 import { getNearBlockById } from "@src/api/transaction"
 import { NearBlock, NearTX, QueueTransactions } from "@src/types/interfaces"
-import { balanceToDecimal } from "@src/components/SwapForm/service/balanceTo"
+import { balanceToDecimal } from "@src/app/swap/SwapForm/service/balanceTo"
 
 export interface ModalConfirmSwapPayload extends CallRequestIntentProps {}
 

@@ -17,8 +17,8 @@ import { useAccountBalance } from "@src/hooks/useAccountBalance"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 import { useMinimumNearBalance } from "@src/hooks/useMinimumNearBalance"
 import { W_BASE_TOKEN_META, W_NEAR_TOKEN_META } from "@src/constants/tokens"
-import { balanceToDecimal } from "@src/components/SwapForm/service/balanceTo"
-import { getBalanceNearAllowedToSwap } from "@src/components/SwapForm/service/getBalanceNearAllowedToSwap"
+import { balanceToDecimal } from "@src/app/swap/SwapForm/service/balanceTo"
+import { getBalanceNearAllowedToSwap } from "@src/app/swap/SwapForm/service/getBalanceNearAllowedToSwap"
 import {
   ethereumERC20Balance,
   ethereumNativeBalance,
