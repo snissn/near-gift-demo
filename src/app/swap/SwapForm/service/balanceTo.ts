@@ -1,4 +1,4 @@
-import { formatUnits, parseUnits } from "viem"
+import { formatUnits, parseUnits } from "ethers"
 
 export const balanceToDecimal = (balance: string, decimal: number): string => {
   return formatUnits(BigInt(balance.toString()), decimal)

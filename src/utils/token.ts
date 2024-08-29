@@ -1,4 +1,4 @@
-import { formatUnits } from "viem"
+import { formatUnits } from "ethers"
 
 import { SolverToken } from "@src/libs/de-sdk/providers/solver0Provider"
 import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"

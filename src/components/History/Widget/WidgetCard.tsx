@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react"
 import Image from "next/image"
 import { Spinner, Text } from "@radix-ui/themes"
 import Link from "next/link"
-import { formatUnits } from "viem"
+import { formatUnits } from "ethers"
 
 import { HistoryData, HistoryStatus } from "@src/stores/historyStore"
 import Button from "@src/components/Button/Button"
