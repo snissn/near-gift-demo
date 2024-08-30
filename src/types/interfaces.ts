@@ -16,8 +16,8 @@ export enum TokenConvertEnum {
 }
 
 export type TokenBalance = {
-  balance?: number
-  balanceToUsd?: number
+  balance?: string
+  balanceUsd?: number
   convertedLast?: {
     [key in TokenConvertEnum]: number
   }
@@ -31,7 +31,7 @@ export interface TokenInfo extends TokenBalance {
   icon?: string
 }
 
-export interface NetworkToken extends Partial<TokenInfo>, DefuseBaseIds {
+export interface NetworkToken extends TokenInfo, DefuseBaseIds {
   chainId?: string
   chainIcon?: string
   chainName?: string
@@ -239,4 +239,20 @@ export interface NearViewAccount {
   locked: string
   storage_paid_at: number
   storage_usage: number
+}
+
+export interface BitcoinBalanceEntity {
+  hash160: string
+  address: string
+  n_tx: number
+  n_unredeemed: number
+  total_received: number
+  total_sent: number
+  final_balance: number
+}
+
+export interface BitcoinPriceInUsdEntity {
+  bitcoin: {
+    usd: number
+  }
 }

@@ -9,7 +9,7 @@ export interface SolverHook {
   getTokenList: () => Promise<NetworkTokenWithSwapRoute[]>
 }
 
-const getChainIconFromId = (defuseAssetId: string): string => {
+export const getChainIconFromId = (defuseAssetId: string): string => {
   const getAssetIdParts = defuseAssetId.split(":")
   const chain = getAssetIdParts.length ? getAssetIdParts[0] : ""
   switch (chain.toLowerCase()) {

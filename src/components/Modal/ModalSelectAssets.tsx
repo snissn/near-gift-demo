@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useDeferredValue, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Text } from "@radix-ui/themes"
 
 import ModalDialog from "@src/components/Modal/ModalDialog"
@@ -10,7 +10,11 @@ import { NetworkToken, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { ModalType } from "@src/stores/modalStore"
 import { useTokensStore } from "@src/providers/TokensStoreProvider"
-import { tieNativeToWrapToken } from "@src/utils/tokenList"
+import { sortByTopBalances, tieNativeToWrapToken } from "@src/utils/tokenList"
+import { useDiscoverDefuseAssets } from "@src/api/hooks/token/useDiscoverDefuseAssets"
+import { debouncePromise } from "@src/utils/debouncePromise"
+import parseDefuseAsset from "@src/utils/parseDefuseAsset"
+import { tokenMetaAdapter } from "@src/utils/token"
 
 export type ModalSelectAssetsPayload = {
   modalType?: ModalType.MODAL_SELECT_ASSETS
@@ -23,26 +27,31 @@ export interface TokenListWithNotSelectableToken
   isNotSelectable?: boolean
 }
 
+const DISCOVERY_ASSETS_AWAIT_MS = 500
+
 const ModalSelectAssets = () => {
-  const [searchValue, setSearchValue] = useState("")
   const [assetList, setAssetList] = useState<NetworkTokenWithSwapRoute[]>([])
   const [assetListWithBalances, setAssetListWithBalances] = useState<
     NetworkTokenWithSwapRoute[]
   >([])
+  const [newAssetList, setNewAssetList] = useState<NetworkTokenWithSwapRoute[]>(
+    []
+  )
 
   const { onCloseModal, modalType, payload } = useModalStore((state) => state)
   const { data, isLoading } = useTokensStore((state) => state)
-  const deferredQuery = useDeferredValue(searchValue)
+  const [searchValue, setSearchValue] = useState("")
+  const { data: dataDiscover, mutate } = useDiscoverDefuseAssets()
 
-  const handleSearchClear = () => setSearchValue("")
+  const handleSearchClear = () => {
+    setSearchValue("")
+    setNewAssetList([])
+  }
 
   const filterPattern = (asset: NetworkToken) =>
-    asset
-      .name!.toLocaleUpperCase()
-      .includes(deferredQuery.toLocaleUpperCase()) ||
-    asset
-      .chainName!.toLocaleUpperCase()
-      .includes(deferredQuery.toLocaleUpperCase())
+    parseDefuseAsset(asset.defuse_asset_id)
+      ?.contractId!.toLocaleUpperCase()
+      .includes(searchValue.toLocaleUpperCase())
 
   const handleSelectToken = (token: NetworkToken) => {
     onCloseModal({
@@ -51,6 +60,36 @@ const ModalSelectAssets = () => {
       token,
     })
   }
+
+  const debouncedGetDiscoverDefuseAssets = useCallback(
+    debouncePromise(
+      async (address: string) => mutate(address),
+      DISCOVERY_ASSETS_AWAIT_MS
+    ),
+    []
+  )
+
+  useEffect(() => {
+    const discoverAssetList = dataDiscover?.result?.tokens
+    if (discoverAssetList?.length) {
+      const newDiscoverAssetList = discoverAssetList
+        .filter(
+          (discoverAsset) =>
+            !assetList.some(
+              (asset) =>
+                asset.defuse_asset_id.toLowerCase() ===
+                discoverAsset.defuse_asset_id.toLowerCase()
+            )
+        )
+        .map(tokenMetaAdapter)
+      setNewAssetList(newDiscoverAssetList)
+    }
+  }, [dataDiscover])
+
+  useEffect(() => {
+    if (!searchValue) return
+    void debouncedGetDiscoverDefuseAssets(searchValue)
+  }, [searchValue])
 
   useEffect(() => {
     if (!data.size && !isLoading) {
@@ -64,16 +103,16 @@ const ModalSelectAssets = () => {
     const getAssetList: TokenListWithNotSelectableToken[] = []
     const getAssetListWithBalances: TokenListWithNotSelectableToken[] = []
     data.forEach((value) => {
+      // Filtration by routes should happen only at "tokenIn" and for including in search it is enough to have only one route available.
+      // We do not filter "tokenOut" allow solver router to find a proposition to swap
+      if (fieldName === "tokenIn" && !value?.routes?.length) {
+        return
+      }
+
       let isNotSelectable = false
-      // We do not filter "tokenIn" as give full access to tokens in first step
-      // Filtration by routes should happen only at "tokenOut"
       const isAlreadySelected =
         selectToken && value.defuse_asset_id === selectToken.defuse_asset_id
-      const isTokenOutAndNotSelectable =
-        selectToken &&
-        fieldName === "tokenOut" &&
-        !selectToken?.routes?.includes(value.defuse_asset_id)
-      if (isAlreadySelected || isTokenOutAndNotSelectable) {
+      if (isAlreadySelected) {
         isNotSelectable = true
       }
 
@@ -86,8 +125,10 @@ const ModalSelectAssets = () => {
       }
       getAssetList.push({ ...value, isNotSelectable })
     })
-    setAssetList(tieNativeToWrapToken(getAssetList))
-    setAssetListWithBalances(tieNativeToWrapToken(getAssetListWithBalances))
+    setAssetList(tieNativeToWrapToken(getAssetList).sort(sortByTopBalances))
+    setAssetListWithBalances(
+      tieNativeToWrapToken(getAssetListWithBalances).sort(sortByTopBalances)
+    )
   }, [data, isLoading])
 
   return (
@@ -100,7 +141,16 @@ const ModalSelectAssets = () => {
             handleOverrideCancel={onCloseModal}
           />
         </div>
-        {!deferredQuery.length && assetListWithBalances.length ? (
+        {newAssetList.length ? (
+          <div className="relative flex-1 border-b border-gray-100 px-2.5 min-h-[228px] h-full max-h-[228px] overflow-y-auto dark:border-black-950">
+            <AssetList
+              assets={newAssetList}
+              title="Add tokens"
+              handleSelectToken={handleSelectToken}
+            />
+          </div>
+        ) : null}
+        {!searchValue.length && assetListWithBalances.length ? (
           <div className="relative flex-1 border-b border-gray-100 px-2.5 min-h-[228px] h-full max-h-[228px] overflow-y-auto dark:border-black-950">
             <AssetList
               assets={assetListWithBalances}
@@ -111,12 +161,12 @@ const ModalSelectAssets = () => {
         ) : null}
         <div className="flex-1 flex flex-col justify-between border-b border-gray-100 px-2.5 overflow-y-auto dark:border-black-950">
           <AssetList
-            assets={deferredQuery ? assetList.filter(filterPattern) : assetList}
-            title={deferredQuery ? "Search results" : "Popular tokens"}
+            assets={searchValue ? assetList.filter(filterPattern) : assetList}
+            title={searchValue ? "Search results" : "Popular tokens"}
             className="h-full"
             handleSelectToken={handleSelectToken}
           />
-          {deferredQuery && (
+          {searchValue && (
             <div className="flex justify-center items-center">
               <button
                 onClick={handleSearchClear}

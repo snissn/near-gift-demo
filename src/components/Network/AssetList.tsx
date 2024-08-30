@@ -6,6 +6,10 @@ import Image from "next/image"
 import AssetComboIcon from "@src/components/Network/AssetComboIcon"
 import { NetworkToken } from "@src/types/interfaces"
 import { TokenListWithNotSelectableToken } from "@src/components/Modal/ModalSelectAssets"
+import {
+  balanceToDecimal,
+  balanceToCurrency,
+} from "@src/app/swap/SwapForm/service/balanceTo"
 
 type Props = {
   title?: string
@@ -49,7 +53,7 @@ const AssetList = ({
   handleSelectToken,
 }: Props) => {
   if (!assets.length) {
-    return emptyState || <EmptyAssetList className={className} />
+    return emptyState || <EmptyAssetList className={className ?? ""} />
   }
   return (
     <div className={clsx("flex flex-col", className && className)}>
@@ -70,8 +74,9 @@ const AssetList = ({
             chainName,
             symbol,
             balance,
-            balanceToUsd,
+            balanceUsd,
             isNotSelectable,
+            decimals,
             ...rest
           },
           i
@@ -96,9 +101,9 @@ const AssetList = ({
                 </Text>
                 <Text as="span" size="2" weight="medium">
                   {balance
-                    ? balance < 0.00001
+                    ? Number(balanceToDecimal(balance, decimals)) < 0.00001
                       ? "< 0.00001"
-                      : balance.toFixed(7)
+                      : Number(balanceToDecimal(balance, decimals)).toFixed(7)
                     : null}
                 </Text>
               </div>
@@ -107,7 +112,7 @@ const AssetList = ({
                   {symbol ? symbol : null}
                 </Text>
                 <Text as="span" size="2">
-                  {balanceToUsd ? `$${balanceToUsd.toFixed(7)}` : null}
+                  {balanceUsd ? `$${balanceToCurrency(balanceUsd)}` : null}
                 </Text>
               </div>
             </div>

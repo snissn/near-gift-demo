@@ -1,7 +1,6 @@
 import { providers } from "near-api-js"
 import { CodeResult } from "near-api-js/lib/providers/provider"
 import { setNearProvider, getNearProvider } from "@near-eth/client"
-import { BigNumber } from "ethers"
 
 import { NearViewAccount } from "@src/types/interfaces"
 
@@ -23,8 +22,8 @@ export async function storageBalance(contractId: string, accountId: string) {
       finality: "optimistic",
     })
     const balance = JSON.parse(Buffer.from(result.result).toString())
-    console.log("Fetching near storage balance of result:", result)
-    return BigNumber.from(balance?.total || "0")
+    // console.log("Fetching near storage balance of result:", result)
+    return BigInt(balance?.total || "0")
   } catch (e) {
     console.error("Failed to check storage balance")
     return null
@@ -46,7 +45,7 @@ export async function nearAccount(
     // console.log("Fetching near account result:", result)
     return result as NearViewAccount
   } catch (e) {
-    console.error("Failed to fetch account or it doesn't exist ")
+    console.error(`Failed to fetch account or it doesn't exist - ${accountId}`)
     return null
   }
 }
@@ -72,7 +71,7 @@ export async function nep141Balance(
     // )
     return JSON.parse(Buffer.from(storageBalance.result).toString())
   } catch (e) {
-    console.error("Failed to check storage balance")
+    console.error("Failed to check NEP-141 balance")
     return null
   }
 }

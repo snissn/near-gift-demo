@@ -9,7 +9,7 @@ import { SwapEstimateProviderResponse } from "@src/libs/de-sdk/types/interfaces"
 import { NetworkToken } from "@src/types/interfaces"
 import { tokenBalanceToFormatUnits } from "@src/utils/token"
 
-import { EvaluateResultEnum } from "../SwapForm/service/evaluateSwap"
+import { EvaluateResultEnum } from "../../app/swap/SwapForm/service/evaluateSwap"
 
 const BEST_PRICE = "best price"
 const LOW_PRICE = "low price"

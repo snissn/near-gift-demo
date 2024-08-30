@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 
 import { getCoinsListWithMarketData } from "@src/libs/de-sdk/providers/coingeckoProvider"
 
-const queryKey = "exchanges"
+const queryKey = "exchange"
 export const getMarketDataKey = [queryKey, "get-market-data"]
 
 export const useGetCoinsListWithMarketData = (options = {}) =>

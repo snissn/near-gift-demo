@@ -29,6 +29,19 @@ export const W_NEAR_TOKEN_META = {
   decimals: 24,
 }
 
+export const W_BASE_TOKEN_META = {
+  defuse_asset_id: "eth:8453:native",
+  blockchain: "eth",
+  chainId: "8453",
+  address: "0x4200000000000000000000000000000000000006",
+  chainName: "BASE",
+  name: "Wrapped Ether",
+  symbol: "WETH",
+  chainIcon: "/static/icons/network/ethereum_white.svg",
+  icon: "https://assets.coingecko.com/coins/images/279/standard/ethereum.png",
+  decimals: 18,
+}
+
 const listNetworksTokensTestnet = [
   {
     defuse_asset_id: "near:testnet:wrap.testnet",

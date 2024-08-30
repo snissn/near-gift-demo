@@ -1,8 +1,6 @@
 "use client"
 
 import { WalletSelector } from "@near-wallet-selector/core"
-import { parseUnits } from "viem"
-import { BigNumber } from "ethers"
 import { useState } from "react"
 
 import {
@@ -30,7 +28,7 @@ import { LIST_NATIVE_TOKENS, W_NEAR_TOKEN_META } from "@src/constants/tokens"
 import { mapCreateIntentTransactionCall } from "@src/libs/de-sdk/utils/maps"
 import { isForeignNetworkToken } from "@src/utils/network"
 import { TransactionMethod } from "@src/types/solver0"
-import { getBalanceNearAllowedToSwap } from "@src/components/SwapForm/service/getBalanceNearAllowedToSwap"
+import { getBalanceNearAllowedToSwap } from "@src/app/swap/SwapForm/service/getBalanceNearAllowedToSwap"
 import { nep141Balance } from "@src/utils/near"
 
 type Props = {
@@ -51,6 +49,7 @@ export type NextEstimateQueueTransactionsProps = {
 export type NextEstimateQueueTransactionsResult = {
   value: EstimateQueueTransactions
   done: boolean
+  failure?: boolean
 }
 
 type WithAccounts = {
@@ -141,7 +140,6 @@ export const useSwap = ({ accountId, selector }: Props) => {
       }
 
       const { selectedTokenIn, selectedTokenOut, tokenIn } = inputs
-
       const [network, chain, address] =
         selectedTokenIn.defuse_asset_id.split(":")
       if (
@@ -150,7 +148,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
         accountId
       ) {
         const balanceNear = await getBalanceNearAllowedToSwap(accountId)
-        if (Number(tokenIn) > balanceNear) {
+        if (BigInt(tokenIn) > BigInt(balanceNear)) {
           queueTransaction.unshift(QueueTransactions.WITHDRAW)
           queue++
         }
@@ -171,9 +169,9 @@ export const useSwap = ({ accountId, selector }: Props) => {
         accountId as string
       )
       if (!isForeignNetworkToken(selectedTokenIn.defuse_asset_id)) {
-        const storageBalanceTokenInToString = BigNumber.from(
-          storageBalanceTokenIn
-        ).toString()
+        const storageBalanceTokenInToString = storageBalanceTokenIn
+          ? storageBalanceTokenIn.toString()
+          : "0"
         console.log(
           "useSwap storageBalanceTokenIn: ",
           storageBalanceTokenInToString
@@ -194,9 +192,9 @@ export const useSwap = ({ accountId, selector }: Props) => {
         !isForeignNetworkToken(selectedTokenOut.defuse_asset_id) &&
         !isNativeTokenOut
       ) {
-        const storageBalanceTokenOutToString = BigNumber.from(
-          storageBalanceTokenOut
-        ).toString()
+        const storageBalanceTokenOutToString = storageBalanceTokenOut
+          ? storageBalanceTokenOut.toString()
+          : "0"
         console.log(
           "useSwap storageBalanceTokenOut: ",
           storageBalanceTokenOutToString
@@ -233,6 +231,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
 
       if (isFailure) {
         return {
+          failure: true,
           value: estimateQueue,
           done: false,
         }
@@ -289,11 +288,6 @@ export const useSwap = ({ accountId, selector }: Props) => {
       const isWithdrawInTrack = estimateQueue.queueTransactionsTrack.includes(
         QueueTransactions.WITHDRAW
       )
-
-      let balanceNear = 0
-      if (isWithdrawInTrack && accountId) {
-        balanceNear = await getBalanceNearAllowedToSwap(accountId)
-      }
 
       if (
         estimateQueue?.queueTransactionsTrack?.length === 1 ||

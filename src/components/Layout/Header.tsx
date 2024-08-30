@@ -9,7 +9,7 @@ import { usePathname } from "next/navigation"
 import Logo from "@src/components/Logo"
 import Navbar from "@src/components/Navbar"
 import ConnectWallet from "@src/components/Wallet"
-// import Settings from "@src/components/Settings"
+import Settings from "@src/components/Settings"
 import { Navigation } from "@src/constants/routes"
 
 const NEXT_PUBLIC_APP_URL = process?.env?.appUrl ?? ""
@@ -31,8 +31,7 @@ const Header = () => {
             {!isMarketPage && (
               <>
                 <ConnectWallet />
-                {/*  TODO Wallet page has to be re-designed */}
-                {/*<Settings />*/}
+                <Settings />
               </>
             )}
             {isMarketPage && (

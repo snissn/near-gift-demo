@@ -2,12 +2,10 @@ import { EmptyTokenBalance } from "@src/app/wallet/page"
 import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 
 const CardToken = ({
-  chainId,
-  icon,
   name,
   symbol,
   balance,
-  balanceToUsd,
+  balanceUsd,
 }: NetworkTokenWithSwapRoute | EmptyTokenBalance) => {
   return (
     <div className="flex justify-between items-start gap-3 bg-gray-200 rounded-[20px] p-5">
@@ -18,7 +16,7 @@ const CardToken = ({
         <span>{name}</span>
         <span>{`${balance} ${symbol}`}</span>
       </div>
-      <span>${balanceToUsd}</span>
+      <span>${balanceUsd}</span>
     </div>
   )
 }

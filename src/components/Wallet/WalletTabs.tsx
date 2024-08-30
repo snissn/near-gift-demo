@@ -2,7 +2,7 @@
 
 import { Box, Text, Tabs, Spinner } from "@radix-ui/themes"
 import { PropsWithChildren, useEffect, useState } from "react"
-import { formatUnits } from "viem"
+import { formatUnits } from "ethers"
 
 import LabelComingSoon from "@src/components/LabelComingSoon"
 import { useTokensStore } from "@src/providers/TokensStoreProvider"
@@ -12,9 +12,7 @@ import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
 const IS_DISABLED_ALL_TABS = true
 
 const WalletTabBox = ({ children }: PropsWithChildren) => {
-  return (
-    <div className="pt-[22px] pb-[26px] flex flex-col gap-2">{children}</div>
-  )
+  return <div className="flex flex-col gap-2">{children}</div>
 }
 
 const TabTotalBalance = ({
@@ -26,8 +24,15 @@ const TabTotalBalance = ({
 }) => {
   return (
     <WalletTabBox>
+      <Text
+        size="1"
+        weight="medium"
+        className="text-gray-600 dark:text-gray-500"
+      >
+        Total balance
+      </Text>
       {isLoading ? (
-        <div className="h-[36px]">
+        <div className="flex h-[36px] items-center">
           <Spinner loading={isLoading} />
         </div>
       ) : (
@@ -35,13 +40,6 @@ const TabTotalBalance = ({
           ${totalBalanceInUsd ? totalBalanceInUsd?.toFixed(2) : "0.00"}
         </Text>
       )}
-      <Text
-        size="2"
-        weight="medium"
-        className="text-gray-600 dark:text-gray-500"
-      >
-        Total balance
-      </Text>
     </WalletTabBox>
   )
 }
@@ -62,8 +60,8 @@ const WalletTabs = () => {
 
     data.forEach((token) => {
       temp.push(token)
-      if (token?.balanceToUsd && token?.balanceToUsd > 0) {
-        balanceInUsd = Number(balanceInUsd) + Number(token!.balanceToUsd)
+      if (token?.balanceUsd && token?.balanceUsd > 0) {
+        balanceInUsd = Number(balanceInUsd) + Number(token!.balanceUsd)
         if (token.defuse_asset_id === "near:mainnet:wrap.near") {
           wNearConvertedLastUsd = token.convertedLast!.usd
         }
@@ -88,7 +86,7 @@ const WalletTabs = () => {
 
   useEffect(() => {
     if (data.size && isFetched) {
-      getBalanceToUsd()
+      void getBalanceToUsd()
     }
   }, [data.size, isFetched])
 

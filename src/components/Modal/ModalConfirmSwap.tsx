@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from "react"
 import { Spinner, Text } from "@radix-ui/themes"
 import Image from "next/image"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { parseUnits } from "viem"
 import { v4 } from "uuid"
 
 import ModalDialog from "@src/components/Modal/ModalDialog"
@@ -20,7 +19,7 @@ import { ModalReviewSwapPayload } from "@src/components/Modal/ModalReviewSwap"
 import { ModalType } from "@src/stores/modalStore"
 import { sha256 } from "@src/actions/crypto"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
-import { usePublishIntentSolver0 } from "@src/api/hooks/Intent/usePublishIntentSolver0"
+import { usePublishIntentSolver0 } from "@src/api/hooks/intent/usePublishIntentSolver0"
 import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
 import { smallBalanceToFormat } from "@src/utils/token"
 import { PublishAtomicNearIntentProps } from "@src/api/intent"
@@ -28,6 +27,7 @@ import { useNotificationStore } from "@src/providers/NotificationProvider"
 import { NotificationType } from "@src/stores/notificationStore"
 import { getNearBlockById } from "@src/api/transaction"
 import { NearBlock, NearTX, QueueTransactions } from "@src/types/interfaces"
+import { balanceToDecimal } from "@src/app/swap/SwapForm/service/balanceTo"
 
 export interface ModalConfirmSwapPayload extends CallRequestIntentProps {}
 
@@ -36,6 +36,7 @@ const ModalConfirmSwap = () => {
   const [dataFromLocal, setDataFromLocal] = useState<ModalConfirmSwapPayload>()
   const [isReadingHistory, setIsReadingHistory] = useState(false)
   const { selector, accountId } = useWalletSelector()
+  const [isErrorTransaction, setIsErrorTransaction] = useState(false)
   const {
     callRequestCreateIntent,
     nextEstimateQueueTransactions,
@@ -140,14 +141,8 @@ const ModalConfirmSwap = () => {
       accountId: accountId,
       intentId: receivedIntentId,
       defuseAssetIdOut: inputs.selectedTokenOut.defuse_asset_id,
-      unitsAmountIn: parseUnits(
-        inputs.tokenIn,
-        inputs.selectedTokenIn?.decimals as number
-      ).toString(),
-      unitsAmountOut: parseUnits(
-        inputs.tokenOut,
-        inputs.selectedTokenOut?.decimals as number
-      ).toString(),
+      unitsAmountIn: inputs.tokenIn,
+      unitsAmountOut: inputs.tokenOut,
     } as PublishAtomicNearIntentProps)
   }
 
@@ -183,10 +178,15 @@ const ModalConfirmSwap = () => {
             QueueTransactions.CREATE_INTENT
           )
 
-        const { value, done } = await nextEstimateQueueTransactions({
+        const { value, done, failure } = await nextEstimateQueueTransactions({
           estimateQueue: data.estimateQueue,
           receivedHash: lastInTransactionHashes as string,
         })
+
+        if (failure) {
+          setIsErrorTransaction(true)
+          return
+        }
 
         const inputs = {
           tokenIn: data!.tokenIn,
@@ -293,13 +293,15 @@ const ModalConfirmSwap = () => {
           },
         })
 
-        const { value, done } = await nextEstimateQueueTransactions({
+        const { value, done, failure } = await nextEstimateQueueTransactions({
           estimateQueue: estimateQueue,
           receivedHash: result.transaction.hash,
         })
 
         // Toggle preview for the main transaction in batch
-        if (resultSequence === callResult.length - 1) {
+        if (failure) {
+          setIsErrorTransaction(true)
+        } else if (resultSequence === callResult.length - 1) {
           if (!done) {
             handleCallCreateIntent(
               {
@@ -339,7 +341,7 @@ const ModalConfirmSwap = () => {
       ongoingPublishingRef.current = false
       router.replace(pathname)
     }
-    if (isError) {
+    if (isError || isErrorTransaction) {
       ongoingPublishingRef.current = false
       setNotification({
         id: v4(),
@@ -347,7 +349,7 @@ const ModalConfirmSwap = () => {
         type: NotificationType.ERROR,
       })
     }
-  }, [isSuccess, isError])
+  }, [isSuccess, isError, isErrorTransaction])
 
   useEffect(() => {
     if (isErrorSwap) {
@@ -365,6 +367,19 @@ const ModalConfirmSwap = () => {
   if (!isReadingHistory) {
     return null
   }
+
+  const tokenInValue = balanceToDecimal(
+    (modalPayload?.tokenIn || dataFromLocal?.tokenIn) ?? "0",
+    (modalPayload?.selectedTokenIn.decimals ||
+      dataFromLocal?.selectedTokenIn.decimals) ??
+      0
+  )
+  const tokenOutValue = balanceToDecimal(
+    (modalPayload?.tokenOut || dataFromLocal?.tokenOut) ?? "0",
+    (modalPayload?.selectedTokenOut.decimals ||
+      dataFromLocal?.selectedTokenOut.decimals) ??
+      0
+  )
 
   return (
     <ModalDialog>
@@ -411,7 +426,7 @@ const ModalConfirmSwap = () => {
         <div className="flex justify-center">
           <div className="flex justify-center items-center gap-1 px-2.5 py-1 bg-gray-950 rounded-full">
             <Text size="2" weight="medium" className="text-black-400">
-              {`${smallBalanceToFormat(modalPayload?.tokenIn || dataFromLocal?.tokenIn || "", 7)} ${modalPayload?.selectedTokenIn?.symbol || dataFromLocal?.selectedTokenIn?.symbol || ""}`}
+              {`${smallBalanceToFormat(tokenInValue, 7)} ${modalPayload?.selectedTokenIn?.symbol || dataFromLocal?.selectedTokenIn?.symbol || ""}`}
             </Text>
             <Image
               src="/static/icons/arrow-right.svg"
@@ -420,7 +435,7 @@ const ModalConfirmSwap = () => {
               height={24}
             />
             <Text size="2" weight="medium" className="text-black-400">
-              {`${smallBalanceToFormat(modalPayload?.tokenOut || dataFromLocal?.tokenOut || "", 7)} ${modalPayload?.selectedTokenOut?.symbol || dataFromLocal?.selectedTokenOut?.symbol || ""}`}
+              {`${smallBalanceToFormat(tokenOutValue, 7)} ${modalPayload?.selectedTokenOut?.symbol || dataFromLocal?.selectedTokenOut?.symbol || ""}`}
             </Text>
           </div>
         </div>

@@ -1,4 +1,3 @@
-import { BigNumber } from "ethers"
 import { providers } from "near-api-js"
 import type { AccountView } from "near-api-js/lib/providers/provider"
 
@@ -31,8 +30,7 @@ export const useAccountBalance = () => {
         finality: "final",
         account_id: accountId,
       })
-      const bn = BigNumber.from(amount)
-      const isZero = bn.isZero()
+      const isZero = BigInt(amount) === BigInt(0)
       return Object.assign(balance, { hasBalance: !isZero, balance: amount })
     } catch (e) {
       console.log("useAccountBalance: ", e)

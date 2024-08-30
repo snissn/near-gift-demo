@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react"
 import Image from "next/image"
 import { Text, Tooltip } from "@radix-ui/themes"
 import { InfoCircledIcon } from "@radix-ui/react-icons"
-import { ethers } from "ethers"
+import { isAddress } from "ethers"
 import * as bitcoin from "bitcoinjs-lib"
 
 import { BlockchainEnum, NetworkToken } from "@src/types/interfaces"
@@ -28,6 +28,32 @@ export type ModalConnectNetworksPayload = {
   solverId: string
 }
 
+export const handleValidateAccount = (
+  account: string,
+  setErrorAccount: (value: string) => void,
+  defuse_asset_id: string
+) => {
+  const result = parseDefuseAsset(defuse_asset_id)
+  const blockchain = result?.blockchain ?? ""
+  switch (blockchain) {
+    case BlockchainEnum.Eth:
+      if (!isAddress(account)) {
+        setErrorAccount("Invalid wallet address.")
+      } else {
+        setErrorAccount("")
+      }
+      break
+    case BlockchainEnum.Btc:
+      try {
+        bitcoin.address.toOutputScript(account)
+        setErrorAccount("")
+      } catch (e) {
+        setErrorAccount("Invalid Bitcoin address.")
+      }
+      break
+  }
+}
+
 const ModalConnectNetworks = () => {
   const [accountFrom, setAccountFrom] = useState("")
   const [accountTo, setAccountTo] = useState("")
@@ -49,33 +75,6 @@ const ModalConnectNetworks = () => {
       accountFrom,
       accountTo,
     })
-  }
-
-  const handleValidateAccount = (
-    account: string,
-    setErrorAccount: (value: string) => void
-  ) => {
-    const result = parseDefuseAsset(
-      convertPayload.selectedTokenOut?.defuse_asset_id ?? ""
-    )
-    const blockchain = result?.blockchain ?? ""
-    switch (blockchain) {
-      case BlockchainEnum.Eth:
-        if (!ethers.utils.isAddress(account)) {
-          setErrorAccount("Invalid wallet address.")
-        } else {
-          setErrorAccount("")
-        }
-        break
-      case BlockchainEnum.Btc:
-        try {
-          bitcoin.address.toOutputScript(account)
-          setErrorAccount("")
-        } catch (e) {
-          setErrorAccount("Invalid Bitcoin address.")
-        }
-        break
-    }
   }
 
   useEffect(() => {
@@ -141,7 +140,11 @@ const ModalConnectNetworks = () => {
                 account={accountFrom}
                 onChange={(account) => setAccountFrom(account)}
                 onBlur={(account) =>
-                  handleValidateAccount(account, setErrorAccountFrom)
+                  handleValidateAccount(
+                    account,
+                    setErrorAccountFrom,
+                    convertPayload.selectedTokenOut?.defuse_asset_id ?? ""
+                  )
                 }
               />
             )}
@@ -170,7 +173,11 @@ const ModalConnectNetworks = () => {
                 account={accountTo}
                 onChange={(account) => setAccountTo(account)}
                 onBlur={(account) =>
-                  handleValidateAccount(account, setErrorAccountTo)
+                  handleValidateAccount(
+                    account,
+                    setErrorAccountTo,
+                    convertPayload.selectedTokenOut?.defuse_asset_id ?? ""
+                  )
                 }
               />
             )}

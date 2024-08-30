@@ -19,14 +19,20 @@ export const tieNativeToWrapToken = (
         (token) => token.defuse_asset_id === W_NEAR_TOKEN_META.defuse_asset_id
       )
       if (findWNear) {
+        const balanceNear = token?.balance ?? 0
+        const balanceNearUsd = token?.balanceUsd ?? 0
         const balanceWNear = findWNear?.balance ?? 0
-        const balanceWNearToUsd = findWNear?.balanceToUsd ?? 0
-        const totalBalance = (token?.balance ?? 0) + balanceWNear
-        const totalBalanceToUsd = (token?.balanceToUsd ?? 0) + balanceWNearToUsd
+        const balanceWNearUsd = findWNear?.balanceUsd ?? 0
+
+        const totalBalance = (
+          BigInt(balanceNear) + BigInt(balanceWNear)
+        ).toString()
+        const totalBalanceUsd = balanceNearUsd + balanceWNearUsd
+
         acc.push({
           ...token,
           balance: totalBalance,
-          balanceToUsd: totalBalanceToUsd,
+          balanceUsd: totalBalanceUsd,
         })
         return acc
       }
@@ -34,4 +40,20 @@ export const tieNativeToWrapToken = (
     acc.push(token)
     return acc
   }, [])
+}
+
+export const sortByTopBalances = (
+  tokenA: NetworkTokenWithSwapRoute,
+  tokenB: NetworkTokenWithSwapRoute
+) => {
+  const balanceA = BigInt(tokenA?.balance ?? "0")
+  const balanceB = BigInt(tokenB?.balance ?? "0")
+
+  if (balanceA < balanceB) {
+    return 1
+  }
+  if (balanceA > balanceB) {
+    return -1
+  }
+  return 0
 }

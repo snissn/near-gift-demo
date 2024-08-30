@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react"
 import Image from "next/image"
 import { Spinner, Text } from "@radix-ui/themes"
 import Link from "next/link"
-import { formatUnits } from "viem"
+import { formatUnits } from "ethers"
 
 import { HistoryData, HistoryStatus } from "@src/stores/historyStore"
 import Button from "@src/components/Button/Button"
@@ -20,6 +20,10 @@ import { useSwap } from "@src/hooks/useSwap"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
 import { TransactionMethod } from "@src/types/solver0"
+import {
+  balanceToDecimal,
+  safeBalanceToDecimal,
+} from "@src/app/swap/SwapForm/service/balanceTo"
 
 const NEAR_EXPLORER = process?.env?.nearExplorer ?? ""
 const PLACEHOLDER = "XX"
@@ -50,13 +54,26 @@ const WidgetCard = ({
     details: HistoryData["details"],
     typeQueueTransactions?: QueueTransactions
   ): { title: string; subTitle?: string } => {
+    const tokenInValue = smallBalanceToFormat(
+      balanceToDecimal(
+        (details?.tokenIn || details?.recoverDetails?.send.amount) ?? "0",
+        details?.selectedTokenIn?.decimals ?? 0
+      )
+    )
+    const tokenOutValue = smallBalanceToFormat(
+      balanceToDecimal(
+        details?.tokenOut ?? "0",
+        details?.selectedTokenOut?.decimals ?? 0
+      )
+    )
+
     switch (typeQueueTransactions) {
       case QueueTransactions.CREATE_INTENT:
         switch (status) {
           case HistoryStatus.FAILED:
             return {
               title: "Transaction failed",
-              subTitle: `You received ${smallBalanceToFormat(details?.tokenOut ?? "0") ?? PLACEHOLDER} ${details?.selectedTokenOut?.symbol ?? PLACEHOLDER}.`,
+              subTitle: `You received ${smallBalanceToFormat(tokenOutValue) ?? PLACEHOLDER} ${details?.selectedTokenOut?.symbol ?? PLACEHOLDER}.`,
             }
 
           case HistoryStatus.ROLLED_BACK:
@@ -78,7 +95,7 @@ const WidgetCard = ({
               : "0"
             return {
               title: `Swap rolled back!`,
-              subTitle: `You received back ${smallBalanceToFormat((details?.tokenIn || tokenIn) ?? "0") ?? PLACEHOLDER} ${(details?.selectedTokenIn?.symbol || tokensData[0]?.symbol) ?? PLACEHOLDER}.`,
+              subTitle: `You received back ${(parseFloat(tokenInValue) ? tokenInValue : smallBalanceToFormat(tokenIn)) ?? PLACEHOLDER} ${(details?.selectedTokenIn?.symbol || tokensData[0]?.symbol) ?? PLACEHOLDER}.`,
             }
 
           // to support new intent
@@ -87,7 +104,7 @@ const WidgetCard = ({
           case HistoryStatus.INTENT_1_EXECUTED:
             return {
               title: `Transaction complete!`,
-              subTitle: `You received ${smallBalanceToFormat(details?.tokenOut ?? "0") ?? PLACEHOLDER} ${details?.selectedTokenOut?.symbol ?? PLACEHOLDER}.`,
+              subTitle: `You received ${smallBalanceToFormat(tokenOutValue) ?? PLACEHOLDER} ${details?.selectedTokenOut?.symbol ?? PLACEHOLDER}.`,
             }
 
           default:
@@ -115,7 +132,7 @@ const WidgetCard = ({
             }
 
             return {
-              title: `Swapping ${smallBalanceToFormat(details?.tokenIn ?? "0")} ${details?.selectedTokenIn?.symbol} for ${smallBalanceToFormat(details?.tokenOut ?? "0")} ${details?.selectedTokenOut?.symbol}`,
+              title: `Swapping ${tokenInValue} ${details?.selectedTokenIn?.symbol} for ${tokenOutValue} ${details?.selectedTokenOut?.symbol}`,
             }
         }
 

@@ -4,6 +4,7 @@ import { useModalStore } from "@src/providers/ModalStoreProvider"
 import ModalReviewSwap from "@src/components/Modal/ModalReviewSwap"
 import ModalConfirmSwap from "@src/components/Modal/ModalConfirmSwap"
 import ModalConnectNetworks from "@src/components/Modal/ModalConnectNetworks"
+import ModalStoreNetwork from "@src/components/Modal/ModalStoreNetwork"
 
 import { ModalType } from "../../stores/modalStore"
 
@@ -21,6 +22,8 @@ const Modal = () => {
       return <ModalConfirmSwap />
     case ModalType.MODAL_CONNECT_NETWORKS:
       return <ModalConnectNetworks />
+    case ModalType.MODAL_STORE_NETWORK:
+      return <ModalStoreNetwork />
   }
 }
 

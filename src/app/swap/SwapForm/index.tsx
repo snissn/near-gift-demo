@@ -1,7 +1,9 @@
 "use client"
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { FieldValues, useForm } from "react-hook-form"
-import { formatUnits, parseUnits } from "viem"
+import { parseUnits } from "ethers"
+import { Text } from "@radix-ui/themes"
+import { v4 } from "uuid"
 
 import Paper from "@src/components/Paper"
 import Form from "@src/components/Form"
@@ -26,8 +28,16 @@ import { useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { debouncePromise } from "@src/utils/debouncePromise"
 import { tieNativeToWrapToken } from "@src/utils/tokenList"
-import { smallNumberToString } from "@src/utils/token"
-import { NEAR_TOKEN_META, W_NEAR_TOKEN_META } from "@src/constants/tokens"
+import { NEAR_TOKEN_META } from "@src/constants/tokens"
+import {
+  balanceToBignumberString,
+  balanceToDecimal,
+} from "@src/app/swap/SwapForm/service/balanceTo"
+import { getBalanceNearAllowedToSwap } from "@src/app/swap/SwapForm/service/getBalanceNearAllowedToSwap"
+import { smallBalanceToFormat } from "@src/utils/token"
+import isWalletConnected from "@src/app/swap/SwapForm/utils/isWalletConnected"
+import { NotificationType } from "@src/stores/notificationStore"
+import { useNotificationStore } from "@src/providers/NotificationProvider"
 
 import {
   EvaluateResultEnum,
@@ -45,7 +55,6 @@ type SelectToken = NetworkToken | undefined
 
 type EstimateSwap = {
   tokenIn: string
-  tokenOut: string
   name: string
   selectTokenIn: SelectToken
   selectTokenOut: SelectToken
@@ -53,16 +62,17 @@ type EstimateSwap = {
 
 enum ErrorEnum {
   INSUFFICIENT_BALANCE = "Insufficient Balance",
-  NOT_AVAILABLE_SWAP = "Not Available Swap",
   NO_QUOTES = "No Quotes",
-  EXCEEDED_NEAR_PER_BYTE_USE = "Must have 0.2N or more left in wallet",
+  EXCEEDED_NEAR_PER_BYTE_USE = "Not enough Near in wallet for gas fee",
 }
 
 const ESTIMATE_BOT_AWAIT_MS = 500
 
 export default function Swap() {
-  const [selectTokenIn, setSelectTokenIn] = useState<SelectToken>()
-  const [selectTokenOut, setSelectTokenOut] = useState<SelectToken>()
+  const [selectTokenIn, setSelectTokenIn] =
+    useState<NetworkTokenWithSwapRoute>()
+  const [selectTokenOut, setSelectTokenOut] =
+    useState<NetworkTokenWithSwapRoute>()
   const [errorSelectTokenIn, setErrorSelectTokenIn] = useState("")
   const [errorSelectTokenOut, setErrorSelectTokenOut] = useState("")
   const { accountId } = useWalletSelector()
@@ -98,6 +108,8 @@ export default function Swap() {
   useModalSearchParams()
   const [errorMsg, setErrorMsg] = useState<ErrorEnum>()
   const [isFetchingData, setIsFetchingData] = useState(false)
+  const allowableNearAmountRef = useRef<null | string>(null)
+  const { setNotification } = useNotificationStore((state) => state)
 
   const onSubmit = async (values: FieldValues) => {
     if (errorMsg) {
@@ -115,25 +127,40 @@ export default function Swap() {
       hasUnsetTokens = true
       setErrorSelectTokenOut("Select token is required")
     }
+
     if (hasUnsetTokens) return
-    setModalType(
+
+    const accountTo = isWalletConnected(
+      selectTokenOut?.defuse_asset_id as string
+    )
+
+    const modalType =
       isForeignChainSwap(
         selectTokenIn?.defuse_asset_id as string,
         selectTokenOut?.defuse_asset_id as string
-      )
+      ) && !accountTo
         ? ModalType.MODAL_CONNECT_NETWORKS
-        : ModalType.MODAL_REVIEW_SWAP,
-      {
-        tokenIn: values.tokenIn,
-        tokenOut: values.tokenOut,
-        selectedTokenIn: selectTokenIn,
-        selectedTokenOut: selectTokenOut,
-        solverId: bestEstimate?.solver_id || "",
-      }
-    )
+        : ModalType.MODAL_REVIEW_SWAP
+
+    const modalPayload = {
+      tokenIn: balanceToBignumberString(
+        values.tokenIn,
+        selectTokenIn?.decimals ?? 0
+      ),
+      tokenOut: balanceToBignumberString(
+        values.tokenOut,
+        selectTokenOut?.decimals ?? 0
+      ),
+      selectedTokenIn: selectTokenIn,
+      selectedTokenOut: selectTokenOut,
+      solverId: bestEstimate?.solver_id || "",
+      accountTo,
+    }
+
+    setModalType(modalType, modalPayload)
   }
 
-  const handleSwitch = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSwitch = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     if (isFetchingData) {
       return
@@ -141,23 +168,23 @@ export default function Swap() {
     setErrorMsg(undefined)
     setPriceEvaluation(null)
     const tempTokenInCopy = Object.assign({}, selectTokenIn)
+
+    if (!selectTokenOut?.routes?.length) {
+      setNotification({
+        id: v4(),
+        message: "This switch not available!",
+        type: NotificationType.ERROR,
+      })
+      return
+    }
+
     setSelectTokenIn(selectTokenOut)
     setSelectTokenOut(tempTokenInCopy)
 
-    // Use isProgrammaticUpdate as true to prevent unnecessary estimate
     const valueTokenIn = getValues("tokenIn")
     const valueTokenOut = getValues("tokenOut")
-    isProgrammaticUpdate.current = true
     setValue("tokenOut", valueTokenIn)
-    isProgrammaticUpdate.current = true
     setValue("tokenIn", valueTokenOut)
-    handleEstimateSwap({
-      tokenIn: getValues("tokenIn"),
-      tokenOut: getValues("tokenOut"),
-      name: "tokenIn",
-      selectTokenIn: selectTokenOut,
-      selectTokenOut: tempTokenInCopy,
-    })
   }
 
   const handleSelect = (fieldName: string, selectToken: SelectToken) => {
@@ -175,20 +202,25 @@ export default function Swap() {
 
   const handleEstimateSwap = async ({
     tokenIn,
-    tokenOut,
     name,
     selectTokenIn,
     selectTokenOut,
-  }: EstimateSwap) => {
+  }: EstimateSwap): Promise<void> => {
     try {
       setErrorMsg(undefined)
       setPriceEvaluation(null)
+      allowableNearAmountRef.current = null
       clearErrors()
       lastInputValue.current = tokenIn
-      const parsedTokeinIn = parseFloat(tokenIn)
+
+      const parsedTokenInBigNumber = BigInt(
+        balanceToBignumberString(tokenIn, selectTokenIn?.decimals ?? 0)
+      )
+      const balanceTokenInBigNumber = BigInt(selectTokenIn?.balance ?? "0")
+
       // Empty input
       if (
-        (name === "tokenIn" && !parsedTokeinIn) ||
+        (name === "tokenIn" && !tokenIn) ||
         !selectTokenIn ||
         !selectTokenOut
       ) {
@@ -197,24 +229,21 @@ export default function Swap() {
         setIsFetchingData(false)
         return
       }
-      if (parsedTokeinIn > (selectTokenIn?.balance ?? 0)) {
-        setErrorMsg(ErrorEnum.INSUFFICIENT_BALANCE)
+
+      if (
+        selectTokenIn.defuse_asset_id === NEAR_TOKEN_META.defuse_asset_id &&
+        accountId
+      ) {
+        const balanceAllowed = await getBalanceNearAllowedToSwap(accountId)
+        const balanceAllowedBigNumber = BigInt(balanceAllowed)
+        if (parsedTokenInBigNumber > balanceAllowedBigNumber) {
+          setErrorMsg(ErrorEnum.EXCEEDED_NEAR_PER_BYTE_USE)
+          allowableNearAmountRef.current = balanceAllowedBigNumber.toString()
+        }
       }
 
-      // TODO See comment below at [place-1]
-
-      // Do not use any estimation of swap between Native and Token if ratio is 1:1
-      const pair = [selectTokenIn.address, selectTokenOut.address]
-      if (
-        pair.includes(NEAR_TOKEN_META.address) &&
-        pair.includes(W_NEAR_TOKEN_META.address)
-      ) {
-        isProgrammaticUpdate.current = true
-        setIsFetchingData(false)
-        return setValue(
-          name === "tokenIn" ? "tokenOut" : "tokenIn",
-          name === "tokenIn" ? tokenIn : tokenOut
-        )
+      if (parsedTokenInBigNumber > balanceTokenInBigNumber) {
+        setErrorMsg(ErrorEnum.INSUFFICIENT_BALANCE)
       }
 
       setIsFetchingData(true)
@@ -250,29 +279,13 @@ export default function Swap() {
         isProgrammaticUpdate.current = true
         const formattedOut =
           bestEstimate.amount_out !== null
-            ? formatUnits(
-                BigInt(bestEstimate.amount_out),
+            ? balanceToDecimal(
+                bestEstimate.amount_out,
                 selectTokenOut.decimals!
               )
             : "0"
         setValue("tokenOut", formattedOut)
         trigger("tokenOut")
-
-        // TODO [place-1] Temporarily showing quote for tokens whose don't have routes,
-        //      allowing solvers to integrate new protocols, and after `if` scope
-        //      has to be returned to.
-        if (
-          !(selectTokenIn as NetworkTokenWithSwapRoute).routes?.includes(
-            selectTokenOut.defuse_asset_id
-          )
-        ) {
-          setErrorMsg(ErrorEnum.NOT_AVAILABLE_SWAP)
-          isProgrammaticUpdate.current = true
-          setIsFetchingData(false)
-          // setValue("tokenOut", "")
-          setValue("tokenOut", parseFloat(formattedOut) ? formattedOut : "")
-          return
-        }
 
         setIsFetchingData(false)
       }
@@ -292,9 +305,9 @@ export default function Swap() {
           getConfirmSwapFromLocal
         )
         const cleanBalance = {
-          balance: 0,
-          balanceToUsd: 0,
-          convertedLast: 0,
+          balance: "0",
+          balanceUsd: 0,
+          convertedLast: undefined,
         }
         setSelectTokenIn(
           Object.assign(parsedData.data.selectedTokenIn, cleanBalance)
@@ -340,14 +353,13 @@ export default function Swap() {
       }
       handleEstimateSwap({
         tokenIn: String(value.tokenIn),
-        tokenOut: String(value.tokenOut),
         name: name as string,
         selectTokenIn,
         selectTokenOut,
       })
     })
     return () => subscription.unsubscribe()
-  }, [watch, selectTokenIn, selectTokenOut, getSwapEstimateBot, setValue])
+  }, [watch, selectTokenIn, selectTokenOut])
 
   useEffect(() => {
     // Use to calculate when selectTokenIn or selectTokenOut is changed
@@ -387,7 +399,6 @@ export default function Swap() {
           } else {
             handleEstimateSwap({
               tokenIn: getValues("tokenIn"),
-              tokenOut: "",
               name: "tokenIn",
               selectTokenIn: token,
               selectTokenOut,
@@ -408,7 +419,6 @@ export default function Swap() {
           } else {
             handleEstimateSwap({
               tokenIn: getValues("tokenIn"),
-              tokenOut: "",
               name: "tokenIn",
               selectTokenIn,
               selectTokenOut: token,
@@ -434,12 +444,18 @@ export default function Swap() {
         <FieldComboInput<FormValues>
           fieldName="tokenIn"
           price={priceToUsdTokenIn}
-          balance={selectTokenIn?.balance?.toString()}
+          balance={balanceToDecimal(
+            selectTokenIn?.balance ?? "0",
+            selectTokenIn?.decimals ?? 0
+          )}
           selected={selectTokenIn as NetworkToken}
           handleSelect={() => handleSelect("tokenIn", selectTokenOut)}
           handleSetMaxValue={() => {
-            const balance = smallNumberToString(selectTokenIn?.balance ?? 0)
-            setValue("tokenIn", balance)
+            const value = balanceToDecimal(
+              selectTokenIn?.balance ?? "0",
+              selectTokenIn?.decimals ?? 0
+            )
+            setValue("tokenIn", value)
           }}
           className="border rounded-t-xl md:max-w-[472px]"
           required="This field is required"
@@ -459,7 +475,10 @@ export default function Swap() {
               tokenOut={selectTokenOut}
             />
           }
-          balance={selectTokenOut?.balance?.toString()}
+          balance={balanceToDecimal(
+            selectTokenOut?.balance ?? "0",
+            selectTokenOut?.decimals ?? 0
+          )}
           selected={selectTokenOut as NetworkToken}
           handleSelect={() => handleSelect("tokenOut", selectTokenIn)}
           className="border rounded-b-xl mb-5 md:max-w-[472px]"
@@ -468,6 +487,33 @@ export default function Swap() {
           errorSelect={errorSelectTokenOut}
           disabled={true}
         />
+        {selectTokenIn?.defuse_asset_id === NEAR_TOKEN_META.defuse_asset_id &&
+          allowableNearAmountRef.current !== null && (
+            <div className="w-full block md:max-w-[472px] mb-5">
+              <Text
+                size="2"
+                weight="medium"
+                className="text-red-400 dark:text-primary-400"
+              >
+                {`You must have ${smallBalanceToFormat((Number(balanceToDecimal(selectTokenIn?.balance ?? "0", selectTokenIn?.decimals ?? 0)) - Number(balanceToDecimal(allowableNearAmountRef.current ?? "0", 24))).toString())} Near in wallet for gas fee. The maximum available to swap value is -`}
+              </Text>
+              <span
+                onClick={() => {
+                  const value = balanceToDecimal(
+                    allowableNearAmountRef.current ?? "0",
+                    24
+                  )
+                  setValue("tokenIn", value)
+                }}
+                className="inline-block text-xs px-2 py-0.5 ml-0.5 rounded-full bg-red-100 text-red-400 dark:bg-red-200 dark:text-primary-400 cursor-pointer"
+              >
+                {smallBalanceToFormat(
+                  balanceToDecimal(allowableNearAmountRef.current ?? "0", 24),
+                  7
+                )}
+              </span>
+            </div>
+          )}
         <Button
           type="submit"
           size="lg"
