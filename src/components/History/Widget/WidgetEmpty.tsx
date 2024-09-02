@@ -8,8 +8,8 @@ const WidgetEmpty = () => {
           Transactions
         </Text>
       </div>
-      <div className="w-full min-h-[36px] md:min-h-[204px] h-full bg-gray rounded-2xl flex justify-center items-center">
-        <div className="w-full md:max-w-[102px] text-center text-gray-600">
+      <div className="w-full min-h-[36px] md:min-h-[204px] h-full bg-gray rounded-2xl flex justify-center items-center dark:bg-black-950">
+        <div className="w-full md:max-w-[102px] text-center text-gray-600 dark:text-gray-500">
           <Text size="1">Your transactions will appear here </Text>
         </div>
       </div>

@@ -47,7 +47,7 @@ const WidgetTransactionsList = <T extends { timestamp: number }>({
       <div className="overflow-auto">
         {Object.keys(groupedData).map((date, index) => (
           <Fragment key={index}>
-            <div className="z-10 sticky top-0 pt-5 pb-3 text-xs font-medium text-gray-600 border-b border-gray-100 bg-white-100">
+            <div className="z-10 sticky top-0 pt-5 pb-3 text-xs font-medium text-gray-600 border-b border-gray-100 bg-white-100 dark:bg-black-900 dark:text-gray-500">
               {date}
             </div>
             {groupedData[date].map((props, idx) => (

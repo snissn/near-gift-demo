@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Button, Text } from "@radix-ui/themes"
 import Image from "next/image"
+import { Cross1Icon } from "@radix-ui/react-icons"
 
 import AssetComboIcon from "@src/components/Network/AssetComboIcon"
 import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
@@ -10,6 +11,7 @@ import { HistoryStatus } from "@src/stores/historyStore"
 import { smallBalanceToFormat } from "@src/utils/token"
 import WidgetCardMask from "@src/components/History/Widget/WidgetCardMask"
 import WidgetCardLink from "@src/components/History/Widget/WidgetCardLink"
+import { debounce } from "@src/utils/debounce"
 
 enum CardSwapStatusEnum {
   PENDING = "Pending",
@@ -57,14 +59,17 @@ const WidgetCardSwap = ({
       break
   }
 
+  const handleMouseOver = debounce(() => setIsActive(true), 50)
+  const handleMouseLeave = debounce(() => setIsActive(false), 50)
+
   return (
     <div
       onClick={() => {
         window.open(NEAR_EXPLORER + "/txns/" + hash)
       }}
-      onMouseOver={() => setIsActive(true)}
-      onMouseLeave={() => setIsActive(false)}
-      className="relative flex flex-nowrap justify-between items-center p-2.5 gap-3 hover:bg-gray-950 cursor-pointer"
+      onMouseOver={handleMouseOver}
+      onMouseLeave={handleMouseLeave}
+      className="relative flex flex-nowrap justify-between items-center p-2.5 gap-3 hover:bg-gray-950 hover:dark:bg-black-950 cursor-pointer"
     >
       {cardStatus !== CardSwapStatusEnum.COMPLETED && (
         <WidgetCardMask timestamp={timestamp} />
@@ -73,21 +78,37 @@ const WidgetCardSwap = ({
         <AssetComboIcon {...selectedTokenOut} />
       </div>
       <div className="shrink grow flex flex-col justify-between items-start">
-        <Text size="2" weight="medium" className="text-black-400">
+        <Text
+          size="2"
+          weight="medium"
+          className="text-black-400 dark:text-white"
+        >
           Swap
         </Text>
         {cardStatus === CardSwapStatusEnum.COMPLETED && isActive ? (
           <span className="flex gap-1">
-            <Text size="1" weight="medium" className="text-gray-600">
+            <Text
+              size="1"
+              weight="medium"
+              className="text-gray-600 dark:text-gray-500"
+            >
               View transaction
             </Text>
           </span>
         ) : (
           <span className="flex gap-1">
-            <Text size="1" weight="medium" className="text-gray-600">
+            <Text
+              size="1"
+              weight="medium"
+              className="text-gray-600 dark:text-gray-500"
+            >
               -{smallBalanceToFormat(tokenIn, 7)}
             </Text>
-            <Text size="1" weight="medium" className="text-gray-600">
+            <Text
+              size="1"
+              weight="medium"
+              className="text-gray-600 dark:text-gray-500"
+            >
               {selectedTokenIn.symbol}
             </Text>
           </span>
@@ -98,7 +119,11 @@ const WidgetCardSwap = ({
       ) : (
         <>
           <div className="shrink grow flex flex-col justify-between items-end">
-            <Text size="1" weight="medium" className="text-gray-600">
+            <Text
+              size="1"
+              weight="medium"
+              className="text-gray-600 dark:text-gray-500"
+            >
               {cardStatus}
             </Text>
             <span className="flex gap-1">
@@ -121,13 +146,7 @@ const WidgetCardSwap = ({
                 }}
                 className="relative w-[32px] h-[32px] cursor-pointer"
               >
-                <Image
-                  className="absolute"
-                  src="/static/icons/cross-2.svg"
-                  alt="Cross"
-                  width={16}
-                  height={16}
-                />
+                <Cross1Icon width={16} height={16} />
               </Button>
             </div>
           )}

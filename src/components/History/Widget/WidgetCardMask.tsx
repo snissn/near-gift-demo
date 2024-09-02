@@ -19,7 +19,7 @@ const WidgetCardMask = ({ timestamp }: Props) => {
       )}
     >
       {!isTimeLeftExpired && (
-        <div className="hidden group-hover:flex h-full justify-center items-center bg-white opacity-85">
+        <div className="hidden group-hover:flex h-full justify-center items-center bg-white opacity-85 dark:bg-black-900">
           <WidgetCardTimer
             timeLeft={timeLeft}
             className="text-sm font-medium"
