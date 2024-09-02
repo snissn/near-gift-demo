@@ -1,8 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { Button, Text } from "@radix-ui/themes"
-import Image from "next/image"
 import { Cross1Icon } from "@radix-ui/react-icons"
 
 import AssetComboIcon from "@src/components/Network/AssetComboIcon"
@@ -59,8 +58,14 @@ const WidgetCardSwap = ({
       break
   }
 
-  const handleMouseOver = debounce(() => setIsActive(true), 50)
-  const handleMouseLeave = debounce(() => setIsActive(false), 50)
+  const handleMouseOver = useCallback(
+    debounce(() => setIsActive(true), 50),
+    []
+  )
+  const handleMouseLeave = useCallback(
+    debounce(() => setIsActive(false), 50),
+    []
+  )
 
   return (
     <div
