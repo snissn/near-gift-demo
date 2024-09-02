@@ -5,6 +5,7 @@ import Image from "next/image"
 import { Spinner, Text } from "@radix-ui/themes"
 import Link from "next/link"
 import { formatUnits } from "ethers"
+import { ArrowTopRightIcon, Cross1Icon } from "@radix-ui/react-icons"
 
 import { HistoryData, HistoryStatus } from "@src/stores/historyStore"
 import Button from "@src/components/Button/Button"
@@ -20,10 +21,7 @@ import { useSwap } from "@src/hooks/useSwap"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
 import { TransactionMethod } from "@src/types/solver0"
-import {
-  balanceToDecimal,
-  safeBalanceToDecimal,
-} from "@src/app/swap/SwapForm/service/balanceTo"
+import { balanceToDecimal } from "@src/app/swap/SwapForm/service/balanceTo"
 
 const NEAR_EXPLORER = process?.env?.nearExplorer ?? ""
 const PLACEHOLDER = "XX"
@@ -240,7 +238,7 @@ const WidgetCard = ({
   }, [details])
 
   return (
-    <div className="max-w-full md:max-w-[260px] min-h-[152px] flex flex-col justify-between mx-5 my-2 p-3 card-history bg-white rounded-[8px] border overflow-hidden">
+    <div className="max-w-full md:max-w-[260px] min-h-[152px] flex flex-col justify-between mx-5 my-2 p-3 card-history bg-white rounded-[8px] border overflow-hidden dark:border-silver-300 dark:bg-black-900">
       <div className="flex justify-between items-center mb-3">
         {(status === HistoryStatus.COMPLETED ||
           status === HistoryStatus.INTENT_1_EXECUTED ||
@@ -270,13 +268,11 @@ const WidgetCard = ({
             "storage_deposit" && <Spinner size="3" />}
 
         {withCloseHistory && (
-          <button onClick={handleCloseHistory}>
-            <Image
-              src="/static/icons/close.svg"
-              width={16}
-              height={16}
-              alt="Close"
-            />
+          <button
+            onClick={handleCloseHistory}
+            className="h-[24px] w-[24px] flex justify-center items-center dark:bg-black-800 rounded-md"
+          >
+            <Cross1Icon width={16} height={16} />
           </button>
         )}
       </div>
@@ -301,7 +297,7 @@ const WidgetCard = ({
           <Button
             size="sm"
             variant="soft"
-            className="bg-black cursor-pointer"
+            className="bg-black cursor-pointer dark:bg-white-300 dark:text-black-800"
             onClick={handleRollbackIntent}
           >
             Cancel Swap
@@ -313,14 +309,16 @@ const WidgetCard = ({
           rel="noopener noreferrer"
           target="_blank"
         >
-          <Text size="1" className="text-gray-600 text-nowrap">
+          <Text
+            size="1"
+            className="text-gray-600 text-nowrap dark:text-gray-500"
+          >
             See in Explorer
           </Text>
-          <Image
-            src="/static/icons/arrow-top-right.svg"
+          <ArrowTopRightIcon
             width={16}
             height={16}
-            alt="Link"
+            className="dark:text-gray-500"
           />
         </Link>
       </div>

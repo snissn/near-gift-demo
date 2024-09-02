@@ -412,16 +412,19 @@ const ModalConfirmSwap = () => {
             />
           </button>
         </div>
-        <div className="flex justify-center">
-          <Spinner loading={isProcessing} />
-        </div>
-        <div className="w-full flex flex-col text-center text-black-400 gap-1 mb-4">
+        <div className="w-full flex flex-col text-center text-black-400 gap-1 mb-4 dark:text-gray-500">
           <Text size="4" weight="bold">
             Confirm swap
           </Text>
-          <Text size="2" weight="bold" className="text-gray-600">
-            Please confirm transaction in your wallet.
-          </Text>
+          {isProcessing ? (
+            <div className="flex justify-center">
+              <Spinner loading={isProcessing} />
+            </div>
+          ) : (
+            <Text size="2" weight="bold" className="text-gray-600">
+              Please confirm transaction in your wallet.
+            </Text>
+          )}
         </div>
         <div className="flex justify-center">
           <div className="flex justify-center items-center gap-1 px-2.5 py-1 bg-gray-950 rounded-full">
