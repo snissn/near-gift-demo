@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { Text } from "@radix-ui/themes"
 
 import AssetComboIcon from "@src/components/Network/AssetComboIcon"
@@ -8,6 +8,7 @@ import { NearTX, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import { smallBalanceToFormat } from "@src/utils/token"
 import WidgetCardLink from "@src/components/History/Widget/WidgetCardLink"
 import { TransactionMethod } from "@src/types/solver0"
+import { debounce } from "@src/utils/debounce"
 
 enum CardFailedStatusEnum {
   SWAP = "Swap",
@@ -51,13 +52,22 @@ const WidgetCardFailed = ({
       break
   }
 
+  const handleMouseOver = useCallback(
+    debounce(() => setIsActive(true), 50),
+    []
+  )
+  const handleMouseLeave = useCallback(
+    debounce(() => setIsActive(false), 50),
+    []
+  )
+
   return (
     <div
       onClick={() => {
         window.open(NEAR_EXPLORER + "/txns/" + hash)
       }}
-      onMouseOver={() => setIsActive(true)}
-      onMouseLeave={() => setIsActive(false)}
+      onMouseOver={handleMouseOver}
+      onMouseLeave={handleMouseLeave}
       className="relative flex flex-nowrap justify-between items-center p-2.5 gap-3 hover:bg-gray-950 hover:dark:bg-black-950 cursor-pointer"
     >
       <div className="flex-none w-[40px] h-[36px]">
