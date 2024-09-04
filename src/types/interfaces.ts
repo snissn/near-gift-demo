@@ -130,6 +130,7 @@ export type NearIntentStatus = {
   status: HistoryStatus
   created_at: number
   min_ttl: number
+  proof?: string
 }
 
 type TransferToken = {
