@@ -1,6 +1,5 @@
 "use client"
 
-import { useCallback, useState } from "react"
 import { Button, Text } from "@radix-ui/themes"
 import { Cross1Icon } from "@radix-ui/react-icons"
 
@@ -10,7 +9,7 @@ import { HistoryStatus } from "@src/stores/historyStore"
 import { smallBalanceToFormat } from "@src/utils/token"
 import WidgetCardMask from "@src/components/History/Widget/WidgetCardMask"
 import WidgetCardLink from "@src/components/History/Widget/WidgetCardLink"
-import { debounce } from "@src/utils/debounce"
+import { useActiveHover } from "@src/hooks/useActiveHover"
 
 enum CardSwapStatusEnum {
   PENDING = "Pending",
@@ -44,7 +43,7 @@ const WidgetCardSwap = ({
   handleCloseIntent,
   receiverId,
 }: Props) => {
-  const [isActive, setIsActive] = useState(false)
+  const { isActive, handleMouseLeave, handleMouseOver } = useActiveHover()
 
   let cardStatus: CardSwapStatusEnum | null = null
   switch (status) {
@@ -57,15 +56,6 @@ const WidgetCardSwap = ({
       cardStatus = CardSwapStatusEnum.COMPLETED
       break
   }
-
-  const handleMouseOver = useCallback(
-    debounce(() => setIsActive(true), 50),
-    []
-  )
-  const handleMouseLeave = useCallback(
-    debounce(() => setIsActive(false), 50),
-    []
-  )
 
   return (
     <div
