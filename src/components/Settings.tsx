@@ -8,7 +8,7 @@ import { ExternalLinkIcon } from "@radix-ui/react-icons"
 import Themes from "@src/types/themes"
 import { THEME_MODE_KEY } from "@src/constants/contracts"
 
-const SOCIAL_LINK_DISCORD = process?.env?.socialDiscord ?? ""
+const NEXT_PUBLIC_LINK_DOCS = process.env.NEXT_PUBLIC_LINK_DOCS ?? ""
 const NEXT_PUBLIC_PUBLIC_MAIL = process?.env?.NEXT_PUBLIC_PUBLIC_MAIL ?? ""
 
 const Settings = () => {
@@ -58,7 +58,7 @@ const Settings = () => {
             <Separator orientation="horizontal" size="4" />
             <div className="flex flex-col justify-between items-center gap-1.5">
               <button
-                onClick={() => window.open(SOCIAL_LINK_DISCORD)}
+                onClick={() => window.open(NEXT_PUBLIC_LINK_DOCS)}
                 className="w-full flex justify-between items-center gap-2"
               >
                 <Text size="2" weight="medium">
