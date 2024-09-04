@@ -24,7 +24,6 @@ import { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
 import { adapterIntent0, adapterIntent1 } from "@src/libs/de-sdk/utils/adapters"
 import { TransactionMethod } from "@src/types/solver0"
 
-const SCHEDULER_30_SEC = 30000
 const SCHEDULER_5_SEC = 5000
 
 function isValidJSON(str: string): boolean {
@@ -36,22 +35,32 @@ function isValidJSON(str: string): boolean {
   }
 }
 
-async function getIntent(
+type GetIntentResult = {
+  status: HistoryStatus
+  proof?: string
+} | null
+async function callRequestGetIntent(
   receiverId: string,
   intentId: string
-): Promise<HistoryStatus | null> {
-  const getIntentStatus = (await intentStatus(
+): Promise<GetIntentResult> {
+  const result = (await intentStatus(
     receiverId,
     intentId
   )) as NearIntentStatus | null
 
-  if (!getIntentStatus?.status) {
+  if (!result?.status) {
     return null
   }
 
-  return getIntentStatus?.status === HistoryStatus.INTENT_1_AVAILABLE
-    ? HistoryStatus.AVAILABLE
-    : (getIntentStatus!.status as HistoryStatus)
+  const status =
+    result?.status === HistoryStatus.INTENT_1_AVAILABLE
+      ? HistoryStatus.AVAILABLE
+      : (result!.status as HistoryStatus)
+
+  return {
+    status,
+    proof: result?.proof,
+  }
 }
 
 export const useHistoryLatest = () => {
@@ -138,7 +147,7 @@ export const useHistoryLatest = () => {
           let args: unknown
           let msgBase64 = ""
           let msgBuffer: Buffer
-          let getIntentStatus: HistoryStatus | null
+          let getIntent: GetIntentResult
           let recoverData: unknown
           switch (transactionMethodName) {
             case TransactionMethod.FT_TRANSFER_CALL:
@@ -209,13 +218,14 @@ export const useHistoryLatest = () => {
                 },
               })
 
-              getIntentStatus = await getIntent(
+              getIntent = await callRequestGetIntent(
                 (args as { receiver_id: string }).receiver_id,
                 historyData.intentId
               )
-              if (getIntentStatus) {
+              if (getIntent?.status) {
                 Object.assign(historyData, {
-                  status: getIntentStatus,
+                  status: getIntent.status,
+                  proof: getIntent?.proof,
                 })
               }
               break
@@ -307,13 +317,14 @@ export const useHistoryLatest = () => {
                 },
               })
 
-              getIntentStatus = await getIntent(
+              getIntent = await callRequestGetIntent(
                 historyData.details.transaction.receiver_id,
                 historyData.intentId
               )
-              if (getIntentStatus) {
+              if (getIntent?.status) {
                 Object.assign(historyData, {
-                  status: getIntentStatus,
+                  status: getIntent.status,
+                  proof: getIntent?.proof,
                 })
               }
               break

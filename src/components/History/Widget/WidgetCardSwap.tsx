@@ -4,7 +4,10 @@ import { Button, Text } from "@radix-ui/themes"
 import { Cross1Icon } from "@radix-ui/react-icons"
 
 import AssetComboIcon from "@src/components/Network/AssetComboIcon"
-import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
+import {
+  BlockchainEnum,
+  NetworkTokenWithSwapRoute,
+} from "@src/types/interfaces"
 import { HistoryStatus } from "@src/stores/historyStore"
 import { smallBalanceToFormat } from "@src/utils/token"
 import WidgetCardMask from "@src/components/History/Widget/WidgetCardMask"
@@ -18,6 +21,7 @@ enum CardSwapStatusEnum {
 
 type Props = {
   hash: string
+  proof: string | undefined
   intentId: string
   timestamp: number
   status: HistoryStatus
@@ -30,9 +34,12 @@ type Props = {
 }
 
 const NEAR_EXPLORER = process?.env?.nearExplorer ?? ""
+const BASE_EXPLORER = process?.env?.baseExplorer ?? ""
+const BITCOIN_EXPLORER = process?.env?.bitcoinExplorer ?? ""
 
 const WidgetCardSwap = ({
   hash,
+  proof,
   intentId,
   timestamp,
   status,
@@ -57,11 +64,30 @@ const WidgetCardSwap = ({
       break
   }
 
+  let explorerUrl = ""
+  switch (selectedTokenOut?.chainName ?? "") {
+    case BlockchainEnum.Near:
+      explorerUrl = NEAR_EXPLORER + "/txns/" + hash
+      break
+    case BlockchainEnum.Eth:
+      if (proof) {
+        explorerUrl = BASE_EXPLORER + "/tx/" + proof
+        break
+      }
+      explorerUrl = NEAR_EXPLORER + "/txns/" + hash
+      break
+    case BlockchainEnum.Btc:
+      if (proof) {
+        explorerUrl = BITCOIN_EXPLORER + "/tx/" + proof
+        break
+      }
+      explorerUrl = NEAR_EXPLORER + "/txns/" + hash
+      break
+  }
+
   return (
     <div
-      onClick={() => {
-        window.open(NEAR_EXPLORER + "/txns/" + hash)
-      }}
+      onClick={() => window.open(explorerUrl)}
       onMouseOver={handleMouseOver}
       onMouseLeave={handleMouseLeave}
       className="relative flex flex-nowrap justify-between items-center p-2.5 gap-3 hover:bg-gray-950 hover:dark:bg-black-950 cursor-pointer"
