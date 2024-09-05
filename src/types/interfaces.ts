@@ -111,25 +111,35 @@ export type NearBlock = Result<{
   header: NearHeader
 }>
 
+export enum AssetTypeEnum {
+  nep141 = "nep141",
+  native = "native",
+  cross_chain = "cross_chain",
+}
+
+export type AbstractAsset = {
+  type: AssetTypeEnum
+  oracle?: string
+  asset?: string
+  token?: string
+}
+
+export type IntentAsset = {
+  amount: string
+  account: string
+} & AbstractAsset
+
 export type NearIntentStatus = {
-  intent: {
-    initiator: string
-    send: {
-      token_id: string
-      amount: string
-    }
-    receive: {
-      token_id: string
-      amount: string
-    }
-    expiration: {
-      Block: number
-    }
-    referral: string
+  asset_in: IntentAsset
+  asset_out: IntentAsset
+  lockup_until: {
+    block_number: number
+  }
+  expiration: {
+    block_number: number
   }
   status: HistoryStatus
-  created_at: number
-  min_ttl: number
+  referral: string
   proof?: string
 }
 
