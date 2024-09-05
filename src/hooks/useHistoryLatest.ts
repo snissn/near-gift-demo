@@ -24,6 +24,7 @@ import { TransactionMethod } from "@src/types/solver0"
 import {
   callRequestGetIntent,
   getDetailsFromGetIntent,
+  getDetailsFromStorageDeposit,
   GetIntentResult,
   isValidJSON,
 } from "@src/utils/history"
@@ -72,7 +73,7 @@ export const useHistoryLatest = () => {
       HistoryStatus.FAILED,
       HistoryStatus.WITHDRAW,
       HistoryStatus.DEPOSIT,
-      HistoryStatus.STORAGE_DEPOSIT,
+      // HistoryStatus.STORAGE_DEPOSIT, // TODO temporarily skipping to fill in the gaps in the storage deposit history
     ]
 
     const historyCompletion: boolean[] = []
@@ -253,8 +254,17 @@ export const useHistoryLatest = () => {
               break
 
             case TransactionMethod.STORAGE_DEPOSIT:
+              const detailsFromStorageDeposit =
+                await getDetailsFromStorageDeposit(
+                  historyData.hash,
+                  accountId as string
+                )
               Object.assign(historyData, {
                 status: HistoryStatus.STORAGE_DEPOSIT,
+                details: {
+                  ...historyData.details,
+                  recoverDetails: detailsFromStorageDeposit,
+                },
               })
               break
 
@@ -322,7 +332,11 @@ export const useHistoryLatest = () => {
                   selectedTokenOut: parsedData.data.selectedTokenOut,
                 },
               })
-            } else if (historyData.details?.transaction?.receiver_id) {
+            } else if (
+              historyData.details?.transaction?.receiver_id &&
+              (transactionMethodName === TransactionMethod.FT_TRANSFER_CALL ||
+                transactionMethodName === TransactionMethod.NATIVE_ON_TRANSFER)
+            ) {
               const detailsFromGetIntent = await getDetailsFromGetIntent(
                 historyData.details!.transaction!.receiver_id,
                 historyData.intentId
