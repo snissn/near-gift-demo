@@ -26,6 +26,16 @@ export function isValidJSON(str: string): boolean {
   }
 }
 
+export function skipFirstCircle(key: string): string {
+  const sfcKey = "__sfc_key"
+  const getSfcKeyFromLocal = localStorage.getItem(sfcKey)
+  if (!getSfcKeyFromLocal) {
+    localStorage.setItem(sfcKey, JSON.stringify(true))
+    return ""
+  }
+  return key
+}
+
 export type GetIntentResult = NearIntentStatus | null
 export async function callRequestGetIntent(
   receiverId: string,
@@ -139,13 +149,16 @@ export const getDetailsFromStorageDeposit = async (
   hash: string,
   accountId: string
 ): Promise<GetDetailsFromStorageDepositResult> => {
-  const { result } = (await getNearTransactionDetails(
+  const data = (await getNearTransactionDetails(
     hash,
     accountId
   )) as Result<NearTX>
+  if (!data) {
+    return {}
+  }
   return {
-    amount: result.transaction.actions[0].FunctionCall.deposit,
-    receiverId: result.transaction.receiver_id,
+    amount: data.result.transaction.actions[0].FunctionCall.deposit,
+    receiverId: data.result.transaction.receiver_id,
   }
 }
 

@@ -27,6 +27,7 @@ import {
   getDetailsFromStorageDeposit,
   GetIntentResult,
   isValidJSON,
+  skipFirstCircle,
 } from "@src/utils/history"
 
 const SCHEDULER_5_SEC = 5000
@@ -73,7 +74,7 @@ export const useHistoryLatest = () => {
       HistoryStatus.FAILED,
       HistoryStatus.WITHDRAW,
       HistoryStatus.DEPOSIT,
-      // HistoryStatus.STORAGE_DEPOSIT, // TODO temporarily skipping to fill in the gaps in the storage deposit history
+      skipFirstCircle(HistoryStatus.STORAGE_DEPOSIT), // TODO temporarily skipping first row to fill in the gaps in the storage deposit history
     ]
 
     const historyCompletion: boolean[] = []
@@ -263,7 +264,9 @@ export const useHistoryLatest = () => {
                 status: HistoryStatus.STORAGE_DEPOSIT,
                 details: {
                   ...historyData.details,
-                  recoverDetails: detailsFromStorageDeposit,
+                  recoverDetails: {
+                    ...detailsFromStorageDeposit,
+                  },
                 },
               })
               break
@@ -338,7 +341,8 @@ export const useHistoryLatest = () => {
                 transactionMethodName === TransactionMethod.NATIVE_ON_TRANSFER)
             ) {
               const detailsFromGetIntent = await getDetailsFromGetIntent(
-                historyData.details!.transaction!.receiver_id,
+                historyData?.details.recoverDetails?.receiverId ||
+                  historyData.details.transaction.receiver_id,
                 historyData.intentId
               )
               Object.assign(historyData, {
