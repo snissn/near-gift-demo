@@ -5,13 +5,11 @@ import * as borsh from "borsh"
 
 import { HistoryData, HistoryStatus } from "@src/stores/historyStore"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
-import { intentStatus } from "@src/utils/near"
 import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
 import {
   NearIntent1CreateCrossChain,
   NearIntent1CreateSingleChain,
   NearIntentCreate,
-  NearIntentStatus,
   NearTX,
   RecoverDetails,
   Result,
@@ -23,45 +21,14 @@ import { swapSchema } from "@src/utils/schema"
 import { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
 import { adapterIntent0, adapterIntent1 } from "@src/libs/de-sdk/utils/adapters"
 import { TransactionMethod } from "@src/types/solver0"
+import {
+  callRequestGetIntent,
+  getDetailsFromGetIntent,
+  GetIntentResult,
+  isValidJSON,
+} from "@src/utils/history"
 
 const SCHEDULER_5_SEC = 5000
-
-function isValidJSON(str: string): boolean {
-  try {
-    JSON.parse(str)
-    return true
-  } catch (e) {
-    return false
-  }
-}
-
-type GetIntentResult = {
-  status: HistoryStatus
-  proof?: string
-} | null
-async function callRequestGetIntent(
-  receiverId: string,
-  intentId: string
-): Promise<GetIntentResult> {
-  const result = (await intentStatus(
-    receiverId,
-    intentId
-  )) as NearIntentStatus | null
-
-  if (!result?.status) {
-    return null
-  }
-
-  const status =
-    result?.status === HistoryStatus.INTENT_1_AVAILABLE
-      ? HistoryStatus.AVAILABLE
-      : (result!.status as HistoryStatus)
-
-  return {
-    status,
-    proof: result?.proof,
-  }
-}
 
 export const useHistoryLatest = () => {
   const { accountId } = useWalletSelector()
@@ -331,7 +298,7 @@ export const useHistoryLatest = () => {
           }
         }
 
-        // Extract data from local
+        // Extract data from local or intent
         if (
           !historyData.details?.selectedTokenIn ||
           !historyData.details?.selectedTokenOut ||
@@ -353,6 +320,17 @@ export const useHistoryLatest = () => {
                   tokenOut: parsedData.data.tokenOut,
                   selectedTokenIn: parsedData.data.selectedTokenIn,
                   selectedTokenOut: parsedData.data.selectedTokenOut,
+                },
+              })
+            } else if (historyData.details?.transaction?.receiver_id) {
+              const detailsFromGetIntent = await getDetailsFromGetIntent(
+                historyData.details!.transaction!.receiver_id,
+                historyData.intentId
+              )
+              Object.assign(historyData, {
+                details: {
+                  ...historyData.details,
+                  ...detailsFromGetIntent,
                 },
               })
             }

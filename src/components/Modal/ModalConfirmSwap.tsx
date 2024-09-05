@@ -17,7 +17,6 @@ import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { UseQueryCollectorKeys } from "@src/hooks/useQuery"
 import { ModalReviewSwapPayload } from "@src/components/Modal/ModalReviewSwap"
 import { ModalType } from "@src/stores/modalStore"
-import { sha256 } from "@src/actions/crypto"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { usePublishIntentSolver0 } from "@src/api/hooks/intent/usePublishIntentSolver0"
 import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
@@ -28,6 +27,7 @@ import { NotificationType } from "@src/stores/notificationStore"
 import { getNearBlockById } from "@src/api/transaction"
 import { NearBlock, NearTX, QueueTransactions } from "@src/types/interfaces"
 import { balanceToDecimal } from "@src/app/swap/SwapForm/service/balanceTo"
+import { generateIntentID } from "@src/utils/intent"
 
 export interface ModalConfirmSwapPayload extends CallRequestIntentProps {}
 
@@ -228,7 +228,7 @@ const ModalConfirmSwap = () => {
       return
     }
 
-    const newIntentId = await sha256(v4())
+    const newIntentId = generateIntentID()
 
     if (
       handleBatchCreateSwapQuery({
