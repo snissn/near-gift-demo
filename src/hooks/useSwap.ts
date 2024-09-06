@@ -29,7 +29,7 @@ import { mapCreateIntentTransactionCall } from "@src/libs/de-sdk/utils/maps"
 import { isForeignNetworkToken } from "@src/utils/network"
 import { TransactionMethod } from "@src/types/solver0"
 import { getBalanceNearAllowedToSwap } from "@src/app/swap/SwapForm/service/getBalanceNearAllowedToSwap"
-import { nep141Balance } from "@src/utils/near"
+import { isStorageDepositException, nep141Balance } from "@src/utils/near"
 
 type Props = {
   accountId: string | null
@@ -168,7 +168,10 @@ export const useSwap = ({ accountId, selector }: Props) => {
         storageBalanceTokenInAddress as string,
         accountId as string
       )
-      if (!isForeignNetworkToken(selectedTokenIn.defuse_asset_id)) {
+      if (
+        !isForeignNetworkToken(selectedTokenIn.defuse_asset_id) &&
+        !isStorageDepositException(selectedTokenIn!.address)
+      ) {
         const storageBalanceTokenInToString = storageBalanceTokenIn
           ? storageBalanceTokenIn.toString()
           : "0"
@@ -190,7 +193,8 @@ export const useSwap = ({ accountId, selector }: Props) => {
       )
       if (
         !isForeignNetworkToken(selectedTokenOut.defuse_asset_id) &&
-        !isNativeTokenOut
+        !isNativeTokenOut &&
+        !isStorageDepositException(selectedTokenOut!.address)
       ) {
         const storageBalanceTokenOutToString = storageBalanceTokenOut
           ? storageBalanceTokenOut.toString()

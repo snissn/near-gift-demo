@@ -60,6 +60,7 @@ export interface NearTXTransaction {
     FunctionCall: {
       method_name: string
       args: string
+      deposit: string
     }
   }[]
   signer_id: string

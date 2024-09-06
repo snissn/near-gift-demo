@@ -155,7 +155,6 @@ const ModalConfirmSwap = () => {
       if (data) {
         setDataFromLocal(data)
 
-        // TODO Linked to [#1]
         const receivedHash = searchParams.get(
           UseQueryCollectorKeys.TRANSACTION_HASHS
         )

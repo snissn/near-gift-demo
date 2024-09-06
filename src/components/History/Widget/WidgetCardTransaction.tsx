@@ -14,6 +14,7 @@ import WidgetCardWithdraw from "@src/components/History/Widget/WidgetCardWithdra
 import WidgetCardDeposit from "@src/components/History/Widget/WidgetCardDeposit"
 import WidgetCardStorageDeposit from "@src/components/History/Widget/WidgetCardStorageDeposit"
 import { safeBalanceToDecimal } from "@src/app/swap/SwapForm/service/balanceTo"
+import { NEAR_TOKEN_META } from "@src/constants/tokens"
 
 type Props = {
   onCloseHistory?: () => void
@@ -148,16 +149,21 @@ const WidgetCardTransaction = ({
       )
 
     case HistoryStatus.STORAGE_DEPOSIT:
-      if (!details?.transaction || !hash || iTokenDetailMissing) {
+      if (
+        !details?.recoverDetails?.receiverId ||
+        !hash ||
+        !details?.recoverDetails?.amount
+      ) {
         return <WidgetCardLoading />
       }
+      const storageAmount = safeBalanceToDecimal(
+        details.recoverDetails.amount,
+        NEAR_TOKEN_META.decimals
+      )
       return (
         <WidgetCardStorageDeposit
-          receiverId={details?.transaction.receiver_id as string}
-          tokenIn={tokenInValue}
-          selectedTokenIn={
-            details!.selectedTokenIn as NetworkTokenWithSwapRoute
-          }
+          receiverId={details.recoverDetails.receiverId}
+          amount={storageAmount}
           hash={hash}
         />
       )

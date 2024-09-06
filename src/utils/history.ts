@@ -2,6 +2,7 @@ import {
   AssetTypeEnum,
   IntentAsset,
   NearIntentStatus,
+  NearTX,
   NetworkToken,
   Result,
 } from "@src/types/interfaces"
@@ -14,6 +15,7 @@ import parseDefuseAsset, {
   ParseDefuseAssetResult,
 } from "@src/utils/parseDefuseAsset"
 import { SolverTokenList } from "@src/libs/de-sdk/providers/solver0Provider"
+import { getNearTransactionDetails } from "@src/api/transaction"
 
 export function isValidJSON(str: string): boolean {
   try {
@@ -22,6 +24,16 @@ export function isValidJSON(str: string): boolean {
   } catch (e) {
     return false
   }
+}
+
+export function skipFirstCircle(key: string): string {
+  const sfcKey = "__sfc_key"
+  const getSfcKeyFromLocal = localStorage.getItem(sfcKey)
+  if (!getSfcKeyFromLocal) {
+    localStorage.setItem(sfcKey, JSON.stringify(true))
+    return ""
+  }
+  return key
 }
 
 export type GetIntentResult = NearIntentStatus | null
@@ -85,7 +97,7 @@ async function getSelectedTokenDetails(
   }
 }
 
-type GetDetailsFromGetIntentResult = {
+type GetDetailsResult = {
   tokenIn?: string
   tokenOut?: string
   selectedTokenIn?: NetworkToken
@@ -94,9 +106,9 @@ type GetDetailsFromGetIntentResult = {
 export async function getDetailsFromGetIntent(
   receiverId: string,
   intentId: string
-): Promise<GetDetailsFromGetIntentResult> {
+): Promise<GetDetailsResult> {
   const result = await callRequestGetIntent(receiverId, intentId)
-  const details: GetDetailsFromGetIntentResult = {}
+  const details: GetDetailsResult = {}
 
   const assetInDetails: GetSelectedTokenDetailsResult = result?.asset_in
     ? await getSelectedTokenDetails(result!.asset_in)
@@ -122,3 +134,32 @@ export async function getDetailsFromGetIntent(
     ...details,
   }
 }
+
+export const getDetailsFromFtTransferCall = async () => {}
+
+export const getDetailsFromRollBackIntent = async () => {}
+
+export const getDetailsFromNearWithdraw = async () => {}
+
+type GetDetailsFromStorageDepositResult = {
+  amount?: string
+  receiverId?: string
+}
+export const getDetailsFromStorageDeposit = async (
+  hash: string,
+  accountId: string
+): Promise<GetDetailsFromStorageDepositResult> => {
+  const data = (await getNearTransactionDetails(
+    hash,
+    accountId
+  )) as Result<NearTX>
+  if (!data) {
+    return {}
+  }
+  return {
+    amount: data.result.transaction.actions[0].FunctionCall.deposit,
+    receiverId: data.result.transaction.receiver_id,
+  }
+}
+
+export const getDetailsFromNativeOnTransfer = async () => {}

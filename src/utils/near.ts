@@ -101,3 +101,8 @@ export async function intentStatus(
     return null
   }
 }
+
+export function isStorageDepositException(contractId: string): boolean {
+  const exceptionKeys = ["aurora"]
+  return exceptionKeys.includes(contractId)
+}

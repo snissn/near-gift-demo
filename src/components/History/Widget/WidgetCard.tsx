@@ -54,7 +54,7 @@ const WidgetCard = ({
   ): { title: string; subTitle?: string } => {
     const tokenInValue = smallBalanceToFormat(
       balanceToDecimal(
-        (details?.tokenIn || details?.recoverDetails?.send.amount) ?? "0",
+        (details?.tokenIn || details?.recoverDetails?.send?.amount) ?? "0",
         details?.selectedTokenIn?.decimals ?? 0
       )
     )
