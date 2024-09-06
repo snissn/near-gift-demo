@@ -25,6 +25,9 @@ import {
 } from "@src/utils/ethereum"
 import { bitcoinNativeBalance } from "@src/utils/bitcoin"
 import { getBitcoinPriceInUsd } from "@src/api/token"
+import { useTokensStore } from "@src/providers/TokensStoreProvider"
+
+import { useGetAccount } from "./useGetAccount"
 
 const baseRpc = process.env.BASE_RPC || ""
 
@@ -34,8 +37,12 @@ export const useGetTokensBalance = (
   const [isFetching, setIsFetching] = useState(false)
   const [isError, setIsError] = useState(false)
   const [data, setData] = useState<NetworkTokenWithSwapRoute[]>([])
-  const { accountId } = useWalletSelector()
+  const { accountId, selector } = useWalletSelector()
   const { activePreview } = useHistoryStore((state) => state)
+  const { getAccountIdBase, getAccountIdBinance } = useGetAccount({
+    accountId,
+    selector,
+  })
 
   const { data: exchangesListNear, isFetched: isFetchedListNear } =
     useGetCoingeckoExchangeList("ref_finance")
@@ -44,6 +51,7 @@ export const useGetTokensBalance = (
 
   const { getAccountBalance } = useAccountBalance()
   const { minNearBalance } = useMinimumNearBalance(accountId)
+  const { isLoading } = useTokensStore((state) => state)
 
   const isTokenNative = (address: string): boolean => {
     switch (address) {
@@ -128,8 +136,7 @@ export const useGetTokensBalance = (
   ): Promise<TokenBalance> => {
     const tokenBalance: TokenBalance = {}
 
-    // TODO Get Ethereum accountId from wallet store
-    const accountId = "0xd9f9fcf89743C6a6E7F19bc1AB7Ffe20b24771AA"
+    const accountId = getAccountIdBase()
     if (accountId && isTokenNative(address)) {
       const balance = await ethereumNativeBalance(accountId, baseRpc)
       if (balance) {
@@ -164,8 +171,7 @@ export const useGetTokensBalance = (
   ): Promise<TokenBalance> => {
     const tokenBalance: TokenBalance = {}
 
-    // TODO Get Bitcoin accountId from wallet store
-    const accountId = "1EqTDpr1c54Teeu4TjYRXjz9CsBtrb4nsz"
+    const accountId = getAccountIdBinance()
     if (accountId && isTokenNative(address)) {
       const balance = await bitcoinNativeBalance(accountId)
       if (balance) {
@@ -218,7 +224,6 @@ export const useGetTokensBalance = (
                 default:
                   return token
               }
-              break
             case BlockchainEnum.Eth:
               switch (result.network) {
                 case NetworkEnum.Base:
@@ -232,7 +237,6 @@ export const useGetTokensBalance = (
                 default:
                   return token
               }
-              break
             case BlockchainEnum.Btc:
               switch (result.network) {
                 case NetworkEnum.Mainnet:
@@ -269,6 +273,9 @@ export const useGetTokensBalance = (
   }
 
   useEffect(() => {
+    if (!accountId) {
+      clearTokensBalance()
+    }
     if (accountId && tokensList && isFetchedListNear && isFetchedListBase) {
       void getTokensBalance()
     }
@@ -279,13 +286,8 @@ export const useGetTokensBalance = (
     minNearBalance,
     isFetchedListNear,
     isFetchedListBase,
+    isLoading,
   ])
-
-  useEffect(() => {
-    if (!accountId) {
-      clearTokensBalance()
-    }
-  }, [accountId])
 
   return {
     data,

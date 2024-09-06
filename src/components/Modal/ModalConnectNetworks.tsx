@@ -18,6 +18,7 @@ import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import Network from "@src/components/Network/Network"
 import { networkLabelAdapter } from "@src/utils/network"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
+import { useTokensStore } from "@src/providers/TokensStoreProvider"
 
 export type ModalConnectNetworksPayload = {
   tokenIn: string
@@ -63,6 +64,7 @@ const ModalConnectNetworks = () => {
     (state) => state
   )
   const { accountId } = useWalletSelector()
+  const { triggerTokenUpdate } = useTokensStore((state) => state)
 
   const { handleSignIn, handleSignOut } = useConnectWallet()
   const [convertPayload] = useState<ModalConnectNetworksPayload>(
@@ -75,6 +77,7 @@ const ModalConnectNetworks = () => {
       accountFrom,
       accountTo,
     })
+    triggerTokenUpdate()
   }
 
   useEffect(() => {
