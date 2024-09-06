@@ -84,7 +84,7 @@ export default function Swap() {
     priceToUsd: priceToUsdTokenOut,
     calculateTokenToUsd: calculateTokenToUsdTokenOut,
   } = useCalculateTokenToUsd()
-  const { data, isFetched, isLoading } = useTokensStore((state) => state)
+  const { data, isLoading } = useTokensStore((state) => state)
   const { handleSignIn } = useConnectWallet()
   const [priceEvaluation, setPriceEvaluation] =
     useState<EvaluateResultEnum | null>(null)
@@ -343,7 +343,7 @@ export default function Swap() {
         }
       })
     }
-  }, [data, isFetched, isLoading])
+  }, [data, isLoading])
 
   useEffect(() => {
     const subscription = watch((value, { name }) => {

@@ -15,10 +15,10 @@ import useShortAccountId from "@src/hooks/useShortAccountId"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { ModalType } from "@src/stores/modalStore"
 import {
-  CONFIRM_SWAP_LOCAL_KEY,
   CONNECTOR_BTC_MAINNET,
   CONNECTOR_ETH_BASE,
 } from "@src/constants/contracts"
+import { useTokensStore } from "@src/providers/TokensStoreProvider"
 
 type WalletConnectionState = {
   chainIcon: string
@@ -115,6 +115,7 @@ const WalletConnections = () => {
   const { handleSignOut } = useConnectWallet()
   const [copyWalletAddress, setCopyWalletAddress] = useState<MapsEnum>()
   const { setModalType } = useModalStore((state) => state)
+  const { triggerTokenUpdate } = useTokensStore((state) => state)
   const [isProcessing, setIsProcessing] = useState(false)
 
   const handleGetConnector = (connectorKey: string): string => {
@@ -125,6 +126,7 @@ const WalletConnections = () => {
 
   const handleDisconnectSideWallet = (connectorKey: string) => {
     localStorage.removeItem(connectorKey)
+    triggerTokenUpdate()
     // To force a rerender the component we update the state
     setIsProcessing(true)
   }
@@ -159,7 +161,10 @@ const WalletConnections = () => {
                 chainIcon={getChainIconFromId(`${MapsEnum.NEAR_MAINNET}:0`)}
                 onCopy={() => setCopyWalletAddress(MapsEnum.NEAR_MAINNET)}
                 isCopied={copyWalletAddress === MapsEnum.NEAR_MAINNET}
-                onDisconnect={handleSignOut}
+                onDisconnect={() => {
+                  handleSignOut()
+                  triggerTokenUpdate()
+                }}
                 key={connector}
                 index={i}
               />

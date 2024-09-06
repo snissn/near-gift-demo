@@ -5,6 +5,10 @@ import { WalletSelector } from "@near-wallet-selector/core"
 
 import { useAccountBalance } from "@src/hooks/useAccountBalance"
 import { Account } from "@src/types/interfaces"
+import {
+  CONNECTOR_BTC_MAINNET,
+  CONNECTOR_ETH_BASE,
+} from "@src/constants/contracts"
 
 type Props = {
   accountId: string | null
@@ -47,7 +51,25 @@ export const useGetAccount = ({ accountId, selector }: Props) => {
       }))
   }, [accountId, selector])
 
+  const getAccountIdBase = (): string | null => {
+    const accountIdFromLocal = localStorage.getItem(CONNECTOR_ETH_BASE)
+    if (!accountIdFromLocal) {
+      return null
+    }
+    return accountIdFromLocal
+  }
+
+  const getAccountIdBinance = (): string | null => {
+    const accountIdFromLocal = localStorage.getItem(CONNECTOR_BTC_MAINNET)
+    if (!accountIdFromLocal) {
+      return null
+    }
+    return accountIdFromLocal
+  }
+
   return {
     getAccount,
+    getAccountIdBase,
+    getAccountIdBinance,
   }
 }

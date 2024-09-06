@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { Spinner, Text, TextArea } from "@radix-ui/themes"
+import { Spinner } from "@radix-ui/themes"
 import { formatUnits } from "ethers"
 
 import CardBalance from "@src/app/wallet/CardBalance"
@@ -25,7 +25,7 @@ export interface EmptyTokenBalance {
 }
 
 export default function Wallet() {
-  const { data, isFetched } = useTokensStore((state) => state)
+  const { data, isLoading } = useTokensStore((state) => state)
   const [assetListWithBalances, setAssetListWithBalances] = useState<
     NetworkTokenWithSwapRoute[]
   >([])
@@ -75,9 +75,9 @@ export default function Wallet() {
             label="NEAR balance (available)"
             balance={balanceNear?.substring(0, 12) ?? "0.00"}
           />
-          {!isFetched ? (
+          {!isLoading ? (
             <div className="flex justify-center">
-              <Spinner loading={!isFetched} size="3" />
+              <Spinner loading={!isLoading} size="3" />
             </div>
           ) : (
             <CardTokenList

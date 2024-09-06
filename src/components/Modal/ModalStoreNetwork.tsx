@@ -11,6 +11,7 @@ import ModalDialog from "@src/components/Modal/ModalDialog"
 import Network from "@src/components/Network/Network"
 import { networkLabelAdapter } from "@src/utils/network"
 import { handleValidateAccount } from "@src/components/Modal/ModalConnectNetworks"
+import { useTokensStore } from "@src/providers/TokensStoreProvider"
 
 export type ModalStoreNetworkPayload = {
   storeKey: string
@@ -26,10 +27,12 @@ const ModalStoreNetwork = () => {
   const [convertPayload] = useState<ModalStoreNetworkPayload>(
     payload as ModalStoreNetworkPayload
   )
+  const { triggerTokenUpdate } = useTokensStore((state) => state)
 
   const handleConnect = () => {
     localStorage.setItem(convertPayload.storeKey, account)
     onCloseModal()
+    triggerTokenUpdate()
   }
 
   return (

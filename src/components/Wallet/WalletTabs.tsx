@@ -46,7 +46,7 @@ const TabTotalBalance = ({
 
 const WalletTabs = () => {
   const [isLoading, setIsLoading] = useState(false)
-  const { data, isFetched } = useTokensStore((state) => state)
+  const { data, isLoading: isLoadingTokens } = useTokensStore((state) => state)
   const [totalBalanceInUsd, setTotalBalanceInUsd] = useState<
     number | undefined
   >()
@@ -85,10 +85,10 @@ const WalletTabs = () => {
   }
 
   useEffect(() => {
-    if (data.size && isFetched) {
+    if (data.size && isLoadingTokens) {
       void getBalanceToUsd()
     }
-  }, [data.size, isFetched])
+  }, [data.size, isLoadingTokens])
 
   return IS_DISABLED_ALL_TABS ? (
     <TabTotalBalance
