@@ -85,7 +85,7 @@ const WalletTabs = () => {
   }
 
   useEffect(() => {
-    if (data.size && isLoadingTokens) {
+    if (data.size) {
       void getBalanceToUsd()
     }
   }, [data.size, isLoadingTokens])
