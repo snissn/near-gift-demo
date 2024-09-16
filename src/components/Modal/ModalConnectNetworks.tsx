@@ -19,6 +19,11 @@ import Network from "@src/components/Network/Network"
 import { networkLabelAdapter } from "@src/utils/network"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 import { useTokensStore } from "@src/providers/TokensStoreProvider"
+import { MapsEnum } from "@src/libs/de-sdk/utils/maps"
+import {
+  CONNECTOR_BTC_MAINNET,
+  CONNECTOR_ETH_BASE,
+} from "@src/constants/contracts"
 
 export type ModalConnectNetworksPayload = {
   tokenIn: string
@@ -33,25 +38,40 @@ export const handleValidateAccount = (
   account: string,
   setErrorAccount: (value: string) => void,
   defuse_asset_id: string
-) => {
+): boolean => {
   const result = parseDefuseAsset(defuse_asset_id)
   const blockchain = result?.blockchain ?? ""
   switch (blockchain) {
     case BlockchainEnum.Eth:
       if (!isAddress(account)) {
         setErrorAccount("Invalid wallet address.")
+        return false
       } else {
         setErrorAccount("")
+        return true
       }
-      break
     case BlockchainEnum.Btc:
       try {
         bitcoin.address.toOutputScript(account)
         setErrorAccount("")
+        return true
       } catch (e) {
         setErrorAccount("Invalid Bitcoin address.")
+        return false
       }
-      break
+    default:
+      return false
+  }
+}
+
+const handleGetStoreKey = (defuse_asset_id: string) => {
+  const result = parseDefuseAsset(defuse_asset_id)
+  if (!result) return ""
+  switch (`${result.blockchain}:${result.network}`) {
+    case MapsEnum.ETH_BASE:
+      return CONNECTOR_ETH_BASE
+    case MapsEnum.BTC_MAINNET:
+      return CONNECTOR_BTC_MAINNET
   }
 }
 
@@ -78,6 +98,12 @@ const ModalConnectNetworks = () => {
       accountTo,
     })
     triggerTokenUpdate()
+  }
+
+  const handleStoreAccount = (account: string, defuse_asset_id: string) => {
+    const storeKey = handleGetStoreKey(defuse_asset_id)
+    if (!storeKey) return
+    localStorage.setItem(storeKey, account)
   }
 
   useEffect(() => {
@@ -142,13 +168,19 @@ const ModalConnectNetworks = () => {
                 chainName={convertPayload.selectedTokenIn?.chainName ?? ""}
                 account={accountFrom}
                 onChange={(account) => setAccountFrom(account)}
-                onBlur={(account) =>
-                  handleValidateAccount(
-                    account,
-                    setErrorAccountFrom,
-                    convertPayload.selectedTokenOut?.defuse_asset_id ?? ""
-                  )
-                }
+                onBlur={(account) => {
+                  const defuseAssetId =
+                    convertPayload.selectedTokenIn?.defuse_asset_id ?? ""
+                  if (
+                    handleValidateAccount(
+                      account,
+                      setErrorAccountFrom,
+                      defuseAssetId
+                    )
+                  ) {
+                    handleStoreAccount(account, defuseAssetId)
+                  }
+                }}
               />
             )}
             {errorAccountFrom && (
@@ -175,13 +207,19 @@ const ModalConnectNetworks = () => {
                 chainName={convertPayload.selectedTokenOut?.chainName ?? ""}
                 account={accountTo}
                 onChange={(account) => setAccountTo(account)}
-                onBlur={(account) =>
-                  handleValidateAccount(
-                    account,
-                    setErrorAccountTo,
+                onBlur={(account) => {
+                  const defuseAssetId =
                     convertPayload.selectedTokenOut?.defuse_asset_id ?? ""
-                  )
-                }
+                  if (
+                    handleValidateAccount(
+                      account,
+                      setErrorAccountTo,
+                      defuseAssetId
+                    )
+                  ) {
+                    handleStoreAccount(account, defuseAssetId)
+                  }
+                }}
               />
             )}
             {errorAccountTo && (
