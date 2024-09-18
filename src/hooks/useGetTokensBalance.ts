@@ -266,16 +266,16 @@ export const useGetTokensBalance = (
   }
 
   const clearTokensBalance = () => {
-    const dataCleanBalances = data.map(
-      ({ balance, balanceUsd, convertedLast, ...rest }) => ({ ...rest })
-    )
+    const dataCleanBalances = data.map((token) => ({
+      ...token,
+      balance: undefined,
+      balanceUsd: undefined,
+      convertedLast: undefined,
+    }))
     setData(dataCleanBalances)
   }
 
   useEffect(() => {
-    if (!accountId) {
-      clearTokensBalance()
-    }
     if (accountId && tokensList && isFetchedListNear && isFetchedListBase) {
       void getTokensBalance()
     }
@@ -288,6 +288,12 @@ export const useGetTokensBalance = (
     isFetchedListBase,
     isLoading,
   ])
+
+  useEffect(() => {
+    if (!accountId && !isFetching) {
+      clearTokensBalance()
+    }
+  }, [accountId, isFetching])
 
   return {
     data,
