@@ -5,13 +5,11 @@ import * as borsh from "borsh"
 
 import { HistoryData, HistoryStatus } from "@src/stores/historyStore"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
-import { intentStatus } from "@src/utils/near"
 import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
 import {
   NearIntent1CreateCrossChain,
   NearIntent1CreateSingleChain,
   NearIntentCreate,
-  NearIntentStatus,
   NearTX,
   RecoverDetails,
   Result,
@@ -23,36 +21,16 @@ import { swapSchema } from "@src/utils/schema"
 import { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
 import { adapterIntent0, adapterIntent1 } from "@src/libs/de-sdk/utils/adapters"
 import { TransactionMethod } from "@src/types/solver0"
+import {
+  callRequestGetIntent,
+  getDetailsFromGetIntent,
+  getDetailsFromStorageDeposit,
+  GetIntentResult,
+  isValidJSON,
+  skipFirstCircle,
+} from "@src/utils/history"
 
-const SCHEDULER_30_SEC = 30000
 const SCHEDULER_5_SEC = 5000
-
-function isValidJSON(str: string): boolean {
-  try {
-    JSON.parse(str)
-    return true
-  } catch (e) {
-    return false
-  }
-}
-
-async function getIntent(
-  receiverId: string,
-  intentId: string
-): Promise<HistoryStatus | null> {
-  const getIntentStatus = (await intentStatus(
-    receiverId,
-    intentId
-  )) as NearIntentStatus | null
-
-  if (!getIntentStatus?.status) {
-    return null
-  }
-
-  return getIntentStatus?.status === HistoryStatus.INTENT_1_AVAILABLE
-    ? HistoryStatus.AVAILABLE
-    : (getIntentStatus!.status as HistoryStatus)
-}
 
 export const useHistoryLatest = () => {
   const { accountId } = useWalletSelector()
@@ -96,7 +74,7 @@ export const useHistoryLatest = () => {
       HistoryStatus.FAILED,
       HistoryStatus.WITHDRAW,
       HistoryStatus.DEPOSIT,
-      HistoryStatus.STORAGE_DEPOSIT,
+      skipFirstCircle(HistoryStatus.STORAGE_DEPOSIT), // TODO temporarily skipping first row to fill in the gaps in the storage deposit history
     ]
 
     const historyCompletion: boolean[] = []
@@ -138,7 +116,7 @@ export const useHistoryLatest = () => {
           let args: unknown
           let msgBase64 = ""
           let msgBuffer: Buffer
-          let getIntentStatus: HistoryStatus | null
+          let getIntent: GetIntentResult
           let recoverData: unknown
           switch (transactionMethodName) {
             case TransactionMethod.FT_TRANSFER_CALL:
@@ -209,13 +187,14 @@ export const useHistoryLatest = () => {
                 },
               })
 
-              getIntentStatus = await getIntent(
+              getIntent = await callRequestGetIntent(
                 (args as { receiver_id: string }).receiver_id,
                 historyData.intentId
               )
-              if (getIntentStatus) {
+              if (getIntent?.status) {
                 Object.assign(historyData, {
-                  status: getIntentStatus,
+                  status: getIntent.status,
+                  proof: getIntent?.proof,
                 })
               }
               break
@@ -276,8 +255,19 @@ export const useHistoryLatest = () => {
               break
 
             case TransactionMethod.STORAGE_DEPOSIT:
+              const detailsFromStorageDeposit =
+                await getDetailsFromStorageDeposit(
+                  historyData.hash,
+                  accountId as string
+                )
               Object.assign(historyData, {
                 status: HistoryStatus.STORAGE_DEPOSIT,
+                details: {
+                  ...historyData.details,
+                  recoverDetails: {
+                    ...detailsFromStorageDeposit,
+                  },
+                },
               })
               break
 
@@ -307,20 +297,21 @@ export const useHistoryLatest = () => {
                 },
               })
 
-              getIntentStatus = await getIntent(
+              getIntent = await callRequestGetIntent(
                 historyData.details.transaction.receiver_id,
                 historyData.intentId
               )
-              if (getIntentStatus) {
+              if (getIntent?.status) {
                 Object.assign(historyData, {
-                  status: getIntentStatus,
+                  status: getIntent.status,
+                  proof: getIntent?.proof,
                 })
               }
               break
           }
         }
 
-        // Extract data from local
+        // Extract data from local or intent
         if (
           !historyData.details?.selectedTokenIn ||
           !historyData.details?.selectedTokenOut ||
@@ -342,6 +333,22 @@ export const useHistoryLatest = () => {
                   tokenOut: parsedData.data.tokenOut,
                   selectedTokenIn: parsedData.data.selectedTokenIn,
                   selectedTokenOut: parsedData.data.selectedTokenOut,
+                },
+              })
+            } else if (
+              historyData.details?.transaction?.receiver_id &&
+              (transactionMethodName === TransactionMethod.FT_TRANSFER_CALL ||
+                transactionMethodName === TransactionMethod.NATIVE_ON_TRANSFER)
+            ) {
+              const detailsFromGetIntent = await getDetailsFromGetIntent(
+                historyData?.details.recoverDetails?.receiverId ||
+                  historyData.details.transaction.receiver_id,
+                historyData.intentId
+              )
+              Object.assign(historyData, {
+                details: {
+                  ...historyData.details,
+                  ...detailsFromGetIntent,
                 },
               })
             }

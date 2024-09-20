@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { Text } from "@radix-ui/themes"
 
 import AssetComboIcon from "@src/components/Network/AssetComboIcon"
@@ -8,6 +7,7 @@ import { NearTX, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import { smallBalanceToFormat } from "@src/utils/token"
 import WidgetCardLink from "@src/components/History/Widget/WidgetCardLink"
 import { TransactionMethod } from "@src/types/solver0"
+import { useActiveHover } from "@src/hooks/useActiveHover"
 
 enum CardRollbackStatusEnum {
   SWAP = "Swap",
@@ -39,7 +39,7 @@ const WidgetCardRollback = ({
   selectedTokenIn,
   hash,
 }: Props) => {
-  const [isActive, setIsActive] = useState(false)
+  const { isActive, handleMouseLeave, handleMouseOver } = useActiveHover()
 
   const handleGetActionMethodName = (
     actions: NearTX["transaction"]["actions"]
@@ -63,29 +63,45 @@ const WidgetCardRollback = ({
       onClick={() => {
         window.open(NEAR_EXPLORER + "/txns/" + hash)
       }}
-      onMouseOver={() => setIsActive(true)}
-      onMouseLeave={() => setIsActive(false)}
-      className="relative flex flex-nowrap justify-between items-center p-2.5 gap-3 hover:bg-gray-950 cursor-pointer"
+      onMouseOver={handleMouseOver}
+      onMouseLeave={handleMouseLeave}
+      className="relative flex flex-nowrap justify-between items-center p-2.5 gap-3 hover:bg-gray-950 hover:dark:bg-black-950 cursor-pointer"
     >
       <div className="flex-none w-[40px] h-[36px]">
         <AssetComboIcon {...selectedTokenOut} />
       </div>
       <div className="shrink grow flex flex-col justify-between items-start">
-        <Text size="2" weight="medium" className="text-black-400">
+        <Text
+          size="2"
+          weight="medium"
+          className="text-black-400 dark:text-white"
+        >
           {cardStatus}
         </Text>
         {!isActive && (
           <span className="flex gap-1">
             {cardStatus === CardRollbackStatusEnum.REFUND ? (
-              <Text size="1" weight="medium" className="text-gray-600">
+              <Text
+                size="1"
+                weight="medium"
+                className="text-gray-600 dark:text-gray-500"
+              >
                 Swap refund
               </Text>
             ) : (
               <>
-                <Text size="1" weight="medium" className="text-gray-600">
+                <Text
+                  size="1"
+                  weight="medium"
+                  className="text-gray-600 dark:text-gray-500"
+                >
                   -{smallBalanceToFormat(tokenIn, 7)}
                 </Text>
-                <Text size="1" weight="medium" className="text-gray-600">
+                <Text
+                  size="1"
+                  weight="medium"
+                  className="text-gray-600 dark:text-gray-500"
+                >
                   {selectedTokenIn.symbol}
                 </Text>
               </>
@@ -94,7 +110,11 @@ const WidgetCardRollback = ({
         )}
         {isActive && (
           <span className="flex gap-1">
-            <Text size="1" weight="medium" className="text-gray-600">
+            <Text
+              size="1"
+              weight="medium"
+              className="text-gray-600 dark:text-gray-500"
+            >
               View transaction
             </Text>
           </span>
@@ -102,7 +122,11 @@ const WidgetCardRollback = ({
       </div>
       {!isActive && (
         <div className="shrink grow flex flex-col justify-between items-end">
-          <Text size="1" weight="medium" className="text-gray-600">
+          <Text
+            size="1"
+            weight="medium"
+            className="text-gray-600 dark:text-gray-500"
+          >
             {cardStatus === CardRollbackStatusEnum.REFUND
               ? "Completed"
               : "Refunded"}

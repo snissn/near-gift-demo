@@ -5,7 +5,6 @@ import { parseUnits } from "ethers"
 import { Text } from "@radix-ui/themes"
 import { v4 } from "uuid"
 
-import Paper from "@src/components/Paper"
 import Form from "@src/components/Form"
 import FieldComboInput from "@src/components/Form/FieldComboInput"
 import Button from "@src/components/Button/Button"
@@ -84,7 +83,7 @@ export default function Swap() {
     priceToUsd: priceToUsdTokenOut,
     calculateTokenToUsd: calculateTokenToUsdTokenOut,
   } = useCalculateTokenToUsd()
-  const { data, isFetched, isLoading } = useTokensStore((state) => state)
+  const { data, isLoading } = useTokensStore((state) => state)
   const { handleSignIn } = useConnectWallet()
   const [priceEvaluation, setPriceEvaluation] =
     useState<EvaluateResultEnum | null>(null)
@@ -295,6 +294,24 @@ export default function Swap() {
     }
   }
 
+  const handleHashTokenSelections = (
+    selectedTokenIn: NetworkTokenWithSwapRoute,
+    selectedTokenOut: NetworkTokenWithSwapRoute
+  ) => {
+    localStorage.setItem(
+      CONFIRM_SWAP_LOCAL_KEY,
+      JSON.stringify({
+        data: {
+          selectedTokenIn,
+          selectedTokenOut,
+          tokenIn: "0",
+          tokenOut: "0",
+          estimateQueue: [],
+        },
+      })
+    )
+  }
+
   useEffect(() => {
     if (!selectTokenIn && !selectTokenOut) {
       const getConfirmSwapFromLocal = localStorage.getItem(
@@ -343,7 +360,7 @@ export default function Swap() {
         }
       })
     }
-  }, [data, isFetched, isLoading])
+  }, [data, isLoading])
 
   useEffect(() => {
     const subscription = watch((value, { name }) => {
@@ -403,6 +420,7 @@ export default function Swap() {
               selectTokenIn: token,
               selectTokenOut,
             })
+            handleHashTokenSelections(token, selectTokenOut as NetworkToken)
           }
           isProgrammaticUpdate.current = false
           setErrorSelectTokenIn("")
@@ -423,6 +441,10 @@ export default function Swap() {
               selectTokenIn,
               selectTokenOut: token,
             })
+            handleHashTokenSelections(
+              selectTokenIn as NetworkTokenWithSwapRoute,
+              token
+            )
           }
           isProgrammaticUpdate.current = false
           setErrorSelectTokenOut("")
@@ -433,97 +455,89 @@ export default function Swap() {
   }, [payload, selectTokenIn, selectTokenOut])
 
   return (
-    <Paper
-      title="Swap"
-      description="Cross-chain swap across any network, any token."
-    >
-      <Form<FormValues>
-        handleSubmit={handleSubmit(onSubmit)}
-        register={register}
-      >
-        <FieldComboInput<FormValues>
-          fieldName="tokenIn"
-          price={priceToUsdTokenIn}
-          balance={balanceToDecimal(
+    <Form<FormValues> handleSubmit={handleSubmit(onSubmit)} register={register}>
+      <FieldComboInput<FormValues>
+        fieldName="tokenIn"
+        price={priceToUsdTokenIn}
+        balance={balanceToDecimal(
+          selectTokenIn?.balance ?? "0",
+          selectTokenIn?.decimals ?? 0
+        )}
+        selected={selectTokenIn as NetworkToken}
+        handleSelect={() => handleSelect("tokenIn", selectTokenOut)}
+        handleSetMaxValue={() => {
+          const value = balanceToDecimal(
             selectTokenIn?.balance ?? "0",
             selectTokenIn?.decimals ?? 0
-          )}
-          selected={selectTokenIn as NetworkToken}
-          handleSelect={() => handleSelect("tokenIn", selectTokenOut)}
-          handleSetMaxValue={() => {
-            const value = balanceToDecimal(
-              selectTokenIn?.balance ?? "0",
-              selectTokenIn?.decimals ?? 0
-            )
-            setValue("tokenIn", value)
-          }}
-          className="border rounded-t-xl md:max-w-[472px]"
-          required="This field is required"
-          errors={errors}
-          errorSelect={errorSelectTokenIn}
-        />
-        <div className="relative w-full">
-          <ButtonSwitch onClick={handleSwitch} />
-        </div>
-        <FieldComboInput<FormValues>
-          fieldName="tokenOut"
-          price={priceToUsdTokenOut}
-          label={
-            <BlockEvaluatePrice
-              priceEvaluation={priceEvaluation}
-              priceResults={allEstimates}
-              tokenOut={selectTokenOut}
-            />
-          }
-          balance={balanceToDecimal(
-            selectTokenOut?.balance ?? "0",
-            selectTokenOut?.decimals ?? 0
-          )}
-          selected={selectTokenOut as NetworkToken}
-          handleSelect={() => handleSelect("tokenOut", selectTokenIn)}
-          className="border rounded-b-xl mb-5 md:max-w-[472px]"
-          required="This field is required"
-          errors={errors}
-          errorSelect={errorSelectTokenOut}
-          disabled={true}
-        />
-        {selectTokenIn?.defuse_asset_id === NEAR_TOKEN_META.defuse_asset_id &&
-          allowableNearAmountRef.current !== null && (
-            <div className="w-full block md:max-w-[472px] mb-5">
-              <Text
-                size="2"
-                weight="medium"
-                className="text-red-400 dark:text-primary-400"
-              >
-                {`You must have ${smallBalanceToFormat((Number(balanceToDecimal(selectTokenIn?.balance ?? "0", selectTokenIn?.decimals ?? 0)) - Number(balanceToDecimal(allowableNearAmountRef.current ?? "0", 24))).toString())} Near in wallet for gas fee. The maximum available to swap value is -`}
-              </Text>
-              <span
-                onClick={() => {
-                  const value = balanceToDecimal(
-                    allowableNearAmountRef.current ?? "0",
-                    24
-                  )
-                  setValue("tokenIn", value)
-                }}
-                className="inline-block text-xs px-2 py-0.5 ml-0.5 rounded-full bg-red-100 text-red-400 dark:bg-red-200 dark:text-primary-400 cursor-pointer"
-              >
-                {smallBalanceToFormat(
-                  balanceToDecimal(allowableNearAmountRef.current ?? "0", 24),
-                  7
-                )}
-              </span>
-            </div>
-          )}
-        <Button
-          type="submit"
-          size="lg"
-          fullWidth
-          isLoading={isFetchingData}
-          disabled={Boolean(errorMsg)}
-        >
-          {isFetchingData ? "" : errorMsg ? errorMsg : "Swap"}
-        </Button>
-      </Form>
-    </Paper>
+          )
+          setValue("tokenIn", value)
+        }}
+        className="border rounded-t-xl md:max-w-[472px]"
+        required="This field is required"
+        errors={errors}
+        errorSelect={errorSelectTokenIn}
+      />
+      <div className="relative w-full">
+        <ButtonSwitch onClick={handleSwitch} />
+      </div>
+      <FieldComboInput<FormValues>
+        fieldName="tokenOut"
+        price={priceToUsdTokenOut}
+        label={
+          <BlockEvaluatePrice
+            priceEvaluation={priceEvaluation}
+            priceResults={allEstimates}
+            tokenOut={selectTokenOut}
+          />
+        }
+        balance={balanceToDecimal(
+          selectTokenOut?.balance ?? "0",
+          selectTokenOut?.decimals ?? 0
+        )}
+        selected={selectTokenOut as NetworkToken}
+        handleSelect={() => handleSelect("tokenOut", selectTokenIn)}
+        className="border rounded-b-xl mb-5 md:max-w-[472px]"
+        required="This field is required"
+        errors={errors}
+        errorSelect={errorSelectTokenOut}
+        disabled={true}
+      />
+      {selectTokenIn?.defuse_asset_id === NEAR_TOKEN_META.defuse_asset_id &&
+        allowableNearAmountRef.current !== null && (
+          <div className="w-full block md:max-w-[472px] mb-5">
+            <Text
+              size="2"
+              weight="medium"
+              className="text-red-400 dark:text-primary-400"
+            >
+              {`You must have ${smallBalanceToFormat((Number(balanceToDecimal(selectTokenIn?.balance ?? "0", selectTokenIn?.decimals ?? 0)) - Number(balanceToDecimal(allowableNearAmountRef.current ?? "0", 24))).toString())} Near in wallet for gas fee. The maximum available to swap value is -`}
+            </Text>
+            <span
+              onClick={() => {
+                const value = balanceToDecimal(
+                  allowableNearAmountRef.current ?? "0",
+                  24
+                )
+                setValue("tokenIn", value)
+              }}
+              className="inline-block text-xs px-2 py-0.5 ml-0.5 rounded-full bg-red-100 text-red-400 dark:bg-red-200 dark:text-primary-400 cursor-pointer"
+            >
+              {smallBalanceToFormat(
+                balanceToDecimal(allowableNearAmountRef.current ?? "0", 24),
+                7
+              )}
+            </span>
+          </div>
+        )}
+      <Button
+        type="submit"
+        size="lg"
+        fullWidth
+        isLoading={isFetchingData}
+        disabled={Boolean(errorMsg)}
+      >
+        {isFetchingData ? "" : errorMsg ? errorMsg : "Swap"}
+      </Button>
+    </Form>
   )
 }

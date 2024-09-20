@@ -1,5 +1,6 @@
 import { parseUnits } from "ethers"
 import * as borsh from "borsh"
+import Ajv from "ajv"
 
 import {
   CONTRACTS_REGISTER,
@@ -18,6 +19,10 @@ import {
 } from "@src/types/interfaces"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 import { TransactionMethod } from "@src/types/solver0"
+import {
+  msgSchemaCreateIntent1CrossChain,
+  msgSchemaCreateIntent1SingleChain,
+} from "@src/libs/de-sdk/utils/jsonValidations"
 
 const REFERRAL_ACCOUNT = process.env.REFERRAL_ACCOUNT ?? ""
 
@@ -122,6 +127,14 @@ export const prepareCreateIntent1CrossChain = (
     referral: REFERRAL_ACCOUNT,
   }
 
+  const ajv = new Ajv()
+  const validate = ajv.compile(msgSchemaCreateIntent1CrossChain)
+  const isValid = validate(msg)
+  if (!isValid) {
+    console.log("Validation errors:", validate.errors)
+    throw new Error(`Validation schema errors`)
+  }
+
   const params = {}
   if (contractIdTokenIn === ContractIdEnum.Native) {
     Object.assign(params, {
@@ -177,8 +190,8 @@ export const prepareCreateIntent1SingleChain = (
     id: inputs.intentId as string,
     asset_out: {
       type: contractIdTokenOut === ContractIdEnum.Native ? "native" : "nep141",
-      token: contractIdTokenOut,
-      amount: estimateUnitsBackAmount,
+      token: contractIdTokenOut as string,
+      amount: estimateUnitsBackAmount as string,
       account: inputs.accountTo
         ? (inputs.accountTo as string)
         : (inputs.accountId as string),
@@ -190,6 +203,14 @@ export const prepareCreateIntent1SingleChain = (
       block_number: inputs.blockHeight + CREATE_INTENT_EXPIRATION_BLOCK_BOOST,
     },
     referral: REFERRAL_ACCOUNT,
+  }
+
+  const ajv = new Ajv()
+  const validate = ajv.compile(msgSchemaCreateIntent1SingleChain)
+  const isValid = validate(msg)
+  if (!isValid) {
+    console.log("Validation errors:", validate.errors)
+    throw new Error(`Validation schema errors`)
   }
 
   const params = {}

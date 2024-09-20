@@ -16,7 +16,7 @@ import "@near-wallet-selector/modal-ui/styles.css"
 import "@near-wallet-selector/account-export/styles.css"
 import "../styles/global.scss"
 
-const DEV_MODE = process?.env?.DEV_MODE === "true" ?? false
+const DEV_MODE = process?.env?.NEXT_PUBLIC_DEV_MODE === "true" ?? false
 
 const RootLayout = ({
   children,

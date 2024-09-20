@@ -17,15 +17,15 @@ const NetworkIcon = ({
         className={clsx(
           "relative overflow-hidden w-[36px] h-[36px] flex justify-center items-center border border-silver-100 rounded-full dark:border-white",
           chainName === "near" && "bg-black",
-          chainName === "eth" && "bg-blue-600",
+          chainName === "eth" && "bg-white",
           chainName === "btc" && "bg-white"
         )}
       >
         <Image
           src={chainIcon}
           alt={chainName ?? "Network Logo"}
-          width={16}
-          height={16}
+          width={20}
+          height={20}
         />
       </div>
       {isConnect && (

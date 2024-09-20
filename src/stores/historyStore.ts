@@ -25,6 +25,7 @@ export type HistoryData = {
   hash: string
   timestamp: number
   status?: HistoryStatus
+  proof?: string
   errorMessage?: string
   isClosed?: boolean
   details?: {

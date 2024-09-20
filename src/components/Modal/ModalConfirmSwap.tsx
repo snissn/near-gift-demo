@@ -17,7 +17,6 @@ import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { UseQueryCollectorKeys } from "@src/hooks/useQuery"
 import { ModalReviewSwapPayload } from "@src/components/Modal/ModalReviewSwap"
 import { ModalType } from "@src/stores/modalStore"
-import { sha256 } from "@src/actions/crypto"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { usePublishIntentSolver0 } from "@src/api/hooks/intent/usePublishIntentSolver0"
 import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
@@ -28,6 +27,7 @@ import { NotificationType } from "@src/stores/notificationStore"
 import { getNearBlockById } from "@src/api/transaction"
 import { NearBlock, NearTX, QueueTransactions } from "@src/types/interfaces"
 import { balanceToDecimal } from "@src/app/swap/SwapForm/service/balanceTo"
+import { generateIntentID } from "@src/utils/intent"
 
 export interface ModalConfirmSwapPayload extends CallRequestIntentProps {}
 
@@ -155,7 +155,6 @@ const ModalConfirmSwap = () => {
       if (data) {
         setDataFromLocal(data)
 
-        // TODO Linked to [#1]
         const receivedHash = searchParams.get(
           UseQueryCollectorKeys.TRANSACTION_HASHS
         )
@@ -228,7 +227,7 @@ const ModalConfirmSwap = () => {
       return
     }
 
-    const newIntentId = await sha256(v4())
+    const newIntentId = generateIntentID()
 
     if (
       handleBatchCreateSwapQuery({
@@ -412,16 +411,19 @@ const ModalConfirmSwap = () => {
             />
           </button>
         </div>
-        <div className="flex justify-center">
-          <Spinner loading={isProcessing} />
-        </div>
-        <div className="w-full flex flex-col text-center text-black-400 gap-1 mb-4">
+        <div className="w-full flex flex-col text-center text-black-400 gap-1 mb-4 dark:text-gray-500">
           <Text size="4" weight="bold">
             Confirm swap
           </Text>
-          <Text size="2" weight="bold" className="text-gray-600">
-            Please confirm transaction in your wallet.
-          </Text>
+          {isProcessing ? (
+            <div className="flex justify-center">
+              <Spinner loading={isProcessing} />
+            </div>
+          ) : (
+            <Text size="2" weight="bold" className="text-gray-600">
+              Please confirm transaction in your wallet.
+            </Text>
+          )}
         </div>
         <div className="flex justify-center">
           <div className="flex justify-center items-center gap-1 px-2.5 py-1 bg-gray-950 rounded-full">

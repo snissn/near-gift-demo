@@ -25,6 +25,8 @@ const nextConfig = {
     walletConnectProjectId: process.env.WALLET_CONNECT_PROJECT_ID,
     appUrl: process.env.NEXT_PUBLIC_APP_URL,
     nearExplorer: process.env.NEXT_PUBLIC_NEAR_EXPLORER,
+    baseExplorer: process.env.NEXT_PUBLIC_BASE_EXPLORER,
+    bitcoinExplorer: process.env.NEXT_PUBLIC_BITCOIN_EXPLORER,
     publicMail: process.env.NEXT_PUBLIC_PUBLIC_MAIL,
     socialX: process.env.NEXT_PUBLIC_LINK_X,
     socialDiscord: process.env.NEXT_PUBLIC_LINK_DISCORD,

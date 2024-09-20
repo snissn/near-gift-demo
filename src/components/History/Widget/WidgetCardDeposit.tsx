@@ -1,13 +1,13 @@
 "use client"
 
-import { useState } from "react"
 import { Text } from "@radix-ui/themes"
 
 import AssetComboIcon from "@src/components/Network/AssetComboIcon"
-import { NearTX, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
+import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import { smallBalanceToFormat } from "@src/utils/token"
 import WidgetCardLink from "@src/components/History/Widget/WidgetCardLink"
 import useShortAccountId from "@src/hooks/useShortAccountId"
+import { useActiveHover } from "@src/hooks/useActiveHover"
 
 type Props = {
   accountId: string
@@ -24,7 +24,7 @@ const WidgetCardDeposit = ({
   selectedTokenIn,
   hash,
 }: Props) => {
-  const [isActive, setIsActive] = useState(false)
+  const { isActive, handleMouseLeave, handleMouseOver } = useActiveHover()
   const { shortAccountId } = useShortAccountId(accountId)
 
   return (
@@ -32,27 +32,39 @@ const WidgetCardDeposit = ({
       onClick={() => {
         window.open(NEAR_EXPLORER + "/txns/" + hash)
       }}
-      onMouseOver={() => setIsActive(true)}
-      onMouseLeave={() => setIsActive(false)}
-      className="relative flex flex-nowrap justify-between items-center p-2.5 gap-3 hover:bg-gray-950 cursor-pointer"
+      onMouseOver={handleMouseOver}
+      onMouseLeave={handleMouseLeave}
+      className="relative flex flex-nowrap justify-between items-center p-2.5 gap-3 hover:bg-gray-950 hover:dark:bg-black-950 cursor-pointer"
     >
       <div className="flex-none w-[40px] h-[36px]">
         <AssetComboIcon {...selectedTokenIn} />
       </div>
       <div className="shrink grow flex flex-col justify-between items-start">
-        <Text size="2" weight="medium" className="text-black-400">
+        <Text
+          size="2"
+          weight="medium"
+          className="text-black-400 dark:text-white"
+        >
           Deposit
         </Text>
         {!isActive && (
           <span className="flex gap-1">
-            <Text size="1" weight="medium" className="text-gray-600">
+            <Text
+              size="1"
+              weight="medium"
+              className="text-gray-600 dark:text-gray-500"
+            >
               To {shortAccountId}
             </Text>
           </span>
         )}
         {isActive && (
           <span className="flex gap-1">
-            <Text size="1" weight="medium" className="text-gray-600">
+            <Text
+              size="1"
+              weight="medium"
+              className="text-gray-600 dark:text-gray-500"
+            >
               View transaction
             </Text>
           </span>
@@ -60,7 +72,11 @@ const WidgetCardDeposit = ({
       </div>
       {!isActive && (
         <div className="shrink grow flex flex-col justify-between items-end">
-          <Text size="1" weight="medium" className="text-gray-600">
+          <Text
+            size="1"
+            weight="medium"
+            className="text-gray-600 dark:text-gray-500"
+          >
             Completed
           </Text>
           <span className="flex gap-1">

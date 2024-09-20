@@ -37,7 +37,7 @@ export const W_BASE_TOKEN_META = {
   chainName: "BASE",
   name: "Wrapped Ether",
   symbol: "WETH",
-  chainIcon: "/static/icons/network/ethereum_white.svg",
+  chainIcon: "/static/icons/network/base.svg",
   icon: "https://assets.coingecko.com/coins/images/279/standard/ethereum.png",
   decimals: 18,
 }
