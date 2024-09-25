@@ -25,6 +25,7 @@ import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { getBalanceNearAllowedToSwap } from "@src/app/swap/SwapForm/service/getBalanceNearAllowedToSwap"
 import { NEAR_TOKEN_META, W_NEAR_TOKEN_META } from "@src/constants/tokens"
 import { balanceToDecimal } from "@src/app/swap/SwapForm/service/balanceTo"
+import { sendGaEvent } from "@src/utils/googleAnalytics"
 
 export type ModalReviewSwapPayload = {
   tokenIn: string
@@ -139,6 +140,10 @@ const ModalReviewSwap = () => {
   }
 
   const handleConfirmSwap = async () => {
+    sendGaEvent({
+      name: "confirm_swap",
+      parameters: { status: "success" },
+    })
     setModalType(ModalType.MODAL_CONFIRM_SWAP, payload)
   }
 

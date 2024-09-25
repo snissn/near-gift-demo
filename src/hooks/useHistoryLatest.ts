@@ -100,7 +100,7 @@ export const useHistoryLatest = () => {
               details: {
                 ...historyData.details,
                 receipts_outcome: result.receipts_outcome,
-                transaction: result.transaction,
+                transaction: result?.transaction,
               },
             })
           }
