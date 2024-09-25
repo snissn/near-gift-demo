@@ -2,7 +2,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { FieldValues, useForm } from "react-hook-form"
 import { parseUnits } from "ethers"
-import { Text } from "@radix-ui/themes"
 import { v4 } from "uuid"
 
 import Form from "@src/components/Form"
@@ -33,10 +32,11 @@ import {
   balanceToDecimal,
 } from "@src/app/swap/SwapForm/service/balanceTo"
 import { getBalanceNearAllowedToSwap } from "@src/app/swap/SwapForm/service/getBalanceNearAllowedToSwap"
-import { smallBalanceToFormat } from "@src/utils/token"
 import isWalletConnected from "@src/app/swap/SwapForm/utils/isWalletConnected"
 import { NotificationType } from "@src/stores/notificationStore"
 import { useNotificationStore } from "@src/providers/NotificationProvider"
+
+import WarnBox from "../WarnBox"
 
 import {
   EvaluateResultEnum,
@@ -502,33 +502,16 @@ export default function Swap() {
         errorSelect={errorSelectTokenOut}
         disabled={true}
       />
-      {selectTokenIn?.defuse_asset_id === NEAR_TOKEN_META.defuse_asset_id &&
-        allowableNearAmountRef.current !== null && (
-          <div className="w-full block md:max-w-[472px] mb-5">
-            <Text
-              size="2"
-              weight="medium"
-              className="text-red-400 dark:text-primary-400"
-            >
-              {`You must have ${smallBalanceToFormat((Number(balanceToDecimal(selectTokenIn?.balance ?? "0", selectTokenIn?.decimals ?? 0)) - Number(balanceToDecimal(allowableNearAmountRef.current ?? "0", 24))).toString())} Near in wallet for gas fee. The maximum available to swap value is -`}
-            </Text>
-            <span
-              onClick={() => {
-                const value = balanceToDecimal(
-                  allowableNearAmountRef.current ?? "0",
-                  24
-                )
-                setValue("tokenIn", value)
-              }}
-              className="inline-block text-xs px-2 py-0.5 ml-0.5 rounded-full bg-red-100 text-red-400 dark:bg-red-200 dark:text-primary-400 cursor-pointer"
-            >
-              {smallBalanceToFormat(
-                balanceToDecimal(allowableNearAmountRef.current ?? "0", 24),
-                7
-              )}
-            </span>
-          </div>
-        )}
+      {selectTokenIn?.defuse_asset_id === NEAR_TOKEN_META.defuse_asset_id && (
+        <WarnBox
+          allowableNearAmount={allowableNearAmountRef.current}
+          balance={selectTokenIn?.balance ?? "0"}
+          decimals={selectTokenIn?.decimals ?? 0}
+          setValue={(value: string) => {
+            setValue("tokenIn", value)
+          }}
+        />
+      )}
       <Button
         type="submit"
         size="lg"
