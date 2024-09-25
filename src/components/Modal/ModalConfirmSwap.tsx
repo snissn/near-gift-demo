@@ -28,6 +28,7 @@ import { getNearBlockById } from "@src/api/transaction"
 import { NearBlock, NearTX, QueueTransactions } from "@src/types/interfaces"
 import { balanceToDecimal } from "@src/app/swap/SwapForm/service/balanceTo"
 import { generateIntentID } from "@src/utils/intent"
+import { sendGaEvent } from "@src/utils/googleAnalytics"
 
 export interface ModalConfirmSwapPayload extends CallRequestIntentProps {}
 
@@ -339,6 +340,11 @@ const ModalConfirmSwap = () => {
       onCloseModal()
       ongoingPublishingRef.current = false
       router.replace(pathname)
+
+      sendGaEvent({
+        name: "publish_intent",
+        parameters: { status: "success" },
+      })
     }
     if (isError || isErrorTransaction) {
       ongoingPublishingRef.current = false
@@ -346,6 +352,11 @@ const ModalConfirmSwap = () => {
         id: v4(),
         message: "Intent hasn't been published!",
         type: NotificationType.ERROR,
+      })
+
+      sendGaEvent({
+        name: "publish_intent",
+        parameters: { status: "fail" },
       })
     }
   }, [isSuccess, isError, isErrorTransaction])
