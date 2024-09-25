@@ -502,16 +502,18 @@ export default function Swap() {
         errorSelect={errorSelectTokenOut}
         disabled={true}
       />
-      {selectTokenIn?.defuse_asset_id === NEAR_TOKEN_META.defuse_asset_id && (
-        <WarnBox
-          allowableNearAmount={allowableNearAmountRef.current}
-          balance={selectTokenIn?.balance ?? "0"}
-          decimals={selectTokenIn?.decimals ?? 0}
-          setValue={(value: string) => {
-            setValue("tokenIn", value)
-          }}
-        />
-      )}
+      {selectTokenIn?.defuse_asset_id === NEAR_TOKEN_META.defuse_asset_id &&
+        errorMsg !== ErrorEnum.INSUFFICIENT_BALANCE &&
+        errorMsg !== ErrorEnum.NO_QUOTES && (
+          <WarnBox
+            allowableNearAmount={allowableNearAmountRef.current}
+            balance={selectTokenIn?.balance ?? "0"}
+            decimals={selectTokenIn?.decimals ?? 0}
+            setValue={(value: string) => {
+              setValue("tokenIn", value)
+            }}
+          />
+        )}
       <Button
         type="submit"
         size="lg"
