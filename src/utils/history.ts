@@ -157,8 +157,8 @@ export const getDetailsFromStorageDeposit = async (
     return {}
   }
   return {
-    amount: data.result.transaction.actions[0].FunctionCall.deposit,
-    receiverId: data.result.transaction.receiver_id,
+    amount: data.result?.transaction.actions[0].FunctionCall.deposit,
+    receiverId: data.result?.transaction.receiver_id,
   }
 }
 

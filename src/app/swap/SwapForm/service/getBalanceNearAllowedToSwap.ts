@@ -20,9 +20,16 @@ export const getBalanceNearAllowedToSwap = async (
     if (!viewAccount) {
       return "0"
     }
+
     const bigNumberBalance = BigInt(viewAccount.amount)
-    const balanceAllowedToSwap =
-      bigNumberBalance - minimumNearBalance(viewAccount.storage_usage)
+    const bigNumberMinReservedBalance = minimumNearBalance(
+      viewAccount.storage_usage
+    )
+    const balanceAllowedToSwap = bigNumberBalance - bigNumberMinReservedBalance
+    if (bigNumberMinReservedBalance > bigNumberBalance) {
+      return "0"
+    }
+
     return balanceAllowedToSwap > BigInt(0)
       ? balanceAllowedToSwap.toString()
       : "0"

@@ -269,7 +269,7 @@ const ModalConfirmSwap = () => {
       const timestamps = await Promise.all(
         callResult.map(async (result) => {
           const { result: resultBlock } = (await getNearBlockById(
-            result.transaction.hash as string
+            result?.transaction.hash as string
           )) as NearBlock
           return (
             resultBlock?.header?.timestamp ??
@@ -282,7 +282,7 @@ const ModalConfirmSwap = () => {
       for (const result of callResult) {
         updateOneHistory({
           intentId: inputs.intentId as string,
-          hash: result.transaction.hash as string,
+          hash: result?.transaction.hash as string,
           timestamp: timestamps[resultSequence] ?? 0,
           details: {
             tokenIn: modalPayload.tokenIn,
@@ -294,7 +294,7 @@ const ModalConfirmSwap = () => {
 
         const { value, done, failure } = await nextEstimateQueueTransactions({
           estimateQueue: estimateQueue,
-          receivedHash: result.transaction.hash,
+          receivedHash: result?.transaction.hash,
         })
 
         // Toggle preview for the main transaction in batch
@@ -312,13 +312,13 @@ const ModalConfirmSwap = () => {
             onCloseModal()
             router.replace(pathname)
           } else {
-            togglePreview(result.transaction.hash as string)
+            togglePreview(result?.transaction.hash as string)
             handlePublishIntentToSolver(
               Object.assign(inputs, {
                 selectedTokenIn: modalPayload!.selectedTokenIn,
               }),
               inputs.intentId,
-              result.transaction.hash as string
+              result?.transaction.hash as string
             )
           }
         }
