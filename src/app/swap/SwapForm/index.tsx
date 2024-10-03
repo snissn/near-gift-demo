@@ -212,12 +212,7 @@ export default function Swap() {
       clearErrors()
       lastInputValue.current = tokenIn
 
-      const parsedTokenInBigNumber = BigInt(
-        balanceToBignumberString(tokenIn, selectTokenIn?.decimals ?? 0)
-      )
-      const balanceTokenInBigNumber = BigInt(selectTokenIn?.balance ?? "0")
-
-      // Empty input
+      // Check for empty input
       if (
         (name === "tokenIn" && !tokenIn) ||
         !selectTokenIn ||
@@ -228,6 +223,11 @@ export default function Swap() {
         setIsFetchingData(false)
         return
       }
+
+      const parsedTokenInBigNumber = BigInt(
+        balanceToBignumberString(tokenIn, selectTokenIn?.decimals ?? 0)
+      )
+      const balanceTokenInBigNumber = BigInt(selectTokenIn?.balance ?? "0")
 
       if (
         selectTokenIn.defuse_asset_id === NEAR_TOKEN_META.defuse_asset_id &&

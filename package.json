@@ -13,6 +13,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@defuse-protocol/defuse-sdk": "^1.1.3",
     "@near-eth/client": "^1.11.1",
     "@near-wallet-selector/account-export": "^8.9.12",
     "@near-wallet-selector/bitget-wallet": "^8.9.12",

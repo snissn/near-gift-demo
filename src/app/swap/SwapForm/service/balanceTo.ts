@@ -8,10 +8,16 @@ export const balanceToBignumberString = (
   balance: string,
   decimal: number
 ): string => {
+  if (!balance || balance.trim() === "") {
+    return "0"
+  }
   return parseUnits(balance, decimal).toString()
 }
 
 export const balanceToCurrency = (balance: number): number => {
+  if (balance === 0) {
+    return 0
+  }
   const roundedValue = Math.ceil(balance * 100) / 100
   return Number(roundedValue.toFixed(2))
 }

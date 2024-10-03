@@ -1,8 +1,11 @@
+"use client"
+
 import { Theme } from "@radix-ui/themes"
 import { ThemeProvider } from "next-themes"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { GoogleAnalytics } from "@next/third-parties/google"
+import { SwapWidgetProvider } from "@defuse-protocol/defuse-sdk"
 
 import queryClient from "@src/constants/queryClient"
 import { WalletSelectorProvider } from "@src/providers/WalletSelectorProvider"
@@ -28,25 +31,27 @@ const RootLayout = ({
   return (
     <html lang="en">
       <body>
-        <NotificationStoreProvider>
-          <QueryClientProvider client={queryClient}>
-            <WalletSelectorProvider>
-              <ThemeProvider attribute="class">
-                <Theme>
-                  <HistoryStoreProvider>
-                    <TokensStoreProvider>
-                      <ModalStoreProvider>
-                        {children}
-                        <Modal />
-                      </ModalStoreProvider>
-                    </TokensStoreProvider>
-                  </HistoryStoreProvider>
-                </Theme>
-              </ThemeProvider>
-            </WalletSelectorProvider>
-            {DEV_MODE && <ReactQueryDevtools initialIsOpen={false} />}
-          </QueryClientProvider>
-        </NotificationStoreProvider>
+        <SwapWidgetProvider>
+          <NotificationStoreProvider>
+            <QueryClientProvider client={queryClient}>
+              <WalletSelectorProvider>
+                <ThemeProvider attribute="class">
+                  <Theme>
+                    <HistoryStoreProvider>
+                      <TokensStoreProvider>
+                        <ModalStoreProvider>
+                          {children}
+                          <Modal />
+                        </ModalStoreProvider>
+                      </TokensStoreProvider>
+                    </HistoryStoreProvider>
+                  </Theme>
+                </ThemeProvider>
+              </WalletSelectorProvider>
+              {DEV_MODE && <ReactQueryDevtools initialIsOpen={false} />}
+            </QueryClientProvider>
+          </NotificationStoreProvider>
+        </SwapWidgetProvider>
       </body>
       <GoogleAnalytics gaId="G-WNE3NB46KM" />
     </html>

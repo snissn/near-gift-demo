@@ -225,6 +225,46 @@ export const LIST_NETWORKS_TOKENS: NetworkToken[] =
     ? listNetworksTokensTestnet
     : listNetworksTokensMainnet
 
+export const LIST_TOKENS = [
+  {
+    defuseAssetId:
+      "near:mainnet:17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
+    address: "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
+    decimals: 6,
+    icon: "https://assets.coingecko.com/coins/images/6319/standard/usdc.png",
+    chainId: "mainnet",
+    chainIcon: "/static/icons/network/near.svg",
+    chainName: "NEAR",
+    routes: [],
+    symbol: "USDC",
+    name: "USDC",
+  },
+  {
+    defuseAssetId: "near:mainnet:usdt.tether-token.near",
+    address: "usdt.tether-token.near",
+    decimals: 6,
+    icon: "https://assets.coingecko.com/coins/images/325/standard/Tether.png",
+    chainId: "mainnet",
+    chainIcon: "/static/icons/network/near.svg",
+    chainName: "NEAR",
+    routes: [],
+    symbol: "USDT",
+    name: "USDt",
+  },
+  {
+    defuseAssetId: "near:mainnet:aurora",
+    address: "aurora",
+    decimals: 18,
+    icon: "https://assets.coingecko.com/coins/images/279/standard/ethereum.png",
+    chainId: "mainnet",
+    chainIcon: "/static/icons/network/near.svg",
+    chainName: "NEAR",
+    routes: ["near:mainnet:aurora"],
+    symbol: "ETH",
+    name: "ETH",
+  },
+]
+
 const listNativeTokensTestnet = [
   {
     defuse_asset_id: "near:testnet:native",
