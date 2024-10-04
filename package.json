@@ -96,6 +96,9 @@
       "yarn run format"
     ]
   },
+  "engines": {
+    "node": ">=20.13.1"
+  },
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
