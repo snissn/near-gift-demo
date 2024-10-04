@@ -10,12 +10,8 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version-file: package.json
-    - name: Configure .npmrc
+    - name: Setup NPM token
       run: |
-        if [ ! -f .npmrc ]; then
-          touch .npmrc
-        fi
-        echo "@defuse-protocol:registry=https://npm.pkg.github.com" > .npmrc
         echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_TOKEN }}" >> .npmrc
       shell: bash
     - name: Install
