@@ -39,6 +39,3 @@ next-env.d.ts
 
 # sentry
 .env.sentry-build-plugin
-
-# tokens
-.npmrc
