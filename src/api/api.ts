@@ -80,7 +80,7 @@ export const useInterceptors = () => {
   ) {
     this._method = method
     this._url = url.toString()
-    open.call(this, method, url, async, username, password)
+    open.call(this, method, url, Boolean(async), username, password)
   }
 
   XMLHttpRequest.prototype.send = function (body) {
