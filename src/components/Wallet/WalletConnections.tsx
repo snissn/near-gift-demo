@@ -55,7 +55,7 @@ const WalletConnectionsConnector = ({
   const { shortAccountId } = useShortAccountId(accountId ?? "")
   return (
     <div className="flex flex-col justify-between items-center gap-2.5">
-      {!index ? <Separator orientation="horizontal" size="4" /> : <div></div>}
+      {!index ? <Separator orientation="horizontal" size="4" /> : <div />}
       <div className="w-full flex justify-between items-center">
         <div className="flex justify-center items-center gap-4">
           <NetworkIcon
@@ -76,6 +76,7 @@ const WalletConnectionsConnector = ({
           <div className="flex justify-center items-center gap-2.5">
             <CopyToClipboard onCopy={onCopy} text={accountId ?? ""}>
               <button
+                type={"button"}
                 className={clsx(
                   "w-[32px] h-[32px] flex justify-center items-center rounded-full border border-gray-500 dark:border-white",
                   isCopied && "bg-primary border-0 text-white"
@@ -85,6 +86,7 @@ const WalletConnectionsConnector = ({
               </button>
             </CopyToClipboard>
             <button
+              type={"button"}
               onClick={onDisconnect}
               className="w-[32px] h-[32px] flex justify-center items-center rounded-full bg-white-200 dark:border dark:border-white"
             >

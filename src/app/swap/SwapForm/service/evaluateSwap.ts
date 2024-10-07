@@ -22,14 +22,14 @@ const getSwapEstimateFromRefFinance = async (
 ): Promise<EvaluateResultEnum | null> => {
   try {
     const result = await swapEstimateRefFinanceProvider({
-      tokenIn: prepareRefAddressData(tokenIn.address!),
-      tokenOut: prepareRefAddressData(tokenOut.address!),
+      tokenIn: prepareRefAddressData(tokenIn.address),
+      tokenOut: prepareRefAddressData(tokenOut.address),
       amountIn,
     })
 
     if (result === "0") return null
     const refFinancePrice = +result
-    const bestOutN = +formatUnits(BigInt(bestOut), tokenOut.decimals!)
+    const bestOutN = +formatUnits(BigInt(bestOut), tokenOut.decimals)
     if (bestOutN > refFinancePrice) {
       return EvaluateResultEnum.BEST
     }

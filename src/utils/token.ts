@@ -30,13 +30,10 @@ export const tokenBalanceToFormatUnits = ({
   balance: string | undefined
   decimals: number
 }): string => {
-  if (!Number.parseFloat(balance?.toString() ?? "0")) {
+  if (balance == null || !Number.parseFloat(balance)) {
     return "0"
   }
-  const balanceToUnits = formatUnits(
-    BigInt(balance!.toString()),
-    decimals
-  ).toString()
+  const balanceToUnits = formatUnits(BigInt(balance), decimals).toString()
 
   return smallBalanceToFormat(balanceToUnits, 7)
 }

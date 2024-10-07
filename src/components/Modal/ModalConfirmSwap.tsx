@@ -25,7 +25,11 @@ import type { PublishAtomicNearIntentProps } from "@src/api/intent"
 import { useNotificationStore } from "@src/providers/NotificationProvider"
 import { NotificationType } from "@src/stores/notificationStore"
 import { getNearBlockById } from "@src/api/transaction"
-import { type NearBlock, type NearTX, QueueTransactions } from "@src/types/interfaces"
+import {
+  type NearBlock,
+  type NearTX,
+  QueueTransactions,
+} from "@src/types/interfaces"
 import { balanceToDecimal } from "@src/app/swap/SwapForm/service/balanceTo"
 import { generateIntentID } from "@src/utils/intent"
 import { sendGaEvent } from "@src/utils/googleAnalytics"
@@ -81,8 +85,8 @@ const ModalConfirmSwap = () => {
 
   const handleBatchCleanupQuery = (keys: string[]) => {
     const params = new URLSearchParams(searchParams.toString())
-    keys.forEach((key) => params.delete(key))
-    router.replace(pathname + "?" + params)
+    for (const key of keys) params.delete(key)
+    router.replace(`${pathname}?${params}`)
   }
 
   const handleBatchCreateSwapQuery = ({
@@ -95,10 +99,10 @@ const ModalConfirmSwap = () => {
       queryParams.set("modalType", ModalType.MODAL_CONFIRM_SWAP)
       queryParams.set("intentId", intentId)
       const updatedQueryString = queryParams.toString()
-      router.replace(pathname + "?" + updatedQueryString)
+      router.replace(`${pathname}?${updatedQueryString}`)
       return true
     } catch (e) {
-      console.log(`ModalConfirmSwap handleBatchCreateSwapQuery: `, e)
+      console.log("ModalConfirmSwap handleBatchCreateSwapQuery:", e)
       return false
     }
   }
@@ -189,10 +193,10 @@ const ModalConfirmSwap = () => {
         }
 
         const inputs = {
-          tokenIn: data!.tokenIn,
-          tokenOut: data!.tokenOut,
-          selectedTokenIn: data!.selectedTokenIn,
-          selectedTokenOut: data!.selectedTokenOut,
+          tokenIn: data.tokenIn,
+          tokenOut: data.tokenOut,
+          selectedTokenIn: data.selectedTokenIn,
+          selectedTokenOut: data.selectedTokenOut,
           intentId: data.intentId,
           estimateQueue: value,
         }
@@ -262,7 +266,7 @@ const ModalConfirmSwap = () => {
     inputs: CallRequestIntentProps,
     estimateQueue: CallRequestIntentProps["estimateQueue"]
   ): Promise<void> => {
-    const callResult: NearTX[] | void = await callRequestCreateIntent(
+    const callResult: NearTX[] | undefined = await callRequestCreateIntent(
       inputs,
       (mutate) => setSwapToLocal(mutate)
     )
@@ -274,7 +278,7 @@ const ModalConfirmSwap = () => {
           )) as NearBlock
           return (
             resultBlock?.header?.timestamp ??
-            Number(`${new Date().getTime()}` + "0".repeat(6))
+            Number(`${new Date().getTime()}${"0".repeat(6)}`)
           )
         })
       )
@@ -316,7 +320,7 @@ const ModalConfirmSwap = () => {
             togglePreview(result?.transaction.hash as string)
             handlePublishIntentToSolver(
               Object.assign(inputs, {
-                selectedTokenIn: modalPayload!.selectedTokenIn,
+                selectedTokenIn: modalPayload.selectedTokenIn,
               }),
               inputs.intentId,
               result?.transaction.hash as string
@@ -329,12 +333,14 @@ const ModalConfirmSwap = () => {
     }
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     if (isFetched && !isProcessing) {
       handleTrackSwap()
     }
   }, [historyData, isFetched, isProcessing])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     if (isSuccess) {
       onCloseModal()
@@ -361,6 +367,7 @@ const ModalConfirmSwap = () => {
     }
   }, [isSuccess, isError, isErrorTransaction])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     if (isErrorSwap) {
       onCloseModal()
@@ -411,6 +418,7 @@ const ModalConfirmSwap = () => {
             </div>
           </div>
           <button
+            type={"button"}
             className="shrink-0 w-[40px] h-[40px] flex justify-center items-center"
             onClick={onCloseModal}
           >

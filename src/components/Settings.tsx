@@ -14,6 +14,7 @@ const NEXT_PUBLIC_PUBLIC_MAIL = process?.env?.NEXT_PUBLIC_PUBLIC_MAIL ?? ""
 const Settings = () => {
   const { theme, setTheme } = useTheme()
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     const getThemeFromLocal = localStorage.getItem(THEME_MODE_KEY)
     if (!getThemeFromLocal) {
@@ -35,10 +36,13 @@ const Settings = () => {
     <div>
       <Popover.Root>
         <Popover.Trigger>
-          <button className="w-[32px] h-[32px] flex justify-center items-center bg-gray-200 rounded-full gap-1 dark:bg-gray-1000">
-            <span className={elementCircleStyle}></span>
-            <span className={elementCircleStyle}></span>
-            <span className={elementCircleStyle}></span>
+          <button
+            type={"button"}
+            className="w-[32px] h-[32px] flex justify-center items-center bg-gray-200 rounded-full gap-1 dark:bg-gray-1000"
+          >
+            <span className={elementCircleStyle} />
+            <span className={elementCircleStyle} />
+            <span className={elementCircleStyle} />
           </button>
         </Popover.Trigger>
         <Popover.Content className="min-w-[180px] mt-1 dark:bg-black-800 rounded-2xl">
@@ -58,6 +62,7 @@ const Settings = () => {
             <Separator orientation="horizontal" size="4" />
             <div className="flex flex-col justify-between items-center gap-1.5">
               <button
+                type={"button"}
                 onClick={() => window.open(NEXT_PUBLIC_LINK_DOCS)}
                 className="w-full flex justify-between items-center gap-2"
               >
@@ -67,6 +72,7 @@ const Settings = () => {
                 <ExternalLinkIcon width={16} height={16} />
               </button>
               <button
+                type={"button"}
                 onClick={() => window.open(`mailto:${NEXT_PUBLIC_PUBLIC_MAIL}`)}
                 className="w-full flex justify-between items-center gap-2"
               >

@@ -53,7 +53,7 @@ export async function callRequestGetIntent(
   const status =
     result?.status === HistoryStatus.INTENT_1_AVAILABLE
       ? HistoryStatus.AVAILABLE
-      : (result!.status as HistoryStatus)
+      : (result.status as HistoryStatus)
 
   return {
     ...result,
@@ -79,15 +79,16 @@ async function getSelectedTokenDetails(
         selectedToken: NEAR_TOKEN_META,
       }
     case AssetTypeEnum.nep141:
-      discoverAsset = await getDiscoverDefuseAssets(asset!.token as string)
+      discoverAsset = await getDiscoverDefuseAssets(asset.token as string)
       return {
         amount: asset.amount,
         selectedToken: tokenMetaAdapter(discoverAsset.result.tokens[0]),
       }
     case AssetTypeEnum.cross_chain:
-      defuse_asset_id = asset!.asset as string
+      defuse_asset_id = asset.asset as string
       defuseAsset = parseDefuseAsset(defuse_asset_id)
-      discoverAsset = await getDiscoverDefuseAssets(defuseAsset!.contractId)
+      assert(defuseAsset, "Invalid defuse asset")
+      discoverAsset = await getDiscoverDefuseAssets(defuseAsset.contractId)
       return {
         amount: asset.amount,
         selectedToken: tokenMetaAdapter(discoverAsset.result.tokens[0]),
@@ -111,7 +112,7 @@ export async function getDetailsFromGetIntent(
   const details: GetDetailsResult = {}
 
   const assetInDetails: GetSelectedTokenDetailsResult = result?.asset_in
-    ? await getSelectedTokenDetails(result!.asset_in)
+    ? await getSelectedTokenDetails(result.asset_in)
     : null
   if (assetInDetails) {
     Object.assign(details, {
@@ -121,7 +122,7 @@ export async function getDetailsFromGetIntent(
   }
 
   const assetOutDetails: GetSelectedTokenDetailsResult = result?.asset_in
-    ? await getSelectedTokenDetails(result!.asset_out)
+    ? await getSelectedTokenDetails(result.asset_out)
     : null
   if (assetOutDetails) {
     Object.assign(details, {
@@ -163,3 +164,9 @@ export const getDetailsFromStorageDeposit = async (
 }
 
 export const getDetailsFromNativeOnTransfer = async () => {}
+
+function assert(condition: unknown, msg?: string): asserts condition {
+  if (!condition) {
+    throw new Error(msg)
+  }
+}

@@ -12,7 +12,10 @@ import ButtonSwitch from "@src/components/Button/ButtonSwitch"
 import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { ModalType } from "@src/stores/modalStore"
-import type { NetworkToken, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
+import type {
+  NetworkToken,
+  NetworkTokenWithSwapRoute,
+} from "@src/types/interfaces"
 import type {
   ModalSelectAssetsPayload,
   TokenListWithNotSelectableToken,
@@ -279,10 +282,7 @@ export default function Swap() {
         isProgrammaticUpdate.current = true
         const formattedOut =
           bestEstimate.amount_out !== null
-            ? balanceToDecimal(
-                bestEstimate.amount_out,
-                selectTokenOut.decimals!
-              )
+            ? balanceToDecimal(bestEstimate.amount_out, selectTokenOut.decimals)
             : "0"
         setValue("tokenOut", formattedOut)
         trigger("tokenOut")
@@ -313,6 +313,7 @@ export default function Swap() {
     )
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     if (!selectTokenIn && !selectTokenOut) {
       const getConfirmSwapFromLocal = localStorage.getItem(
@@ -336,33 +337,36 @@ export default function Swap() {
         return
       }
       if (data.size) {
-        data.forEach((token) => {
+        for (const token of data.values()) {
           if (token.address === "near") {
             setSelectTokenIn(token)
           }
           if (token.address === "usdt") {
             setSelectTokenOut(token)
           }
-        })
+        }
         return
       }
     }
     // Do evaluate usd select tokens prices
     if (data.size && !isLoading) {
       const getAssetList: TokenListWithNotSelectableToken[] = []
-      data.forEach((value) => getAssetList.push(value))
+      for (const value of data.values()) {
+        getAssetList.push(value)
+      }
       const tieNativeToWrapAssetList = tieNativeToWrapToken(getAssetList)
-      tieNativeToWrapAssetList.forEach((token) => {
+      for (const token of tieNativeToWrapAssetList) {
         if (selectTokenIn?.defuse_asset_id === token.defuse_asset_id) {
           setSelectTokenIn(token)
         }
         if (selectTokenOut?.defuse_asset_id === token.defuse_asset_id) {
           setSelectTokenOut(token)
         }
-      })
+      }
     }
   }, [data, isLoading])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     const subscription = watch((value, { name }) => {
       if (isProgrammaticUpdate.current) {
@@ -379,6 +383,7 @@ export default function Swap() {
     return () => subscription.unsubscribe()
   }, [watch, selectTokenIn, selectTokenOut])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     // Use to calculate when selectTokenIn or selectTokenOut is changed
     const valueTokenIn = getValues("tokenIn")
@@ -394,6 +399,7 @@ export default function Swap() {
     return () => subscription.unsubscribe()
   }, [watch, selectTokenIn, selectTokenOut])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     if (
       (payload as ModalSelectAssetsPayload)?.modalType !==
@@ -404,7 +410,7 @@ export default function Swap() {
     const { modalType, fieldName, token } = payload as ModalSelectAssetsPayload
     if (modalType === ModalType.MODAL_SELECT_ASSETS && fieldName && token) {
       switch (fieldName) {
-        case "tokenIn":
+        case "tokenIn": {
           setSelectTokenIn(token)
           const isSelectTokenOutReset = isSameToken(
             token,
@@ -426,7 +432,8 @@ export default function Swap() {
           isProgrammaticUpdate.current = false
           setErrorSelectTokenIn("")
           break
-        case "tokenOut":
+        }
+        case "tokenOut": {
           setSelectTokenOut(token)
           const isSelectTokenInReset = isSameToken(
             token,
@@ -450,6 +457,7 @@ export default function Swap() {
           isProgrammaticUpdate.current = false
           setErrorSelectTokenOut("")
           break
+        }
       }
       onCloseModal(undefined)
     }

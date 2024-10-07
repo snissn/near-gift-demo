@@ -19,6 +19,7 @@ export default function Jobs() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:col-span-2 gap-4">
         {jobsData.map((job, i) => (
+          /* biome-ignore lint/suspicious/noArrayIndexKey: <reason> */
           <CardJob key={i} {...job} />
         ))}
       </div>

@@ -45,6 +45,7 @@ const ConnectWallet = () => {
       <Spinner loading={isLoading} />
     ) : (
       <button
+        type={"button"}
         onClick={handleSignIn}
         className={clsx(
           "rounded-full text-white px-4 py-2.5 text-sm",
@@ -64,6 +65,7 @@ const ConnectWallet = () => {
       <Popover.Root>
         <Popover.Trigger>
           <button
+            type={"button"}
             className="rounded-full bg-gray-200 text-black-400 text-sm px-3 py-1.5 dark:bg-gray-1000 dark:text-gray-100"
             disabled={TURN_OFF_APPS}
           >

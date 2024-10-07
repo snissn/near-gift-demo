@@ -15,8 +15,11 @@ enum CardRollbackStatusEnum {
 }
 
 enum CardRollbackActionEnum {
+  // biome-ignore lint/style/useLiteralEnumMembers: <reason>
   FT_TRANSFER_CALL = TransactionMethod.FT_TRANSFER_CALL,
+  // biome-ignore lint/style/useLiteralEnumMembers: <reason>
   ROLLBACK_INTENT = TransactionMethod.ROLLBACK_INTENT,
+  // biome-ignore lint/style/useLiteralEnumMembers: <reason>
   NATIVE_ON_TRANSFER = TransactionMethod.NATIVE_ON_TRANSFER,
 }
 
@@ -59,9 +62,10 @@ const WidgetCardRollback = ({
   }
 
   return (
+    // biome-ignore lint/a11y/useKeyWithMouseEvents lint/a11y/useKeyWithClickEvents: <reason>
     <div
       onClick={() => {
-        window.open(NEAR_EXPLORER + "/txns/" + hash)
+        window.open(`${NEAR_EXPLORER}/txns/${hash}`)
       }}
       onMouseOver={handleMouseOver}
       onMouseLeave={handleMouseLeave}

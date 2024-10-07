@@ -95,7 +95,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
       console.log("Non valid recipient address")
       return false
     }
-    if (!inputs!.selectedTokenIn?.address) {
+    if (!inputs.selectedTokenIn?.address) {
       console.log("Non valid contract address")
       return false
     }
@@ -154,15 +154,16 @@ export const useSwap = ({ accountId, selector }: Props) => {
         }
       }
 
-      const isNativeTokenIn = selectedTokenIn!.address === "native"
+      const isNativeTokenIn = selectedTokenIn.address === "native"
       const tokenNearNative = LIST_NATIVE_TOKENS.find(
         (token) => token.defuse_asset_id === "near:mainnet:native"
       )
+      assert(tokenNearNative, "Token Near Native is not found")
       const storageBalanceTokenInAddress = isNativeTokenIn
-        ? tokenNearNative!.routes
-          ? tokenNearNative!.routes[0]
+        ? tokenNearNative.routes
+          ? tokenNearNative.routes[0]
           : ""
-        : selectedTokenIn!.address
+        : selectedTokenIn.address
       // Estimate if user did storage before in order to transfer tokens for swap
       const storageBalanceTokenIn = await getStorageBalance(
         storageBalanceTokenInAddress as string,
@@ -170,7 +171,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
       )
       if (
         !isForeignNetworkToken(selectedTokenIn.defuse_asset_id) &&
-        !isStorageDepositException(selectedTokenIn!.address)
+        !isStorageDepositException(selectedTokenIn.address)
       ) {
         const storageBalanceTokenInToString = storageBalanceTokenIn
           ? storageBalanceTokenIn.toString()
@@ -185,16 +186,16 @@ export const useSwap = ({ accountId, selector }: Props) => {
         }
       }
 
-      const isNativeTokenOut = selectedTokenOut!.address === "native"
+      const isNativeTokenOut = selectedTokenOut.address === "native"
       // Estimate if user did storage before in order to transfer tokens for swap
       const storageBalanceTokenOut = await getStorageBalance(
-        selectedTokenOut!.address as string,
+        selectedTokenOut.address,
         accountId as string
       )
       if (
         !isForeignNetworkToken(selectedTokenOut.defuse_asset_id) &&
         !isNativeTokenOut &&
-        !isStorageDepositException(selectedTokenOut!.address)
+        !isStorageDepositException(selectedTokenOut.address)
       ) {
         const storageBalanceTokenOutToString = storageBalanceTokenOut
           ? storageBalanceTokenOut.toString()
@@ -246,9 +247,9 @@ export const useSwap = ({ accountId, selector }: Props) => {
       return {
         value: {
           queueTransactionsTrack: updateEstimateQueue,
-          queueInTrack: updateEstimateQueue!.length,
+          queueInTrack: updateEstimateQueue.length,
         },
-        done: updateEstimateQueue!.length ? false : true,
+        done: !updateEstimateQueue.length,
       } as NextEstimateQueueTransactionsResult
     } catch (e) {
       handleError(e)
@@ -262,7 +263,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
   const callRequestCreateIntent = async (
     inputs: CallRequestIntentProps,
     mutate?: (input: CallRequestIntentProps) => void
-  ): Promise<NearTX[] | void> => {
+  ): Promise<NearTX[] | undefined> => {
     try {
       if (
         !isValidInputs(inputs) &&
@@ -285,9 +286,8 @@ export const useSwap = ({ accountId, selector }: Props) => {
 
       const getBlock = await getNearBlock()
 
-      // TODO Update type to NearTX[] | void
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let transactionResult: any | void = undefined
+      // biome-ignore lint/suspicious/noExplicitAny: TODO Update type to NearTX[] | void
+      let transactionResult: any | undefined = undefined
 
       const isWithdrawInTrack = estimateQueue.queueTransactionsTrack.includes(
         QueueTransactions.WITHDRAW
@@ -298,7 +298,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
         isWithdrawInTrack
       ) {
         const currentQueue: QueueTransactions =
-          estimateQueue!.queueTransactionsTrack[0]
+          estimateQueue.queueTransactionsTrack[0]
 
         switch (currentQueue) {
           case QueueTransactions.WITHDRAW:
@@ -317,9 +317,9 @@ export const useSwap = ({ accountId, selector }: Props) => {
             }
             break
 
-          case QueueTransactions.STORAGE_DEPOSIT_TOKEN_IN:
+          case QueueTransactions.STORAGE_DEPOSIT_TOKEN_IN: {
             const storageBalanceTokenIn = await getStorageBalance(
-              selectedTokenIn!.address as string,
+              selectedTokenIn.address as string,
               accountId as string
             )
             if (
@@ -327,15 +327,16 @@ export const useSwap = ({ accountId, selector }: Props) => {
               !Number(storageBalanceTokenIn?.toString() || "0")
             ) {
               transactionResult = await setStorageDeposit(
-                selectedTokenIn!.address as string,
+                selectedTokenIn.address as string,
                 accountId as string
               )
             }
             break
+          }
 
-          case QueueTransactions.STORAGE_DEPOSIT_TOKEN_OUT:
+          case QueueTransactions.STORAGE_DEPOSIT_TOKEN_OUT: {
             const storageBalanceTokenOut = await getStorageBalance(
-              selectedTokenOut!.address as string,
+              selectedTokenOut.address as string,
               accountId as string
             )
             if (
@@ -343,14 +344,16 @@ export const useSwap = ({ accountId, selector }: Props) => {
               !Number(storageBalanceTokenOut?.toString() || "0")
             ) {
               transactionResult = await setStorageDeposit(
-                selectedTokenOut!.address as string,
+                selectedTokenOut.address as string,
                 accountId as string
               )
             }
             break
+          }
 
-          case QueueTransactions.CREATE_INTENT:
-            const wallet = await selector!.wallet()
+          case QueueTransactions.CREATE_INTENT: {
+            assert(selector, "Wallet selector is not found")
+            const wallet = await selector.wallet()
             const getIntentsTransactionCall = mapCreateIntentTransactionCall({
               tokenIn,
               tokenOut,
@@ -374,20 +377,21 @@ export const useSwap = ({ accountId, selector }: Props) => {
               transactions: [findFirst[1]],
             })
             break
+          }
         }
 
         setIsProcessing(false)
         return transactionResult
       }
 
-      const receiverIdIn = selectedTokenIn!.address as string
-      const receiverIdOut = selectedTokenOut!.address as string
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const receiverIdIn = selectedTokenIn.address
+      const receiverIdOut = selectedTokenOut.address
+      // biome-ignore lint/suspicious/noExplicitAny: <reason>
       const transactions: { receiverId: string; actions: any }[] = []
       const mutateEstimateQueue = inputs.estimateQueue
       let tempQueueTransactionsTrack = []
 
-      let amountToWithdraw: string
+      let amountToWithdraw = "0"
       if (
         estimateQueue.queueTransactionsTrack.includes(
           QueueTransactions.WITHDRAW
@@ -400,7 +404,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
         amountToWithdraw = getBalanceWNear ?? "0"
       }
 
-      estimateQueue.queueTransactionsTrack.forEach((queueTransaction) => {
+      for (const queueTransaction of estimateQueue.queueTransactionsTrack) {
         switch (queueTransaction) {
           case QueueTransactions.WITHDRAW:
             if (selectedTokenIn?.address && accountId) {
@@ -481,7 +485,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
             mutateEstimateQueue.queueTransactionsTrack =
               tempQueueTransactionsTrack
             break
-          case QueueTransactions.CREATE_INTENT:
+          case QueueTransactions.CREATE_INTENT: {
             const getIntentsTransactionCall = mapCreateIntentTransactionCall({
               tokenIn,
               tokenOut,
@@ -503,16 +507,17 @@ export const useSwap = ({ accountId, selector }: Props) => {
             }
             transactions.push(findFirst[1])
             break
+          }
         }
+      }
+
+      mutate?.({
+        ...inputs,
+        estimateQueue: mutateEstimateQueue,
       })
 
-      mutate &&
-        mutate({
-          ...inputs,
-          estimateQueue: mutateEstimateQueue,
-        })
-
-      const wallet = await selector!.wallet()
+      assert(selector, "Wallet selector is not found")
+      const wallet = await selector.wallet()
       transactionResult = await wallet.signAndSendTransactions({
         transactions: transactions.filter((tx) => tx.actions.length),
       })
@@ -529,7 +534,8 @@ export const useSwap = ({ accountId, selector }: Props) => {
     receiverId?: string
   }) => {
     try {
-      const wallet = await selector!.wallet()
+      assert(selector, "Wallet selector is not found")
+      const wallet = await selector.wallet()
       await wallet.signAndSendTransactions({
         transactions: [
           {
@@ -566,5 +572,11 @@ export const useSwap = ({ accountId, selector }: Props) => {
     getEstimateQueueTransactions,
     callRequestCreateIntent,
     callRequestRollbackIntent,
+  }
+}
+
+function assert(condition: unknown, msg?: string): asserts condition {
+  if (!condition) {
+    throw new Error(msg)
   }
 }

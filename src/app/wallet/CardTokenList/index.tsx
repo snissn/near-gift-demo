@@ -9,6 +9,7 @@ const CardTokenList = ({ list }: Props) => {
   return (
     <div className="flex flex-col gap-2.5">
       {list.map((tokenProps, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: <reason>
         <CardToken key={i} {...tokenProps} />
       ))}
     </div>

@@ -22,7 +22,7 @@ const getExchangesList = () => {
   }
   const id = "coinbase"
   return axios
-    .get(`https://pro-api.coingecko.com/api/v3/exchanges/list`, config)
+    .get("https://pro-api.coingecko.com/api/v3/exchanges/list", config)
     .then((resp) => resp.data)
 }
 

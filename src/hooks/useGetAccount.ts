@@ -20,6 +20,7 @@ const NEAR_NODE_URL = process.env.nearNodeUrl ?? "https://rpc.mainnet.near.org"
 export const useGetAccount = ({ accountId, selector }: Props) => {
   const { getAccountBalance } = useAccountBalance()
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   const getAccount = useCallback(async (): Promise<Account | null> => {
     if (!accountId || !selector) {
       return null

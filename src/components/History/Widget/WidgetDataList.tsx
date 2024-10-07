@@ -18,6 +18,7 @@ const WidgetDataList = <T,>({ data, className, Component }: Props<T>) => {
       )}
     >
       {data.map((props, index) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: <reason>
         <Component {...props} key={index} />
       ))}
     </div>

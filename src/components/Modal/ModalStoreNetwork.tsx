@@ -53,7 +53,7 @@ const ModalStoreNetwork = () => {
               </Tooltip>
             </div>
           </div>
-          <button className="shrink-0" onClick={onCloseModal}>
+          <button type={"button"} className="shrink-0" onClick={onCloseModal}>
             <Image
               src="/static/icons/close.svg"
               alt="Close Icon"

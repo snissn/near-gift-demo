@@ -67,25 +67,26 @@ const WidgetCardSwap = ({
   let explorerUrl = ""
   switch (selectedTokenOut?.chainName ?? "") {
     case BlockchainEnum.Near:
-      explorerUrl = NEAR_EXPLORER + "/txns/" + hash
+      explorerUrl = `${NEAR_EXPLORER}/txns/${hash}`
       break
     case BlockchainEnum.Eth:
       if (proof) {
-        explorerUrl = BASE_EXPLORER + "/tx/" + proof
+        explorerUrl = `${BASE_EXPLORER}/tx/${proof}`
         break
       }
-      explorerUrl = NEAR_EXPLORER + "/txns/" + hash
+      explorerUrl = `${NEAR_EXPLORER}/txns/${hash}`
       break
     case BlockchainEnum.Btc:
       if (proof) {
-        explorerUrl = BITCOIN_EXPLORER + "/tx/" + proof
+        explorerUrl = `${BITCOIN_EXPLORER}/tx/${proof}`
         break
       }
-      explorerUrl = NEAR_EXPLORER + "/txns/" + hash
+      explorerUrl = `${NEAR_EXPLORER}/txns/${hash}`
       break
   }
 
   return (
+    // biome-ignore lint/a11y/useKeyWithMouseEvents lint/a11y/useKeyWithClickEvents: <reason>
     <div
       onClick={() => window.open(explorerUrl)}
       onMouseOver={handleMouseOver}

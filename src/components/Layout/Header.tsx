@@ -58,7 +58,7 @@ const Header = () => {
           </div>
         </div>
       </header>
-      <div className="block md:hidden h-[56px]"></div>
+      <div className="block md:hidden h-[56px]" />
     </>
   )
 }

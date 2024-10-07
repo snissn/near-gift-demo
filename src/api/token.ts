@@ -26,9 +26,9 @@ export const getDiscoverDefuseAssets = (
 export const getBitcoinBalance = (
   address: string
 ): Promise<BitcoinBalanceEntity> =>
-  axios.get(BITCOIN_INFO_URL + "/" + address).then((resp) => resp.data)
+  axios.get(`${BITCOIN_INFO_URL}/${address}`).then((resp) => resp.data)
 
 export const getBitcoinPriceInUsd = (): Promise<BitcoinPriceInUsdEntity> =>
   axios
-    .get(COINGECKO_API_URL + "/simple/price?ids=bitcoin&vs_currencies=usd")
+    .get(`${COINGECKO_API_URL}/simple/price?ids=bitcoin&vs_currencies=usd`)
     .then((resp) => resp.data)

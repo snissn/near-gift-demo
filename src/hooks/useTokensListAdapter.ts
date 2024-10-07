@@ -72,6 +72,7 @@ export const useTokensListAdapter = (solversHook: SolverHook[]) => {
     }
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     getTokensList()
   }, [])

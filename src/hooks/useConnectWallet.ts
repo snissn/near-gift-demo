@@ -37,7 +37,7 @@ export const useConnectWallet = (): ConnectWalletAction => {
 
     selector.setActiveAccount(nextAccountId)
 
-    alert("Switched account to " + nextAccountId)
+    alert(`Switched account to ${nextAccountId}`)
   }
 
   return {

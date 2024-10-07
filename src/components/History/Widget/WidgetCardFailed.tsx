@@ -14,6 +14,7 @@ enum CardFailedStatusEnum {
 }
 
 enum CardFailedActionEnum {
+  // biome-ignore lint/style/useLiteralEnumMembers: <reason>
   FT_TRANSFER_CALL = TransactionMethod.FT_TRANSFER_CALL,
 }
 
@@ -52,9 +53,10 @@ const WidgetCardFailed = ({
   }
 
   return (
+    // biome-ignore lint/a11y/useKeyWithMouseEvents lint/a11y/useKeyWithClickEvents: <reason>
     <div
       onClick={() => {
-        window.open(NEAR_EXPLORER + "/txns/" + hash)
+        window.open(`${NEAR_EXPLORER}/txns/${hash}`)
       }}
       onMouseOver={handleMouseOver}
       onMouseLeave={handleMouseLeave}

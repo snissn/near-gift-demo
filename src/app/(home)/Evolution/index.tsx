@@ -14,10 +14,8 @@ const Evolution = () => {
   const [containerWidth, setContainerWidth] = useState<number>(0)
 
   useEffect(() => {
-    setContainerWidth(
-      divRef.current ? (divRef.current!.offsetWidth as number) : 0
-    )
-  }, [divRef.current, width])
+    setContainerWidth(divRef.current ? divRef.current.offsetWidth : 0)
+  }, [])
 
   return (
     <Section title="The Evolution of Trading Platforms">

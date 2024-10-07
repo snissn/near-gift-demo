@@ -44,8 +44,9 @@ const HistoryLastUpdate = () => {
     return () => {
       togglePreview(undefined)
     }
-  }, [active])
+  }, [active, togglePreview])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `handleFindHistory` is not a stable reference
   useEffect(() => {
     if (activePreview && data.size) {
       handleFindHistory(activePreview)

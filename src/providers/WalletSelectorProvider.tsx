@@ -155,7 +155,9 @@ export const WalletSelectorProvider: React.FC<{
         setAccounts(nextAccounts)
       })
 
-    const onHideSubscription = modal!.on("onHide", ({ hideReason }) => {
+    assert(modal, "Modal is not defined")
+
+    const onHideSubscription = modal.on("onHide", ({ hideReason }) => {
       console.log(`The reason for hiding the modal ${hideReason}`)
     })
 
@@ -167,7 +169,9 @@ export const WalletSelectorProvider: React.FC<{
 
   const walletSelectorContextValue = useMemo<WalletSelectorContextValue>(
     () => ({
+      // biome-ignore lint/style/noNonNullAssertion: <reason>
       selector: selector!,
+      // biome-ignore lint/style/noNonNullAssertion: <reason>
       modal: modal!,
       accounts,
       accountId: accounts.find((account) => account.active)?.accountId || null,
@@ -196,4 +200,10 @@ export function useWalletSelector() {
   }
 
   return context
+}
+
+function assert(condition: unknown, msg?: string): asserts condition {
+  if (!condition) {
+    throw new Error(msg)
+  }
 }

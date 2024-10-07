@@ -45,7 +45,7 @@ const BlockEvaluatePrice = ({
                           Rate{" "}
                           {tokenBalanceToFormatUnits({
                             balance: result.amount_out,
-                            decimals: tokenOut.decimals!,
+                            decimals: tokenOut.decimals,
                           })}{" "}
                           from {result.solver_id}
                         </span>

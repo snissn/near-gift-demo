@@ -46,10 +46,10 @@ export const handleValidateAccount = (
       if (!isAddress(account)) {
         setErrorAccount("Invalid wallet address.")
         return false
-      } else {
-        setErrorAccount("")
-        return true
       }
+      setErrorAccount("")
+      return true
+
     case BlockchainEnum.Btc:
       try {
         bitcoin.address.toOutputScript(account)
@@ -140,7 +140,7 @@ const ModalConnectNetworks = () => {
               </Tooltip>
             </div>
           </div>
-          <button className="shrink-0" onClick={onCloseModal}>
+          <button type={"button"} className="shrink-0" onClick={onCloseModal}>
             <Image
               src="/static/icons/close.svg"
               alt="Close Icon"

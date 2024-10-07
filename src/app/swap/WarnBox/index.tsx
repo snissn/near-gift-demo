@@ -38,6 +38,7 @@ const WarnBox = ({
         {generateWarningBalanceMessage()}
       </Text>
       {allowableNearAmount !== "0" && (
+        // biome-ignore lint/a11y/useKeyWithClickEvents: <reason>
         <span
           onClick={() => {
             const value = balanceToDecimal(allowableNearAmount ?? "0", decimals)

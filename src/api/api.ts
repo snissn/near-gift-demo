@@ -20,6 +20,7 @@ export const useInterceptors = () => {
     requestPayload: string,
     notificationType: NotificationType
   ) => {
+    // biome-ignore lint/suspicious/noImplicitAnyLet: <reason>
     let payload
     try {
       payload = JSON.parse(requestPayload)

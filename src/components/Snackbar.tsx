@@ -15,9 +15,9 @@ const Snackbar = () => {
   useEffect(() => {
     if (data.size) {
       const newOpenNotifications: Notification[] = []
-      data.forEach((value) => {
+      for (const value of data.values()) {
         newOpenNotifications.push(value)
-      })
+      }
       setOpenNotifications(newOpenNotifications)
     }
   }, [data])
@@ -58,7 +58,7 @@ const Snackbar = () => {
             asChild
             altText="Close notification"
           >
-            <button>
+            <button type={"button"}>
               <Image
                 src="/static/icons/close.svg"
                 width={12}

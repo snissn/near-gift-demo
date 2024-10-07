@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid"
 
-import { createHash } from "crypto"
+import { createHash } from "node:crypto"
 
 export function sha256(msg: string) {
   return createHash("sha256").update(msg).digest("hex")

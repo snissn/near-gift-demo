@@ -38,13 +38,13 @@ export default function Withdraw() {
           balance="515.22"
           selected={{ name: "AURORA" } as NetworkToken}
         />
-        <div className="h-[10px]"></div>
+        <div className="h-[10px]" />
         <FieldTextInput
           fieldName="walletTo"
           label="To"
           placeholder="Enter wallet address"
         />
-        <div className="h-[20px]"></div>
+        <div className="h-[20px]" />
         <Button type="submit" size="lg" fullWidth disabled>
           Coming soon
         </Button>

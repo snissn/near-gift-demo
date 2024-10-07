@@ -33,15 +33,18 @@ export default function Wallet() {
 
   const [balanceNear, setBalanceNear] = useState<string | undefined>()
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `getAccountBalance` is not a stable reference
   useEffect(() => {
     const tokenNearNative = LIST_NATIVE_TOKENS.find(
       (token) => token.defuse_asset_id === "near:mainnet:native"
     )
     ;(async () => {
+      assert(tokenNearNative, "Token not found")
+
       const { balance } = await getAccountBalance()
       const formattedAmountOut = formatUnits(
         BigInt(balance),
-        tokenNearNative!.decimals as number
+        tokenNearNative.decimals as number
       )
       setBalanceNear(formattedAmountOut)
     })()
@@ -51,14 +54,14 @@ export default function Wallet() {
     }
 
     const getAssetListWithBalances: NetworkTokenWithSwapRoute[] = []
-    data.forEach((value) => {
+    for (const value of data.values()) {
       if (value?.balance) {
         getAssetListWithBalances.push({
           ...value,
           balance: value?.balance,
         })
       }
-    })
+    }
 
     setAssetListWithBalances(getAssetListWithBalances)
   }, [data])
@@ -93,4 +96,10 @@ export default function Wallet() {
       </div>
     </div>
   )
+}
+
+function assert(condition: unknown, msg?: string): asserts condition {
+  if (!condition) {
+    throw new Error(msg)
+  }
 }

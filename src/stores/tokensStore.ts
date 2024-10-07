@@ -36,7 +36,7 @@ export const createTokensStore = (
     updateTokens: (data: NetworkTokenWithSwapRoute[]) =>
       set((state) => {
         const updatedData = new Map(state.data)
-        data.forEach((item) => updatedData.set(item.defuse_asset_id, item))
+        for (const item of data) updatedData.set(item.defuse_asset_id, item)
         return { data: updatedData, isLoading: false }
       }),
     triggerTokenUpdate: () => set((state) => ({ ...state, isLoading: true })),

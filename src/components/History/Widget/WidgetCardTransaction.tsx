@@ -54,14 +54,12 @@ const WidgetCardTransaction = ({
       }
       return (
         <WidgetCardFailed
-          actions={details!.transaction!.actions}
+          actions={details.transaction.actions}
           tokenIn={tokenInValue}
           tokenOut={tokenOutValue}
-          selectedTokenIn={
-            details!.selectedTokenIn as NetworkTokenWithSwapRoute
-          }
+          selectedTokenIn={details.selectedTokenIn as NetworkTokenWithSwapRoute}
           selectedTokenOut={
-            details!.selectedTokenOut as NetworkTokenWithSwapRoute
+            details.selectedTokenOut as NetworkTokenWithSwapRoute
           }
           hash={hash}
         />
@@ -82,15 +80,13 @@ const WidgetCardTransaction = ({
           intentId={intentId}
           tokenIn={tokenInValue}
           tokenOut={tokenOutValue}
-          selectedTokenIn={
-            details!.selectedTokenIn as NetworkTokenWithSwapRoute
-          }
+          selectedTokenIn={details.selectedTokenIn as NetworkTokenWithSwapRoute}
           selectedTokenOut={
-            details!.selectedTokenOut as NetworkTokenWithSwapRoute
+            details.selectedTokenOut as NetworkTokenWithSwapRoute
           }
           timestamp={timestamp}
           handleCloseIntent={callRequestRollbackIntent}
-          receiverId={details!.recoverDetails?.receiverId ?? ""}
+          receiverId={details.recoverDetails?.receiverId ?? ""}
         />
       )
 
@@ -101,37 +97,36 @@ const WidgetCardTransaction = ({
       }
       return (
         <WidgetCardRollback
-          actions={details!.transaction!.actions}
+          actions={details.transaction.actions}
           tokenIn={tokenInValue}
           tokenOut={tokenOutValue}
-          selectedTokenIn={
-            details!.selectedTokenIn as NetworkTokenWithSwapRoute
-          }
+          selectedTokenIn={details.selectedTokenIn as NetworkTokenWithSwapRoute}
           selectedTokenOut={
-            details!.selectedTokenOut as NetworkTokenWithSwapRoute
+            details.selectedTokenOut as NetworkTokenWithSwapRoute
           }
           hash={hash}
         />
       )
 
-    case HistoryStatus.WITHDRAW:
+    case HistoryStatus.WITHDRAW: {
       if (!details?.transaction || !hash || iTokenDetailMissing) {
         return <WidgetCardLoading />
       }
       const recoverAmount = (
-        Number(details!.recoverDetails?.amount ?? "0") /
+        Number(details.recoverDetails?.amount ?? "0") /
         10 ** 24
       ).toString()
       return (
         <WidgetCardWithdraw
-          accountId={details?.transaction.signer_id as string}
+          accountId={details.transaction.signer_id as string}
           tokenOut={recoverAmount ?? tokenOutValue}
           selectedTokenOut={
-            details!.selectedTokenOut as NetworkTokenWithSwapRoute
+            details.selectedTokenOut as NetworkTokenWithSwapRoute
           }
           hash={hash}
         />
       )
+    }
 
     case HistoryStatus.DEPOSIT:
       if (!details?.transaction || !hash || iTokenDetailMissing) {
@@ -139,20 +134,18 @@ const WidgetCardTransaction = ({
       }
       return (
         <WidgetCardDeposit
-          accountId={details?.transaction.signer_id as string}
+          accountId={details.transaction.signer_id as string}
           tokenIn={tokenInValue}
-          selectedTokenIn={
-            details!.selectedTokenIn as NetworkTokenWithSwapRoute
-          }
+          selectedTokenIn={details.selectedTokenIn as NetworkTokenWithSwapRoute}
           hash={hash}
         />
       )
 
-    case HistoryStatus.STORAGE_DEPOSIT:
+    case HistoryStatus.STORAGE_DEPOSIT: {
       if (
         !details?.recoverDetails?.receiverId ||
         !hash ||
-        !details?.recoverDetails?.amount
+        !details.recoverDetails?.amount
       ) {
         return <WidgetCardLoading />
       }
@@ -167,6 +160,7 @@ const WidgetCardTransaction = ({
           hash={hash}
         />
       )
+    }
   }
 
   return <WidgetCardLoading />

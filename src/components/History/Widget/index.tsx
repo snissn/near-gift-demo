@@ -18,14 +18,14 @@ const Widget = () => {
 
   const getHistoryFromStore: HistoryData[] = []
   if (data.size) {
-    data.forEach((setOfData) => {
+    for (const setOfData of data.values()) {
       if (
         typeof setOfData === "object" &&
         !setOfData?.isClosed &&
         accountId === setOfData.details?.transaction?.signer_id
       )
         getHistoryFromStore.push(setOfData)
-    })
+    }
   }
 
   return (

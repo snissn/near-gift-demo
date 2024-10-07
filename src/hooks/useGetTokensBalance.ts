@@ -275,6 +275,7 @@ export const useGetTokensBalance = (
     setData(dataCleanBalances)
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     if (accountId && tokensList && isFetchedListNear && isFetchedListBase) {
       void getTokensBalance()
@@ -289,6 +290,7 @@ export const useGetTokensBalance = (
     isLoading,
   ])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     if (!accountId && !isFetching) {
       clearTokensBalance()

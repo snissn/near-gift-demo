@@ -27,7 +27,7 @@ const Infrastructure = () => {
 
   useEffect(() => {
     setContainerWidth(divRef.current?.offsetWidth || 0)
-  }, [divRef.current, width])
+  }, [])
 
   return (
     <Section title="Defuse Infrastructure">

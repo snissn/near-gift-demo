@@ -38,7 +38,7 @@ export const useHistoryStore = <T,>(
   const historyStoreContext = useContext(HistoryStoreContext)
 
   if (!historyStoreContext) {
-    throw new Error(`useHistoryStore must be use within HistoryStoreProvider`)
+    throw new Error("useHistoryStore must be use within HistoryStoreProvider")
   }
 
   return useStore(historyStoreContext, selector)

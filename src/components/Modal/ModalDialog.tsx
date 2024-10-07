@@ -35,11 +35,11 @@ const ModalDialog = ({ children }: PropsWithChildren) => {
     return () => {
       containerWidthRef.current = 0
     }
-  }, [divRef.current?.offsetWidth])
+  }, [])
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
-      <Dialog.Title></Dialog.Title>
+      <Dialog.Title />
       <Dialog.Content
         maxWidth={screenWidth < 768 ? "100%" : defaultMaxWidth}
         className="p-0 dark:bg-black-800"

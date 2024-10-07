@@ -13,13 +13,13 @@ export const useNetworkTokens = () => {
       return result
     }
 
-    networkTokens.forEach((token) => {
-      tokenId.forEach((id) => {
+    for (const token of networkTokens.values()) {
+      for (const id of tokenId) {
         if (token.address?.toLowerCase() === id.toLowerCase()) {
           result.push(token)
         }
-      })
-    })
+      }
+    }
 
     return result
   }

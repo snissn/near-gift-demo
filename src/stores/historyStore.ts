@@ -2,7 +2,11 @@
 
 import { createStore } from "zustand/vanilla"
 
-import type { NearTX, NetworkToken, RecoverDetails } from "@src/types/interfaces"
+import type {
+  NearTX,
+  NetworkToken,
+  RecoverDetails,
+} from "@src/types/interfaces"
 import { NEAR_COLLECTOR_KEY } from "@src/constants/contracts"
 
 export enum HistoryStatus {
@@ -68,7 +72,7 @@ export const defaultInitState: HistoryState = {
 
 const helperHistoryLocalStore = (data: HistoryState["data"]): void => {
   const getHistoryFromStore: HistoryData[] = []
-  data.forEach((value) => getHistoryFromStore.push(value))
+  for (const value of data.values()) getHistoryFromStore.push(value)
   localStorage.setItem(
     NEAR_COLLECTOR_KEY,
     JSON.stringify({ data: getHistoryFromStore }, (key, value) =>
@@ -89,7 +93,7 @@ export const createHistoryStore = (
     updateHistory: (data: HistoryData[]) =>
       set((state) => {
         const updatedData = new Map(state.data)
-        data.forEach((item) => updatedData.set(item.hash, item))
+        for (const item of data) updatedData.set(item.hash, item)
         helperHistoryLocalStore(updatedData as HistoryState["data"])
         return { data: updatedData, isFetched: true }
       }),

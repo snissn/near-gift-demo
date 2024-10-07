@@ -82,12 +82,14 @@ const AssetList = ({
           i
         ) => (
           <button
+            // biome-ignore lint/suspicious/noArrayIndexKey: <reason>
             key={i}
+            type={"button"}
             className={clsx(
               "flex justify-between items-center gap-3 p-2.5 rounded-md hover:bg-gray-950 dark:hover:bg-black-950",
               isNotSelectable && "opacity-50 pointer-events-none"
             )}
-            onClick={() => handleSelectToken && handleSelectToken(assets[i])}
+            onClick={() => handleSelectToken?.(assets[i])}
           >
             <AssetComboIcon
               name={name as string}

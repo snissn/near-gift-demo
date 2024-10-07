@@ -47,7 +47,7 @@ export const useHistoryLatest = () => {
   ): Partial<HistoryData["details"]> => {
     const details: Partial<HistoryData["details"]> = {}
     if (data.size) {
-      data.forEach((history) => {
+      for (const history of data.values()) {
         const method =
           history.details?.transaction?.actions[0].FunctionCall.method_name
         if (
@@ -62,7 +62,7 @@ export const useHistoryLatest = () => {
             selectedTokenOut: history.details?.selectedTokenOut,
           })
         }
-      })
+      }
     }
     return details
   }
@@ -82,7 +82,7 @@ export const useHistoryLatest = () => {
       data.map(async (historyData) => {
         if (
           (historyData?.status &&
-            validHistoryStatuses.includes(historyData!.status ?? "")) ||
+            validHistoryStatuses.includes(historyData.status ?? "")) ||
           historyData.errorMessage ||
           historyData.isClosed
         ) {
@@ -119,7 +119,7 @@ export const useHistoryLatest = () => {
           let getIntent: GetIntentResult
           let recoverData: unknown
           switch (transactionMethodName) {
-            case TransactionMethod.FT_TRANSFER_CALL:
+            case TransactionMethod.FT_TRANSFER_CALL: {
               getHashedArgs =
                 historyData.details.transaction.actions[0].FunctionCall.args
               argsJson = Buffer.from(getHashedArgs ?? "", "base64").toString(
@@ -134,7 +134,8 @@ export const useHistoryLatest = () => {
               if (recoverData === undefined) {
                 msgBuffer = Buffer.from(msgBase64, "base64")
                 const msgBorshDeserialize = borsh.deserialize(
-                  swapSchema as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+                  // biome-ignore lint/suspicious/noExplicitAny: <reason>
+                  swapSchema as any,
                   msgBuffer
                 )
                 recoverData = msgBorshDeserialize
@@ -198,8 +199,9 @@ export const useHistoryLatest = () => {
                 })
               }
               break
+            }
 
-            case TransactionMethod.ROLLBACK_INTENT:
+            case TransactionMethod.ROLLBACK_INTENT: {
               getHashedArgs =
                 historyData.details.transaction.actions[0].FunctionCall.args
               argsJson = Buffer.from(getHashedArgs ?? "", "base64").toString(
@@ -215,15 +217,16 @@ export const useHistoryLatest = () => {
                 status: HistoryStatus.ROLLED_BACK,
               })
               break
+            }
 
-            case TransactionMethod.NEAR_DEPOSIT:
+            case TransactionMethod.NEAR_DEPOSIT: {
               getHashedArgs =
                 historyData.details.transaction.actions[0].FunctionCall.args
               argsJson = Buffer.from(getHashedArgs ?? "", "base64").toString(
                 "utf-8"
               )
               const logMsg = historyData.details?.receipts_outcome
-                ? historyData.details?.receipts_outcome[0]!.outcome!.logs[0]
+                ? historyData.details?.receipts_outcome[0].outcome.logs[0]
                 : undefined
               Object.assign(historyData, {
                 status: HistoryStatus.DEPOSIT,
@@ -235,6 +238,7 @@ export const useHistoryLatest = () => {
                 },
               })
               break
+            }
 
             case TransactionMethod.NEAR_WITHDRAW:
               getHashedArgs =
@@ -254,7 +258,7 @@ export const useHistoryLatest = () => {
               })
               break
 
-            case TransactionMethod.STORAGE_DEPOSIT:
+            case TransactionMethod.STORAGE_DEPOSIT: {
               const detailsFromStorageDeposit =
                 await getDetailsFromStorageDeposit(
                   historyData.hash,
@@ -270,6 +274,7 @@ export const useHistoryLatest = () => {
                 },
               })
               break
+            }
 
             case TransactionMethod.NATIVE_ON_TRANSFER:
               getHashedArgs =
@@ -356,7 +361,7 @@ export const useHistoryLatest = () => {
         }
 
         const { isFailure } = await getTransactionScan(
-          historyData!.details as NearTX
+          historyData.details as NearTX
         )
         if (isFailure) {
           historyCompletion.push(true)

@@ -25,7 +25,7 @@ export interface MapCreateIntentProps {
   solverId?: string
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: <reason>
 export type MapCreateIntentResult = [number, any][]
 
 /**

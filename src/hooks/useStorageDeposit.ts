@@ -25,7 +25,8 @@ const useStorageDeposit = ({ accountId, selector }: Props) => {
     contractAddress: string,
     receiver: string
   ) => {
-    const wallet = await selector!.wallet()
+    assert(selector, "Wallet selector is not initialized")
+    const wallet = await selector.wallet()
     return await wallet.signAndSendTransactions({
       transactions: [
         {
@@ -56,3 +57,9 @@ const useStorageDeposit = ({ accountId, selector }: Props) => {
 }
 
 export default useStorageDeposit
+
+function assert(condition: unknown, msg?: string): asserts condition {
+  if (!condition) {
+    throw new Error(msg)
+  }
+}

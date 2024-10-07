@@ -92,7 +92,7 @@ const ModalReviewSwap = () => {
       const formattedOut = bestEstimate
         ? formatUnits(
             BigInt(bestEstimate.amount_out),
-            convertPayload.selectedTokenOut.decimals!
+            convertPayload.selectedTokenOut.decimals
           )
         : "0"
       setConvertPayload({ ...convertPayload, tokenOut: formattedOut })
@@ -106,6 +106,7 @@ const ModalReviewSwap = () => {
     }
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `calculateTokenToUsdTokenIn` and `calculateTokenToUsdTokenOut` are not stable references
   useEffect(() => {
     calculateTokenToUsdTokenIn(
       convertPayload.tokenIn,
@@ -147,6 +148,7 @@ const ModalReviewSwap = () => {
     setModalType(ModalType.MODAL_CONFIRM_SWAP, payload)
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     void handleCheckNativeBalance()
   }, [])
@@ -165,7 +167,7 @@ const ModalReviewSwap = () => {
               </Text>
             </div>
           </div>
-          <button className="shrink-0" onClick={onCloseModal}>
+          <button type={"button"} className="shrink-0" onClick={onCloseModal}>
             <Image
               src="/static/icons/close.svg"
               alt="Close Icon"

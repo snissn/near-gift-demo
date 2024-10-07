@@ -22,7 +22,7 @@ const History = () => {
 
   const handleCloseModal = useCallback(() => {
     if (!open) closeWidget()
-  }, [open, closeWidget])
+  }, [closeWidget])
 
   useEffect(() => {
     handleCloseModal()
@@ -33,7 +33,7 @@ const History = () => {
       <HistoryButton active={active} onClick={handleOpenHistory} />
       <Popover.Root open={active} onOpenChange={toggleWidget}>
         <Popover.Trigger>
-          <span className="invisible"></span>
+          <span className="invisible" />
         </Popover.Trigger>
         <Popover.Content
           sideOffset={5}

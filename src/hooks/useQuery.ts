@@ -10,7 +10,12 @@ import {
   getNearTransactionDetails,
 } from "@src/api/transaction"
 import type { HistoryData } from "@src/stores/historyStore"
-import type { NearBlock, NearTX, NetworkToken, Result } from "@src/types/interfaces"
+import type {
+  NearBlock,
+  NearTX,
+  NetworkToken,
+  Result,
+} from "@src/types/interfaces"
 import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
 import type { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
@@ -57,8 +62,8 @@ export const useQueryCollector = (): CollectorHook => {
 
   const cleanupQuery = (keys: string[]) => {
     const params = new URLSearchParams(searchParams.toString())
-    keys.forEach((key) => params.delete(key))
-    router.replace(pathname + "?" + params)
+    for (const key of keys) params.delete(key)
+    router.replace(`${pathname}?${params}`)
   }
 
   const handleCleanupQuery = () => {
@@ -86,6 +91,7 @@ export const useQueryCollector = (): CollectorHook => {
     }
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   const getTransactions = useCallback(async (): Promise<HistoryData[]> => {
     try {
       const intentId = searchParams.get(UseQueryCollectorKeys.INTENT_ID)
@@ -143,7 +149,8 @@ export const useQueryCollector = (): CollectorHook => {
         const result: HistoryData[] = []
         txDatas.forEach((txData, i) => {
           if (i === txDatas.length - 1) {
-            togglePreview(txData!.hash)
+            assert(txData, "txData is not defined")
+            togglePreview(txData.hash)
           }
           if (txData) {
             result.push({
@@ -172,5 +179,11 @@ export const useQueryCollector = (): CollectorHook => {
 
   return {
     getTransactions,
+  }
+}
+
+function assert(condition: unknown, msg: string): asserts condition {
+  if (!condition) {
+    throw new Error(msg)
   }
 }

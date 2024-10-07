@@ -38,7 +38,7 @@ export const useNotificationStore = <T,>(
 
   if (!notificationStoreContext) {
     throw new Error(
-      `useNotificationStore must be use within NotificationStoreProvider`
+      "useNotificationStore must be use within NotificationStoreProvider"
     )
   }
 
