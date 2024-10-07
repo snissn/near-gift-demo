@@ -1,4 +1,4 @@
-import { WalletSelector } from "@near-wallet-selector/core"
+import type { WalletSelector } from "@near-wallet-selector/core"
 
 import {
   FT_STORAGE_DEPOSIT_GAS,

@@ -1,11 +1,11 @@
 import axios, { AxiosResponse } from "axios"
 
-import {
+import type {
   BitcoinBalanceEntity,
   BitcoinPriceInUsdEntity,
   Result,
 } from "@src/types/interfaces"
-import { SolverTokenList } from "@src/libs/de-sdk/providers/solver0Provider"
+import type { SolverTokenList } from "@src/libs/de-sdk/providers/solver0Provider"
 
 const SOLVER_RELAY_0_URL = process.env.SOLVER_RELAY_0_URL ?? ""
 const BITCOIN_INFO_URL = process.env.BITCOIN_INFO_URL ?? ""

@@ -1,7 +1,7 @@
 "use client"
 
 import { Box, Text, Tabs, Spinner } from "@radix-ui/themes"
-import { PropsWithChildren, useEffect, useState } from "react"
+import { type PropsWithChildren, useEffect, useState } from "react"
 import { formatUnits } from "ethers"
 
 import LabelComingSoon from "@src/components/LabelComingSoon"

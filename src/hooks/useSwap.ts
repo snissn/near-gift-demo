@@ -1,6 +1,6 @@
 "use client"
 
-import { WalletSelector } from "@near-wallet-selector/core"
+import type { WalletSelector } from "@near-wallet-selector/core"
 import { useState } from "react"
 
 import {
@@ -12,10 +12,10 @@ import {
   MAX_GAS_TRANSACTION,
 } from "@src/constants/contracts"
 import {
-  NearTX,
-  NetworkToken,
+  type NearTX,
+  type NetworkToken,
   QueueTransactions,
-  Result,
+  type Result,
   ContractIdEnum,
   BlockchainEnum,
 } from "@src/types/interfaces"
@@ -179,7 +179,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
           "useSwap storageBalanceTokenIn: ",
           storageBalanceTokenInToString
         )
-        if (!parseFloat(storageBalanceTokenInToString)) {
+        if (!Number.parseFloat(storageBalanceTokenInToString)) {
           queueTransaction.unshift(QueueTransactions.STORAGE_DEPOSIT_TOKEN_IN)
           queue++
         }
@@ -203,7 +203,7 @@ export const useSwap = ({ accountId, selector }: Props) => {
           "useSwap storageBalanceTokenOut: ",
           storageBalanceTokenOutToString
         )
-        if (!parseFloat(storageBalanceTokenOutToString)) {
+        if (!Number.parseFloat(storageBalanceTokenOutToString)) {
           queueTransaction.unshift(QueueTransactions.STORAGE_DEPOSIT_TOKEN_OUT)
           queue++
         }

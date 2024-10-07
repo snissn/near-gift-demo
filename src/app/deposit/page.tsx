@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { FieldValues, useForm } from "react-hook-form"
+import { type FieldValues, useForm } from "react-hook-form"
 import Image from "next/image"
 
 import Paper from "@src/components/Paper"
@@ -10,7 +10,7 @@ import FieldComboInput from "@src/components/Form/FieldComboInput"
 import ButtonSwitch from "@src/components/Button/ButtonSwitch"
 import Accordion from "@src/components/Accordion"
 import Button from "@src/components/Button/Button"
-import { NetworkToken } from "@src/types/interfaces"
+import type { NetworkToken } from "@src/types/interfaces"
 
 type FormValues = {
   tokenIn: string

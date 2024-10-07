@@ -2,7 +2,7 @@
 
 import React from "react"
 import { Checkbox, Text, Tooltip } from "@radix-ui/themes"
-import { CheckedState } from "@radix-ui/react-checkbox"
+import type { CheckedState } from "@radix-ui/react-checkbox"
 import { InfoCircledIcon } from "@radix-ui/react-icons"
 import Image from "next/image"
 import clsx from "clsx"

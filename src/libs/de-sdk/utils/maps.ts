@@ -1,5 +1,5 @@
 import { INDEXER } from "@src/constants/contracts"
-import { CallRequestIntentProps } from "@src/hooks/useSwap"
+import type { CallRequestIntentProps } from "@src/hooks/useSwap"
 import {
   prepareCreateIntent1CrossChain,
   prepareCreateIntent1SingleChain,

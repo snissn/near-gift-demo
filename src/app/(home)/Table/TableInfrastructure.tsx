@@ -1,5 +1,5 @@
 import Image from "next/image"
-import React, { PropsWithChildren } from "react"
+import React, { type PropsWithChildren } from "react"
 import { Text } from "@radix-ui/themes"
 import clsx from "clsx"
 

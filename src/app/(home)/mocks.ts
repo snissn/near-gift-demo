@@ -1,4 +1,4 @@
-import { InfrastructureProps } from "@src/app/(home)/Table/TableInfrastructure"
+import type { InfrastructureProps } from "@src/app/(home)/Table/TableInfrastructure"
 
 export const infrastructureData: InfrastructureProps[] = [
   {

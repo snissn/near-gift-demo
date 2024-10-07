@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, MutableRefObject } from "react"
+import { useEffect, useState, useCallback, type MutableRefObject } from "react"
 
 const useResize = (ref: MutableRefObject<HTMLElement | null>) => {
   const getDimensions = useCallback(

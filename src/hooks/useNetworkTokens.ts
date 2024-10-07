@@ -1,5 +1,5 @@
 import { useTokensStore } from "@src/providers/TokensStoreProvider"
-import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
+import type { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 
 export const useNetworkTokens = () => {
   const { data: networkTokens } = useTokensStore((state) => state)

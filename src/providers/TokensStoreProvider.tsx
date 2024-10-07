@@ -6,7 +6,7 @@ import { type StoreApi, useStore } from "zustand"
 import {
   createTokensStore,
   initTokensStore,
-  TokensStore,
+  type TokensStore,
 } from "@src/stores/tokensStore"
 
 export const TokensStoreContext = createContext<StoreApi<TokensStore> | null>(

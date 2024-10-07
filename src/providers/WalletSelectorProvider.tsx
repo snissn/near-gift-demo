@@ -29,7 +29,7 @@ import { setupNearMobileWallet } from "@near-wallet-selector/near-mobile-wallet"
 import { setupMintbaseWallet } from "@near-wallet-selector/mintbase-wallet"
 import {
   createContext,
-  ReactNode,
+  type ReactNode,
   useState,
   useCallback,
   useEffect,

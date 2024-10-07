@@ -3,16 +3,16 @@
 import { useCallback } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
-import { CollectorHook } from "@src/hooks/useHistoryCollector"
+import type { CollectorHook } from "@src/hooks/useHistoryCollector"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import {
   getNearBlockById,
   getNearTransactionDetails,
 } from "@src/api/transaction"
-import { HistoryData } from "@src/stores/historyStore"
-import { NearBlock, NearTX, NetworkToken, Result } from "@src/types/interfaces"
+import type { HistoryData } from "@src/stores/historyStore"
+import type { NearBlock, NearTX, NetworkToken, Result } from "@src/types/interfaces"
 import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
-import { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
+import type { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 
 interface HistoryFromLocal {

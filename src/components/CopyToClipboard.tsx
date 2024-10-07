@@ -1,6 +1,6 @@
 "use client"
 
-import { PropsWithChildren, useState } from "react"
+import { type PropsWithChildren, useState } from "react"
 import { CopyToClipboard } from "react-copy-to-clipboard"
 import clsx from "clsx"
 

@@ -10,7 +10,7 @@ import {
   nearTokenList,
   otherTokenList,
 } from "@src/app/wallet/CardBalance/mocks"
-import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
+import type { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import { useTokensStore } from "@src/providers/TokensStoreProvider"
 import { useAccountBalance } from "@src/hooks/useAccountBalance"
 import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"

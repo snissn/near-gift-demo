@@ -1,4 +1,4 @@
-import { NearTX } from "@src/types/interfaces"
+import type { NearTX } from "@src/types/interfaces"
 
 export type GetTransactionScanResult = {
   isFailure: boolean

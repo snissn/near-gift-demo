@@ -2,7 +2,7 @@
 
 import { Text } from "@radix-ui/themes"
 import Image from "next/image"
-import { PropsWithChildren, useEffect, useRef, useState } from "react"
+import { type PropsWithChildren, useEffect, useRef, useState } from "react"
 
 import Section from "@src/app/(home)/Section"
 import useResize from "@src/hooks/useResize"

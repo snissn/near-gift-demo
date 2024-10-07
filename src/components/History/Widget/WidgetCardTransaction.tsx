@@ -2,8 +2,8 @@
 
 import React from "react"
 
-import { HistoryData, HistoryStatus } from "@src/stores/historyStore"
-import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
+import { type HistoryData, HistoryStatus } from "@src/stores/historyStore"
+import type { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import { useSwap } from "@src/hooks/useSwap"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import WidgetCardSwap from "@src/components/History/Widget/WidgetCardSwap"

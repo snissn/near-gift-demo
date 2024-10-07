@@ -1,4 +1,4 @@
-import { JobsDetails } from "@src/types/interfaces"
+import type { JobsDetails } from "@src/types/interfaces"
 
 export const jobsData: JobsDetails[] = [
   {

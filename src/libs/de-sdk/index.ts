@@ -1,4 +1,4 @@
-import {
+import type {
   DataEstimateRequest,
   SwapEstimateProviderResponse,
 } from "@src/libs/de-sdk/types/interfaces"

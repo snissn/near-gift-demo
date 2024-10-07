@@ -6,7 +6,7 @@ import { Text } from "@radix-ui/themes"
 import Image from "next/image"
 
 import { useNotificationStore } from "@src/providers/NotificationProvider"
-import { Notification } from "@src/stores/notificationStore"
+import type { Notification } from "@src/stores/notificationStore"
 
 const Snackbar = () => {
   const { data, deleteNotification } = useNotificationStore((state) => state)

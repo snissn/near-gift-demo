@@ -1,6 +1,6 @@
 import Image from "next/image"
 
-import { NetworkToken } from "@src/types/interfaces"
+import type { NetworkToken } from "@src/types/interfaces"
 
 const AssetComboIcon = ({
   icon,

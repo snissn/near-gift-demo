@@ -4,7 +4,7 @@ import Image from "next/image"
 import React from "react"
 import clsx from "clsx"
 
-import { JobsDetails } from "@src/types/interfaces"
+import type { JobsDetails } from "@src/types/interfaces"
 
 const CardJob = ({ team, position, link, applicationLink }: JobsDetails) => {
   const animationStyle =

@@ -1,4 +1,4 @@
-import { NetworkToken } from "@src/types/interfaces"
+import type { NetworkToken } from "@src/types/interfaces"
 
 export default function isSameToken(
   token: NetworkToken,

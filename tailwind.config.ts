@@ -163,7 +163,7 @@ const config: Config = {
     forms,
     typography,
     lineClamp,
-    plugin(function ({ addUtilities }) {
+    plugin(({ addUtilities }) => {
       const newUtilities = {
         ".hide-scrollbar": {
           "scrollbar-width": "none",

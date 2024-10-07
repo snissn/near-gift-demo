@@ -7,7 +7,7 @@ import { formatUnits, parseUnits } from "ethers"
 
 import ModalDialog from "@src/components/Modal/ModalDialog"
 import {
-  NetworkToken,
+  type NetworkToken,
   ContractIdEnum,
   BlockchainEnum,
 } from "@src/types/interfaces"

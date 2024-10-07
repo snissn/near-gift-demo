@@ -5,14 +5,14 @@ import { useEffect, useState } from "react"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { nep141Balance } from "@src/utils/near"
 import {
-  NetworkTokenWithSwapRoute,
-  TokenBalance,
+  type NetworkTokenWithSwapRoute,
+  type TokenBalance,
   NetworkEnum,
   BlockchainEnum,
 } from "@src/types/interfaces"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { useGetCoingeckoExchangeList } from "@src/api/hooks/exchange/useGetCoingeckoExchangeList"
-import { CoingeckoExchanges } from "@src/types/coingecko"
+import type { CoingeckoExchanges } from "@src/types/coingecko"
 import { useAccountBalance } from "@src/hooks/useAccountBalance"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 import { useMinimumNearBalance } from "@src/hooks/useMinimumNearBalance"

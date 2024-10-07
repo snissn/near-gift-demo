@@ -1,4 +1,4 @@
-import React from "react"
+import type React from "react"
 
 export const Loading: React.FC = () => (
   <div className="lds-ellipsis">

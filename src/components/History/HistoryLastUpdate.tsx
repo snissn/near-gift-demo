@@ -4,7 +4,7 @@ import { Spinner } from "@radix-ui/themes"
 
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import WidgetCard from "@src/components/History/Widget/WidgetCard"
-import { HistoryData } from "@src/stores/historyStore"
+import type { HistoryData } from "@src/stores/historyStore"
 
 const SCHEDULER_30_SEC = 30000
 

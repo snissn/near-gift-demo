@@ -9,12 +9,12 @@ import {
   INDEXER,
   MAX_GAS_TRANSACTION,
 } from "@src/constants/contracts"
-import { MapCreateIntentProps } from "@src/libs/de-sdk/utils/maps"
+import type { MapCreateIntentProps } from "@src/libs/de-sdk/utils/maps"
 import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
 import { swapSchema } from "@src/utils/schema"
 import {
-  NearIntent1CreateCrossChain,
-  NearIntent1CreateSingleChain,
+  type NearIntent1CreateCrossChain,
+  type NearIntent1CreateSingleChain,
   ContractIdEnum,
 } from "@src/types/interfaces"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"

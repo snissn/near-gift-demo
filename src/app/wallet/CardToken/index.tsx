@@ -1,5 +1,5 @@
-import { EmptyTokenBalance } from "@src/app/wallet/page"
-import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
+import type { EmptyTokenBalance } from "@src/app/wallet/page"
+import type { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 
 const CardToken = ({
   name,

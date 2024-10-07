@@ -73,7 +73,7 @@ export const useInterceptors = () => {
   XMLHttpRequest.prototype.open = function (
     method: string,
     url: string | URL,
-    async: boolean = true,
+    async = true,
     username?: string | null,
     password?: string | null
   ) {

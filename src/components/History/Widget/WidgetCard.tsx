@@ -7,9 +7,9 @@ import Link from "next/link"
 import { formatUnits } from "ethers"
 import { ArrowTopRightIcon, Cross1Icon } from "@radix-ui/react-icons"
 
-import { HistoryData, HistoryStatus } from "@src/stores/historyStore"
+import { type HistoryData, HistoryStatus } from "@src/stores/historyStore"
 import Button from "@src/components/Button/Button"
-import { NearTX, QueueTransactions } from "@src/types/interfaces"
+import { type NearTX, QueueTransactions } from "@src/types/interfaces"
 import { WidgetCardTimer } from "@src/components/History/Widget/WidgetCardTimer"
 import {
   smallBalanceToFormat,
@@ -93,7 +93,7 @@ const WidgetCard = ({
               : "0"
             return {
               title: `Swap rolled back!`,
-              subTitle: `You received back ${(parseFloat(tokenInValue) ? tokenInValue : smallBalanceToFormat(tokenIn)) ?? PLACEHOLDER} ${(details?.selectedTokenIn?.symbol || tokensData[0]?.symbol) ?? PLACEHOLDER}.`,
+              subTitle: `You received back ${(Number.parseFloat(tokenInValue) ? tokenInValue : smallBalanceToFormat(tokenIn)) ?? PLACEHOLDER} ${(details?.selectedTokenIn?.symbol || tokensData[0]?.symbol) ?? PLACEHOLDER}.`,
             }
 
           // to support new intent

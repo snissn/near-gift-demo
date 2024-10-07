@@ -1,5 +1,5 @@
-import React from "react"
-import {
+import type React from "react"
+import type {
   Path,
   FieldValues,
   FieldErrors,
@@ -9,9 +9,9 @@ import {
 import clsx from "clsx"
 
 import AssetsSelect from "@src/components/Network/SelectAssets"
-import { NetworkToken } from "@src/types/interfaces"
+import type { NetworkToken } from "@src/types/interfaces"
 import BlockMultiBalances, {
-  BlockMultiBalancesProps,
+  type BlockMultiBalancesProps,
 } from "@src/components/Block/BlockMultiBalances"
 
 interface Props<T extends FieldValues> {
@@ -132,7 +132,7 @@ const FieldComboInput = <T extends FieldValues>({
       ) : null}
       {price && price !== "0" && errors && !errors[fieldName] ? (
         <span className="absolute flex flex-nowrap items-center gap-2 bottom-4 left-5 text-sm font-medium text-secondary">
-          ~${parseFloat(price).toFixed(2)}
+          ~${Number.parseFloat(price).toFixed(2)}
           {label && label}
         </span>
       ) : null}

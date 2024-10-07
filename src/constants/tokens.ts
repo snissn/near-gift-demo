@@ -1,4 +1,4 @@
-import { NetworkToken, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
+import type { NetworkToken, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 
 const environment = process.env.environment || "production"
 

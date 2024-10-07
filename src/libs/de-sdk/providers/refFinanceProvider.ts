@@ -1,16 +1,16 @@
 import {
   estimateSwap,
   fetchAllPools,
-  EstimateSwapView,
-  Pool,
-  StablePool,
+  type EstimateSwapView,
+  type Pool,
+  type StablePool,
   ftGetTokenMetadata,
   getStablePools,
-  SwapOptions,
+  type SwapOptions,
   init_env,
 } from "@ref-finance/ref-sdk"
 
-import { DataEstimateRequest } from "../types/interfaces"
+import type { DataEstimateRequest } from "../types/interfaces"
 
 const environment =
   process?.env?.environment === "production" ? "mainnet" : "testnet"

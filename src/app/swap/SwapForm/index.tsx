@@ -1,6 +1,7 @@
 "use client"
-import React, { useCallback, useEffect, useRef, useState } from "react"
-import { FieldValues, useForm } from "react-hook-form"
+import type React from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { type FieldValues, useForm } from "react-hook-form"
 import { parseUnits } from "ethers"
 import { v4 } from "uuid"
 
@@ -11,8 +12,8 @@ import ButtonSwitch from "@src/components/Button/ButtonSwitch"
 import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { ModalType } from "@src/stores/modalStore"
-import { NetworkToken, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
-import {
+import type { NetworkToken, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
+import type {
   ModalSelectAssetsPayload,
   TokenListWithNotSelectableToken,
 } from "@src/components/Modal/ModalSelectAssets"
@@ -20,7 +21,7 @@ import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
 import { useModalSearchParams } from "@src/hooks/useModalSearchParams"
 import { useCalculateTokenToUsd } from "@src/hooks/useCalculateTokenToUsd"
 import { useTokensStore } from "@src/providers/TokensStoreProvider"
-import { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
+import type { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
 import BlockEvaluatePrice from "@src/components/Block/BlockEvaluatePrice"
 import { useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
@@ -39,7 +40,7 @@ import { useNotificationStore } from "@src/providers/NotificationProvider"
 import WarnBox from "../WarnBox"
 
 import {
-  EvaluateResultEnum,
+  type EvaluateResultEnum,
   getEvaluateSwapEstimate,
 } from "./service/evaluateSwap"
 import isForeignChainSwap from "./utils/isForeignChainSwap"

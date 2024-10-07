@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 
 import { useQueryCollector } from "@src/hooks/useQuery"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
-import { HistoryData } from "@src/stores/historyStore"
+import type { HistoryData } from "@src/stores/historyStore"
 import { NEAR_COLLECTOR_KEY } from "@src/constants/contracts"
 import { useHistoryLatest } from "@src/hooks/useHistoryLatest"
 import { adapterIntent0, adapterIntent1 } from "@src/libs/de-sdk/utils/adapters"

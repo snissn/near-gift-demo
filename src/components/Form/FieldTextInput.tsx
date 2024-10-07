@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import { FieldValues, Path, UseFormRegister } from "react-hook-form"
+import type { FieldValues, Path, UseFormRegister } from "react-hook-form"
 
 interface Props<T extends FieldValues> {
   fieldName: Path<T>

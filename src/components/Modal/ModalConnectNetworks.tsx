@@ -7,7 +7,7 @@ import { InfoCircledIcon } from "@radix-ui/react-icons"
 import { isAddress } from "ethers"
 import * as bitcoin from "bitcoinjs-lib"
 
-import { BlockchainEnum, NetworkToken } from "@src/types/interfaces"
+import { BlockchainEnum, type NetworkToken } from "@src/types/interfaces"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import Button from "@src/components/Button/Button"
 import ModalDialog from "@src/components/Modal/ModalDialog"

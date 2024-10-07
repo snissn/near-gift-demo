@@ -1,6 +1,6 @@
 import type { AccountView } from "near-api-js/lib/providers/provider"
 
-import { HistoryStatus } from "@src/stores/historyStore"
+import type { HistoryStatus } from "@src/stores/historyStore"
 
 export type DefuseBaseIds = {
   defuse_asset_id: string
@@ -169,8 +169,8 @@ export interface NearIntentCreate {
 }
 
 enum Status {
-  Available,
-  available,
+  Available = 0,
+  available = 1,
 }
 
 export interface NearIntent1CreateCrossChain {

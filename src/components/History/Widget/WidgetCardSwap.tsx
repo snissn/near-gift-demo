@@ -6,7 +6,7 @@ import { Cross1Icon } from "@radix-ui/react-icons"
 import AssetComboIcon from "@src/components/Network/AssetComboIcon"
 import {
   BlockchainEnum,
-  NetworkTokenWithSwapRoute,
+  type NetworkTokenWithSwapRoute,
 } from "@src/types/interfaces"
 import { HistoryStatus } from "@src/stores/historyStore"
 import { smallBalanceToFormat } from "@src/utils/token"

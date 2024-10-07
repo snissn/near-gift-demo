@@ -1,11 +1,11 @@
-import React, { ReactNode } from "react"
+import React, { type ReactNode } from "react"
 import { Text } from "@radix-ui/themes"
 import clsx from "clsx"
 import Image from "next/image"
 
 import AssetComboIcon from "@src/components/Network/AssetComboIcon"
-import { NetworkToken } from "@src/types/interfaces"
-import { TokenListWithNotSelectableToken } from "@src/components/Modal/ModalSelectAssets"
+import type { NetworkToken } from "@src/types/interfaces"
+import type { TokenListWithNotSelectableToken } from "@src/components/Modal/ModalSelectAssets"
 import {
   balanceToDecimal,
   balanceToCurrency,

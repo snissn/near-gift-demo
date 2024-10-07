@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { MouseEvent, PropsWithChildren } from "react"
+import type { MouseEvent, PropsWithChildren } from "react"
 import clsx from "clsx"
 
 interface Props extends PropsWithChildren {

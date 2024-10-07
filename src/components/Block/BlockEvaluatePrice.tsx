@@ -5,8 +5,8 @@ import { InfoCircledIcon } from "@radix-ui/react-icons"
 import { Tooltip } from "@radix-ui/themes"
 import clsx from "clsx"
 
-import { SwapEstimateProviderResponse } from "@src/libs/de-sdk/types/interfaces"
-import { NetworkToken } from "@src/types/interfaces"
+import type { SwapEstimateProviderResponse } from "@src/libs/de-sdk/types/interfaces"
+import type { NetworkToken } from "@src/types/interfaces"
 import { tokenBalanceToFormatUnits } from "@src/utils/token"
 
 import { EvaluateResultEnum } from "../../app/swap/SwapForm/service/evaluateSwap"

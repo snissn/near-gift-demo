@@ -1,8 +1,8 @@
 import { providers } from "near-api-js"
-import { CodeResult } from "near-api-js/lib/providers/provider"
+import type { CodeResult } from "near-api-js/lib/providers/provider"
 import { setNearProvider, getNearProvider } from "@near-eth/client"
 
-import { NearViewAccount } from "@src/types/interfaces"
+import type { NearViewAccount } from "@src/types/interfaces"
 
 const NEAR_NODE_URL =
   process?.env?.nearNodeUrl ?? "https://rpc.testnet.near.org"

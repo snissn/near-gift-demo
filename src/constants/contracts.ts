@@ -1,6 +1,6 @@
 export enum INDEXER {
-  INTENT_0,
-  INTENT_1,
+  INTENT_0 = 0,
+  INTENT_1 = 1,
 }
 
 const CONTRACTS_MAINNET = {

@@ -1,6 +1,7 @@
 "use client"
 
-import React, { PropsWithChildren, useEffect } from "react"
+import type React from "react"
+import { type PropsWithChildren, useEffect } from "react"
 
 import { useGetTokensBalance } from "@src/hooks/useGetTokensBalance"
 import { useCombinedTokensListAdapter } from "@src/hooks/useTokensListAdapter"

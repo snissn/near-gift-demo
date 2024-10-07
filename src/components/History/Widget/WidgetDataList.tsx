@@ -1,6 +1,6 @@
 "use client"
 
-import { ComponentType } from "react"
+import type { ComponentType } from "react"
 import clsx from "clsx"
 
 type Props<T> = {

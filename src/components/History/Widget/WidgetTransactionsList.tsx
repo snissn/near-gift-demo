@@ -1,6 +1,6 @@
 "use client"
 
-import { ComponentType, Fragment } from "react"
+import { type ComponentType, Fragment } from "react"
 import clsx from "clsx"
 import dayjs from "dayjs"
 import { Text } from "@radix-ui/themes"

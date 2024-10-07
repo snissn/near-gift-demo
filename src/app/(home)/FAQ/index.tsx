@@ -2,7 +2,7 @@
 
 import { Text } from "@radix-ui/themes"
 import Image from "next/image"
-import { PropsWithChildren, useState } from "react"
+import { type PropsWithChildren, useState } from "react"
 import * as Accordion from "@radix-ui/react-accordion"
 import { AccordionContent, AccordionTrigger } from "@radix-ui/react-accordion"
 import clsx from "clsx"

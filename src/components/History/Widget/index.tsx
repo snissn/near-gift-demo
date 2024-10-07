@@ -6,7 +6,7 @@ import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import WidgetEmpty from "@src/components/History/Widget/WidgetEmpty"
 import WidgetTransactionsList from "@src/components/History/Widget/WidgetTransactionsList"
 import WidgetCardTransaction from "@src/components/History/Widget/WidgetCardTransaction"
-import { HistoryData } from "@src/stores/historyStore"
+import type { HistoryData } from "@src/stores/historyStore"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 
 const Widget = () => {

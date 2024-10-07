@@ -2,7 +2,7 @@ import React from "react"
 import { Text } from "@radix-ui/themes"
 import Image from "next/image"
 
-import { NetworkToken } from "@src/types/interfaces"
+import type { NetworkToken } from "@src/types/interfaces"
 import AssetComboIcon from "@src/components/Network/AssetComboIcon"
 
 type Type = {

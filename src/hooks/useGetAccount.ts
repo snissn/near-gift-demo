@@ -1,10 +1,10 @@
 import { useCallback } from "react"
 import { providers } from "near-api-js"
 import type { AccountView } from "near-api-js/lib/providers/provider"
-import { WalletSelector } from "@near-wallet-selector/core"
+import type { WalletSelector } from "@near-wallet-selector/core"
 
 import { useAccountBalance } from "@src/hooks/useAccountBalance"
-import { Account } from "@src/types/interfaces"
+import type { Account } from "@src/types/interfaces"
 import {
   CONNECTOR_BTC_MAINNET,
   CONNECTOR_ETH_BASE,

@@ -2,7 +2,7 @@
 
 import { createStore } from "zustand/vanilla"
 
-import { NearTX, NetworkToken, RecoverDetails } from "@src/types/interfaces"
+import type { NearTX, NetworkToken, RecoverDetails } from "@src/types/interfaces"
 import { NEAR_COLLECTOR_KEY } from "@src/constants/contracts"
 
 export enum HistoryStatus {

@@ -3,10 +3,10 @@
 import { useState } from "react"
 import * as borsh from "borsh"
 
-import { HistoryData, HistoryStatus } from "@src/stores/historyStore"
+import { type HistoryData, HistoryStatus } from "@src/stores/historyStore"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
-import {
+import type {
   NearIntent1CreateCrossChain,
   NearIntent1CreateSingleChain,
   NearIntentCreate,
@@ -18,14 +18,14 @@ import { getNearTransactionDetails } from "@src/api/transaction"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { useTransactionScan } from "@src/hooks/useTransactionScan"
 import { swapSchema } from "@src/utils/schema"
-import { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
+import type { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
 import { adapterIntent0, adapterIntent1 } from "@src/libs/de-sdk/utils/adapters"
 import { TransactionMethod } from "@src/types/solver0"
 import {
   callRequestGetIntent,
   getDetailsFromGetIntent,
   getDetailsFromStorageDeposit,
-  GetIntentResult,
+  type GetIntentResult,
   isValidJSON,
   skipFirstCircle,
 } from "@src/utils/history"
