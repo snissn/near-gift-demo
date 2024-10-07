@@ -1,8 +1,8 @@
-import type React from "react"
 import { CaretDownIcon } from "@radix-ui/react-icons"
+import type React from "react"
 
-import type { NetworkToken } from "@src/types/interfaces"
 import AssetComboIcon from "@src/components/Network/AssetComboIcon"
+import type { NetworkToken } from "@src/types/interfaces"
 
 type Props = {
   selected?: NetworkToken

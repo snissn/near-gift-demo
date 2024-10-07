@@ -1,6 +1,6 @@
+import clsx from "clsx"
 import Image from "next/image"
 import type { MouseEvent, PropsWithChildren } from "react"
-import clsx from "clsx"
 
 interface Props extends PropsWithChildren {
   onClick?: (e: MouseEvent<HTMLButtonElement>) => void

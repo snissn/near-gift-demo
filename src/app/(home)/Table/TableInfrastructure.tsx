@@ -1,7 +1,7 @@
-import Image from "next/image"
-import React, { type PropsWithChildren } from "react"
 import { Text } from "@radix-ui/themes"
 import clsx from "clsx"
+import Image from "next/image"
+import React, { type PropsWithChildren } from "react"
 
 export enum ColumnGroupType {
   MAIN = "main",

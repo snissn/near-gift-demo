@@ -1,14 +1,17 @@
 "use client"
 
-import { useCallback } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { useCallback } from "react"
 
-import type { CollectorHook } from "@src/hooks/useHistoryCollector"
-import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import {
   getNearBlockById,
   getNearTransactionDetails,
 } from "@src/api/transaction"
+import type { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
+import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
+import type { CollectorHook } from "@src/hooks/useHistoryCollector"
+import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
+import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import type { HistoryData } from "@src/stores/historyStore"
 import type {
   NearBlock,
@@ -16,9 +19,6 @@ import type {
   NetworkToken,
   Result,
 } from "@src/types/interfaces"
-import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
-import type { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
-import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 
 interface HistoryFromLocal {
   tokenIn?: string

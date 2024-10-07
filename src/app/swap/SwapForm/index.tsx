@@ -1,44 +1,44 @@
 "use client"
+import { parseUnits } from "ethers"
 import type React from "react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { type FieldValues, useForm } from "react-hook-form"
-import { parseUnits } from "ethers"
 import { v4 } from "uuid"
 
-import Form from "@src/components/Form"
-import FieldComboInput from "@src/components/Form/FieldComboInput"
-import Button from "@src/components/Button/Button"
-import ButtonSwitch from "@src/components/Button/ButtonSwitch"
-import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
-import { useModalStore } from "@src/providers/ModalStoreProvider"
-import { ModalType } from "@src/stores/modalStore"
-import type {
-  NetworkToken,
-  NetworkTokenWithSwapRoute,
-} from "@src/types/interfaces"
-import type {
-  ModalSelectAssetsPayload,
-  TokenListWithNotSelectableToken,
-} from "@src/components/Modal/ModalSelectAssets"
-import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
-import { useModalSearchParams } from "@src/hooks/useModalSearchParams"
-import { useCalculateTokenToUsd } from "@src/hooks/useCalculateTokenToUsd"
-import { useTokensStore } from "@src/providers/TokensStoreProvider"
-import type { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
-import BlockEvaluatePrice from "@src/components/Block/BlockEvaluatePrice"
-import { useConnectWallet } from "@src/hooks/useConnectWallet"
-import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import { debouncePromise } from "@src/utils/debouncePromise"
-import { tieNativeToWrapToken } from "@src/utils/tokenList"
-import { NEAR_TOKEN_META } from "@src/constants/tokens"
 import {
   balanceToBignumberString,
   balanceToDecimal,
 } from "@src/app/swap/SwapForm/service/balanceTo"
 import { getBalanceNearAllowedToSwap } from "@src/app/swap/SwapForm/service/getBalanceNearAllowedToSwap"
 import isWalletConnected from "@src/app/swap/SwapForm/utils/isWalletConnected"
-import { NotificationType } from "@src/stores/notificationStore"
+import BlockEvaluatePrice from "@src/components/Block/BlockEvaluatePrice"
+import Button from "@src/components/Button/Button"
+import ButtonSwitch from "@src/components/Button/ButtonSwitch"
+import Form from "@src/components/Form"
+import FieldComboInput from "@src/components/Form/FieldComboInput"
+import type { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
+import type {
+  ModalSelectAssetsPayload,
+  TokenListWithNotSelectableToken,
+} from "@src/components/Modal/ModalSelectAssets"
+import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
+import { NEAR_TOKEN_META } from "@src/constants/tokens"
+import { useCalculateTokenToUsd } from "@src/hooks/useCalculateTokenToUsd"
+import { useConnectWallet } from "@src/hooks/useConnectWallet"
+import { useModalSearchParams } from "@src/hooks/useModalSearchParams"
+import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
+import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { useNotificationStore } from "@src/providers/NotificationProvider"
+import { useTokensStore } from "@src/providers/TokensStoreProvider"
+import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import { ModalType } from "@src/stores/modalStore"
+import { NotificationType } from "@src/stores/notificationStore"
+import type {
+  NetworkToken,
+  NetworkTokenWithSwapRoute,
+} from "@src/types/interfaces"
+import { debouncePromise } from "@src/utils/debouncePromise"
+import { tieNativeToWrapToken } from "@src/utils/tokenList"
 
 import WarnBox from "../WarnBox"
 

@@ -1,15 +1,15 @@
-import React, { type ReactNode } from "react"
 import { Text } from "@radix-ui/themes"
 import clsx from "clsx"
 import Image from "next/image"
+import React, { type ReactNode } from "react"
 
+import {
+  balanceToCurrency,
+  balanceToDecimal,
+} from "@src/app/swap/SwapForm/service/balanceTo"
+import type { TokenListWithNotSelectableToken } from "@src/components/Modal/ModalSelectAssets"
 import AssetComboIcon from "@src/components/Network/AssetComboIcon"
 import type { NetworkToken } from "@src/types/interfaces"
-import type { TokenListWithNotSelectableToken } from "@src/components/Modal/ModalSelectAssets"
-import {
-  balanceToDecimal,
-  balanceToCurrency,
-} from "@src/app/swap/SwapForm/service/balanceTo"
 
 type Props = {
   title?: string

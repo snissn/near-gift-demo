@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
 import { Text } from "@radix-ui/themes"
+import { useEffect, useRef, useState } from "react"
 
 import Section from "@src/app/(home)/Section"
+import TableInfrastructure from "@src/app/(home)/Table/TableInfrastructure"
 import { infrastructureData } from "@src/app/(home)/mocks"
 import useResize from "@src/hooks/useResize"
-import TableInfrastructure from "@src/app/(home)/Table/TableInfrastructure"
 
 const Evolution = () => {
   const divRef = useRef<HTMLDivElement>(null)

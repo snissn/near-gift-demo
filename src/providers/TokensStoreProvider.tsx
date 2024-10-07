@@ -1,12 +1,12 @@
 "use client"
 
-import { type ReactNode, createContext, useRef, useContext } from "react"
+import { type ReactNode, createContext, useContext, useRef } from "react"
 import { type StoreApi, useStore } from "zustand"
 
 import {
+  type TokensStore,
   createTokensStore,
   initTokensStore,
-  type TokensStore,
 } from "@src/stores/tokensStore"
 
 export const TokensStoreContext = createContext<StoreApi<TokensStore> | null>(

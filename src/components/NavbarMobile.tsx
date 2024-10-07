@@ -1,8 +1,8 @@
 "use client"
 
-import React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import React from "react"
 
 import Navbar from "@src/components/Navbar"
 import { LINKS_HEADER, Navigation } from "@src/constants/routes"

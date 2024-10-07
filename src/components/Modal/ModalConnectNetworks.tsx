@@ -1,29 +1,29 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
-import Image from "next/image"
-import { Text, Tooltip } from "@radix-ui/themes"
 import { InfoCircledIcon } from "@radix-ui/react-icons"
-import { isAddress } from "ethers"
+import { Text, Tooltip } from "@radix-ui/themes"
 import * as bitcoin from "bitcoinjs-lib"
+import { isAddress } from "ethers"
+import Image from "next/image"
+import React, { useEffect, useState } from "react"
 
-import { BlockchainEnum, type NetworkToken } from "@src/types/interfaces"
-import { useModalStore } from "@src/providers/ModalStoreProvider"
 import Button from "@src/components/Button/Button"
 import ModalDialog from "@src/components/Modal/ModalDialog"
-import { ModalType } from "@src/stores/modalStore"
-import NetworkNear from "@src/components/Network/NetworkNear"
-import { useConnectWallet } from "@src/hooks/useConnectWallet"
-import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import Network from "@src/components/Network/Network"
-import { networkLabelAdapter } from "@src/utils/network"
-import parseDefuseAsset from "@src/utils/parseDefuseAsset"
-import { useTokensStore } from "@src/providers/TokensStoreProvider"
-import { MapsEnum } from "@src/libs/de-sdk/utils/maps"
+import NetworkNear from "@src/components/Network/NetworkNear"
 import {
   CONNECTOR_BTC_MAINNET,
   CONNECTOR_ETH_BASE,
 } from "@src/constants/contracts"
+import { useConnectWallet } from "@src/hooks/useConnectWallet"
+import { MapsEnum } from "@src/libs/de-sdk/utils/maps"
+import { useModalStore } from "@src/providers/ModalStoreProvider"
+import { useTokensStore } from "@src/providers/TokensStoreProvider"
+import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import { ModalType } from "@src/stores/modalStore"
+import { BlockchainEnum, type NetworkToken } from "@src/types/interfaces"
+import { networkLabelAdapter } from "@src/utils/network"
+import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 
 export type ModalConnectNetworksPayload = {
   tokenIn: string

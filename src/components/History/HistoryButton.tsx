@@ -1,6 +1,6 @@
 "use client"
-import Image from "next/image"
 import clsx from "clsx"
+import Image from "next/image"
 import type { ButtonHTMLAttributes } from "react"
 
 type Props = {

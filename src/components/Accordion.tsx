@@ -1,5 +1,5 @@
-import type React from "react"
 import Image from "next/image"
+import type React from "react"
 
 type Props = {
   leftHeaderElement?: React.ReactNode

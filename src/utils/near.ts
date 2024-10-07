@@ -1,6 +1,6 @@
+import { getNearProvider, setNearProvider } from "@near-eth/client"
 import { providers } from "near-api-js"
 import type { CodeResult } from "near-api-js/lib/providers/provider"
-import { setNearProvider, getNearProvider } from "@near-eth/client"
 
 import type { NearViewAccount } from "@src/types/interfaces"
 

@@ -3,6 +3,8 @@
 import type { WalletSelector } from "@near-wallet-selector/core"
 import { useState } from "react"
 
+import { getNearTransactionDetails } from "@src/api/transaction"
+import { getBalanceNearAllowedToSwap } from "@src/app/swap/SwapForm/service/getBalanceNearAllowedToSwap"
 import {
   CONTRACTS_REGISTER,
   FT_MINIMUM_STORAGE_BALANCE_LARGE,
@@ -11,25 +13,23 @@ import {
   INDEXER,
   MAX_GAS_TRANSACTION,
 } from "@src/constants/contracts"
+import { LIST_NATIVE_TOKENS, W_NEAR_TOKEN_META } from "@src/constants/tokens"
+import { useNearBlock } from "@src/hooks/useNearBlock"
+import useStorageDeposit from "@src/hooks/useStorageDeposit"
+import useNearSwapNearToWNear from "@src/hooks/useSwapNearToWNear"
+import { useTransactionScan } from "@src/hooks/useTransactionScan"
+import { mapCreateIntentTransactionCall } from "@src/libs/de-sdk/utils/maps"
 import {
+  BlockchainEnum,
+  ContractIdEnum,
   type NearTX,
   type NetworkToken,
   QueueTransactions,
   type Result,
-  ContractIdEnum,
-  BlockchainEnum,
 } from "@src/types/interfaces"
-import useStorageDeposit from "@src/hooks/useStorageDeposit"
-import useNearSwapNearToWNear from "@src/hooks/useSwapNearToWNear"
-import { useNearBlock } from "@src/hooks/useNearBlock"
-import { getNearTransactionDetails } from "@src/api/transaction"
-import { useTransactionScan } from "@src/hooks/useTransactionScan"
-import { LIST_NATIVE_TOKENS, W_NEAR_TOKEN_META } from "@src/constants/tokens"
-import { mapCreateIntentTransactionCall } from "@src/libs/de-sdk/utils/maps"
-import { isForeignNetworkToken } from "@src/utils/network"
 import { TransactionMethod } from "@src/types/solver0"
-import { getBalanceNearAllowedToSwap } from "@src/app/swap/SwapForm/service/getBalanceNearAllowedToSwap"
 import { isStorageDepositException, nep141Balance } from "@src/utils/near"
+import { isForeignNetworkToken } from "@src/utils/network"
 
 type Props = {
   accountId: string | null

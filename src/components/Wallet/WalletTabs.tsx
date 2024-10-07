@@ -1,13 +1,13 @@
 "use client"
 
-import { Box, Text, Tabs, Spinner } from "@radix-ui/themes"
-import { type PropsWithChildren, useEffect, useState } from "react"
+import { Box, Spinner, Tabs, Text } from "@radix-ui/themes"
 import { formatUnits } from "ethers"
+import { type PropsWithChildren, useEffect, useState } from "react"
 
 import LabelComingSoon from "@src/components/LabelComingSoon"
-import { useTokensStore } from "@src/providers/TokensStoreProvider"
-import { useAccountBalance } from "@src/hooks/useAccountBalance"
 import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
+import { useAccountBalance } from "@src/hooks/useAccountBalance"
+import { useTokensStore } from "@src/providers/TokensStoreProvider"
 
 const IS_DISABLED_ALL_TABS = true
 

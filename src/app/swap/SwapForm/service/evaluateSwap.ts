@@ -1,8 +1,8 @@
 import { formatUnits } from "ethers"
 
+import { NEAR_TOKEN_META, W_NEAR_TOKEN_META } from "@src/constants/tokens"
 import { swapEstimateRefFinanceProvider } from "@src/libs/de-sdk/providers/refFinanceProvider"
 import type { NetworkToken } from "@src/types/interfaces"
-import { NEAR_TOKEN_META, W_NEAR_TOKEN_META } from "@src/constants/tokens"
 
 export enum EvaluateResultEnum {
   BEST = 0,

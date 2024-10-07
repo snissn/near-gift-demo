@@ -1,7 +1,7 @@
 "use client"
 
-import React from "react"
 import { Text, TextArea } from "@radix-ui/themes"
+import React from "react"
 
 import CardJob from "@src/app/jobs/Card/CardJob"
 import { jobsData } from "@src/app/jobs/mocks"

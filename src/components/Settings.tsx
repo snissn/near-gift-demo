@@ -1,12 +1,12 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
-import { Popover, Spinner, Switch, Text, Separator } from "@radix-ui/themes"
-import { useTheme } from "next-themes"
 import { ExternalLinkIcon } from "@radix-ui/react-icons"
+import { Popover, Separator, Spinner, Switch, Text } from "@radix-ui/themes"
+import { useTheme } from "next-themes"
+import React, { useState, useEffect } from "react"
 
-import Themes from "@src/types/themes"
 import { THEME_MODE_KEY } from "@src/constants/contracts"
+import Themes from "@src/types/themes"
 
 const NEXT_PUBLIC_LINK_DOCS = process.env.NEXT_PUBLIC_LINK_DOCS ?? ""
 const NEXT_PUBLIC_PUBLIC_MAIL = process?.env?.NEXT_PUBLIC_PUBLIC_MAIL ?? ""

@@ -1,3 +1,8 @@
+import { getDiscoverDefuseAssets } from "@src/api/token"
+import { getNearTransactionDetails } from "@src/api/transaction"
+import { NEAR_TOKEN_META } from "@src/constants/tokens"
+import type { SolverTokenList } from "@src/libs/de-sdk/providers/solver0Provider"
+import { HistoryStatus } from "@src/stores/historyStore"
 import {
   AssetTypeEnum,
   type IntentAsset,
@@ -6,16 +11,11 @@ import {
   type NetworkToken,
   type Result,
 } from "@src/types/interfaces"
-import { HistoryStatus } from "@src/stores/historyStore"
 import { intentStatus } from "@src/utils/near"
-import { NEAR_TOKEN_META } from "@src/constants/tokens"
-import { getDiscoverDefuseAssets } from "@src/api/token"
-import { tokenMetaAdapter } from "@src/utils/token"
 import parseDefuseAsset, {
   type ParseDefuseAssetResult,
 } from "@src/utils/parseDefuseAsset"
-import type { SolverTokenList } from "@src/libs/de-sdk/providers/solver0Provider"
-import { getNearTransactionDetails } from "@src/api/transaction"
+import { tokenMetaAdapter } from "@src/utils/token"
 
 export function isValidJSON(str: string): boolean {
   try {

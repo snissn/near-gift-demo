@@ -1,18 +1,18 @@
+import clsx from "clsx"
 import type React from "react"
 import type {
-  Path,
-  FieldValues,
-  FieldErrors,
   FieldError,
+  FieldErrors,
+  FieldValues,
+  Path,
   UseFormRegister,
 } from "react-hook-form"
-import clsx from "clsx"
 
-import AssetsSelect from "@src/components/Network/SelectAssets"
-import type { NetworkToken } from "@src/types/interfaces"
 import BlockMultiBalances, {
   type BlockMultiBalancesProps,
 } from "@src/components/Block/BlockMultiBalances"
+import AssetsSelect from "@src/components/Network/SelectAssets"
+import type { NetworkToken } from "@src/types/interfaces"
 
 interface Props<T extends FieldValues> {
   fieldName: Path<T>

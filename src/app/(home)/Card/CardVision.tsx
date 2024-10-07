@@ -1,7 +1,7 @@
-import type { ReactNode } from "react"
-import clsx from "clsx"
 import { Text } from "@radix-ui/themes"
+import clsx from "clsx"
 import Image from "next/image"
+import type { ReactNode } from "react"
 
 type Props = {
   title: string | ReactNode

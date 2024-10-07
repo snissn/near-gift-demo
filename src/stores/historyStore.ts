@@ -2,12 +2,12 @@
 
 import { createStore } from "zustand/vanilla"
 
+import { NEAR_COLLECTOR_KEY } from "@src/constants/contracts"
 import type {
   NearTX,
   NetworkToken,
   RecoverDetails,
 } from "@src/types/interfaces"
-import { NEAR_COLLECTOR_KEY } from "@src/constants/contracts"
 
 export enum HistoryStatus {
   INTENT_1_AVAILABLE = "available",

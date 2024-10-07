@@ -1,40 +1,40 @@
 "use client"
 
+import { setupBitgetWallet } from "@near-wallet-selector/bitget-wallet"
+import { setupCoin98Wallet } from "@near-wallet-selector/coin98-wallet"
 import type {
   AccountState,
   Wallet,
   WalletSelector,
 } from "@near-wallet-selector/core"
 import { setupWalletSelector } from "@near-wallet-selector/core"
-import type { WalletSelectorModal } from "@near-wallet-selector/modal-ui"
-import { setupCoin98Wallet } from "@near-wallet-selector/coin98-wallet"
 import { setupHereWallet } from "@near-wallet-selector/here-wallet"
+import { setupLedger } from "@near-wallet-selector/ledger"
 import { setupMathWallet } from "@near-wallet-selector/math-wallet"
 import { setupMeteorWallet } from "@near-wallet-selector/meteor-wallet"
-import { setupNarwallets } from "@near-wallet-selector/narwallets"
+import { setupMintbaseWallet } from "@near-wallet-selector/mintbase-wallet"
+import type { WalletSelectorModal } from "@near-wallet-selector/modal-ui"
 import { setupModal } from "@near-wallet-selector/modal-ui"
+import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet"
+import { setupNarwallets } from "@near-wallet-selector/narwallets"
+import { setupNearMobileWallet } from "@near-wallet-selector/near-mobile-wallet"
+import { setupNearSnap } from "@near-wallet-selector/near-snap"
 import { setupNearFi } from "@near-wallet-selector/nearfi"
+import { setupNeth } from "@near-wallet-selector/neth"
 import { setupNightly } from "@near-wallet-selector/nightly"
+import { setupRamperWallet } from "@near-wallet-selector/ramper-wallet"
 import { setupSender } from "@near-wallet-selector/sender"
-import { setupBitgetWallet } from "@near-wallet-selector/bitget-wallet"
 import { setupWalletConnect } from "@near-wallet-selector/wallet-connect"
 import { setupWelldoneWallet } from "@near-wallet-selector/welldone-wallet"
-import { setupNearSnap } from "@near-wallet-selector/near-snap"
-import { setupNeth } from "@near-wallet-selector/neth"
-import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet"
-import { setupLedger } from "@near-wallet-selector/ledger"
 import { setupXDEFI } from "@near-wallet-selector/xdefi"
-import { setupRamperWallet } from "@near-wallet-selector/ramper-wallet"
-import { setupNearMobileWallet } from "@near-wallet-selector/near-mobile-wallet"
-import { setupMintbaseWallet } from "@near-wallet-selector/mintbase-wallet"
 import {
-  createContext,
   type ReactNode,
-  useState,
+  createContext,
   useCallback,
-  useEffect,
   useContext,
+  useEffect,
   useMemo,
+  useState,
 } from "react"
 import { distinctUntilChanged, map } from "rxjs"
 

@@ -1,9 +1,9 @@
 "use client"
 
-import { type ComponentType, Fragment } from "react"
+import { Text } from "@radix-ui/themes"
 import clsx from "clsx"
 import dayjs from "dayjs"
-import { Text } from "@radix-ui/themes"
+import { type ComponentType, Fragment } from "react"
 
 type Props<T extends { timestamp: number }> = {
   Component: ComponentType<T>

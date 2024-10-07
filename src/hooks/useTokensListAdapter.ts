@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 
+import { getSupportTokenListSolver0 } from "@src/api/intent"
 import type { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import type { SupportedTokens } from "@src/types/solver0"
-import { getSupportTokenListSolver0 } from "@src/api/intent"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 
 export interface SolverHook {

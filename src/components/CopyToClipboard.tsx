@@ -1,8 +1,8 @@
 "use client"
 
+import clsx from "clsx"
 import { type PropsWithChildren, useState } from "react"
 import { CopyToClipboard } from "react-copy-to-clipboard"
-import clsx from "clsx"
 
 interface Props extends PropsWithChildren {
   value: string

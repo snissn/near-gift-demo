@@ -2,12 +2,12 @@
 
 import React from "react"
 
-import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
+import WidgetCardTransaction from "@src/components/History/Widget/WidgetCardTransaction"
 import WidgetEmpty from "@src/components/History/Widget/WidgetEmpty"
 import WidgetTransactionsList from "@src/components/History/Widget/WidgetTransactionsList"
-import WidgetCardTransaction from "@src/components/History/Widget/WidgetCardTransaction"
-import type { HistoryData } from "@src/stores/historyStore"
+import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import type { HistoryData } from "@src/stores/historyStore"
 
 const Widget = () => {
   const { accountId } = useWalletSelector()

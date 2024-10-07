@@ -1,9 +1,9 @@
 import { formatUnits } from "ethers"
 
+import { getChainIconFromId } from "@src/hooks/useTokensListAdapter"
 import type { SolverToken } from "@src/libs/de-sdk/providers/solver0Provider"
 import type { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
-import { getChainIconFromId } from "@src/hooks/useTokensListAdapter"
 
 export const smallBalanceToFormat = (balance: string, toFixed = 14): string => {
   if (!Number.parseFloat(balance)) {

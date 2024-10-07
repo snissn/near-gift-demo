@@ -1,9 +1,9 @@
 "use client"
 
-import React from "react"
 import { InfoCircledIcon } from "@radix-ui/react-icons"
 import { Tooltip } from "@radix-ui/themes"
 import clsx from "clsx"
+import React from "react"
 
 import type { SwapEstimateProviderResponse } from "@src/libs/de-sdk/types/interfaces"
 import type { NetworkToken } from "@src/types/interfaces"

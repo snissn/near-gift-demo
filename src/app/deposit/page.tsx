@@ -1,15 +1,15 @@
 "use client"
 
+import Image from "next/image"
 import React from "react"
 import { type FieldValues, useForm } from "react-hook-form"
-import Image from "next/image"
 
-import Paper from "@src/components/Paper"
-import Form from "@src/components/Form"
-import FieldComboInput from "@src/components/Form/FieldComboInput"
-import ButtonSwitch from "@src/components/Button/ButtonSwitch"
 import Accordion from "@src/components/Accordion"
 import Button from "@src/components/Button/Button"
+import ButtonSwitch from "@src/components/Button/ButtonSwitch"
+import Form from "@src/components/Form"
+import FieldComboInput from "@src/components/Form/FieldComboInput"
+import Paper from "@src/components/Paper"
 import type { NetworkToken } from "@src/types/interfaces"
 
 type FormValues = {

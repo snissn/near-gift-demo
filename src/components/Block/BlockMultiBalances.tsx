@@ -1,11 +1,11 @@
 "use client"
 
-import React from "react"
-import { Checkbox, Text, Tooltip } from "@radix-ui/themes"
 import type { CheckedState } from "@radix-ui/react-checkbox"
 import { InfoCircledIcon } from "@radix-ui/react-icons"
-import Image from "next/image"
+import { Checkbox, Text, Tooltip } from "@radix-ui/themes"
 import clsx from "clsx"
+import Image from "next/image"
+import React from "react"
 
 import { smallBalanceToFormat } from "@src/utils/token"
 

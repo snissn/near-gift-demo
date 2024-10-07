@@ -1,15 +1,15 @@
 "use client"
 
-import React from "react"
-import Link from "next/link"
-import clsx from "clsx"
 import { Text } from "@radix-ui/themes"
+import clsx from "clsx"
+import Link from "next/link"
 import { usePathname } from "next/navigation"
+import React from "react"
 
 import Logo from "@src/components/Logo"
 import Navbar from "@src/components/Navbar"
-import ConnectWallet from "@src/components/Wallet"
 import Settings from "@src/components/Settings"
+import ConnectWallet from "@src/components/Wallet"
 import { Navigation } from "@src/constants/routes"
 
 const NEXT_PUBLIC_APP_URL = process?.env?.appUrl ?? ""

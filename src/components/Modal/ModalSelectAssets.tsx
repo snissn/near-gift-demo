@@ -1,23 +1,23 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
 import { Text } from "@radix-ui/themes"
+import { useCallback, useEffect, useState } from "react"
 
+import { useDiscoverDefuseAssets } from "@src/api/hooks/token/useDiscoverDefuseAssets"
 import ModalDialog from "@src/components/Modal/ModalDialog"
-import SearchBar from "@src/components/SearchBar"
 import AssetList from "@src/components/Network/AssetList"
+import SearchBar from "@src/components/SearchBar"
+import { useModalStore } from "@src/providers/ModalStoreProvider"
+import { useTokensStore } from "@src/providers/TokensStoreProvider"
+import type { ModalType } from "@src/stores/modalStore"
 import type {
   NetworkToken,
   NetworkTokenWithSwapRoute,
 } from "@src/types/interfaces"
-import { useModalStore } from "@src/providers/ModalStoreProvider"
-import type { ModalType } from "@src/stores/modalStore"
-import { useTokensStore } from "@src/providers/TokensStoreProvider"
-import { sortByTopBalances, tieNativeToWrapToken } from "@src/utils/tokenList"
-import { useDiscoverDefuseAssets } from "@src/api/hooks/token/useDiscoverDefuseAssets"
 import { debouncePromise } from "@src/utils/debouncePromise"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 import { tokenMetaAdapter } from "@src/utils/token"
+import { sortByTopBalances, tieNativeToWrapToken } from "@src/utils/tokenList"
 
 export type ModalSelectAssetsPayload = {
   modalType?: ModalType.MODAL_SELECT_ASSETS

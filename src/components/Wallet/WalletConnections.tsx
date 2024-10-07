@@ -1,24 +1,24 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
-import { EnterIcon, CopyIcon } from "@radix-ui/react-icons"
+import { CopyIcon, EnterIcon } from "@radix-ui/react-icons"
 import { Button, Separator, Text } from "@radix-ui/themes"
-import { CopyToClipboard } from "react-copy-to-clipboard"
 import clsx from "clsx"
+import React, { useEffect, useState } from "react"
+import { CopyToClipboard } from "react-copy-to-clipboard"
 
-import { useConnectWallet } from "@src/hooks/useConnectWallet"
-import { MapsEnum } from "@src/libs/de-sdk/utils/maps"
-import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import { getChainIconFromId } from "@src/hooks/useTokensListAdapter"
 import NetworkIcon from "@src/components/Network/NetworkIcon"
-import useShortAccountId from "@src/hooks/useShortAccountId"
-import { useModalStore } from "@src/providers/ModalStoreProvider"
-import { ModalType } from "@src/stores/modalStore"
 import {
   CONNECTOR_BTC_MAINNET,
   CONNECTOR_ETH_BASE,
 } from "@src/constants/contracts"
+import { useConnectWallet } from "@src/hooks/useConnectWallet"
+import useShortAccountId from "@src/hooks/useShortAccountId"
+import { getChainIconFromId } from "@src/hooks/useTokensListAdapter"
+import { MapsEnum } from "@src/libs/de-sdk/utils/maps"
+import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { useTokensStore } from "@src/providers/TokensStoreProvider"
+import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import { ModalType } from "@src/stores/modalStore"
 
 type WalletConnectionState = {
   chainIcon: string

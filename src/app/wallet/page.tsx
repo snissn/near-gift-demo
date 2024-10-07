@@ -1,19 +1,19 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
 import { Spinner } from "@radix-ui/themes"
 import { formatUnits } from "ethers"
+import React, { useEffect, useState } from "react"
 
 import CardBalance from "@src/app/wallet/CardBalance"
-import CardTokenList from "@src/app/wallet/CardTokenList"
 import {
   nearTokenList,
   otherTokenList,
 } from "@src/app/wallet/CardBalance/mocks"
-import type { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
-import { useTokensStore } from "@src/providers/TokensStoreProvider"
-import { useAccountBalance } from "@src/hooks/useAccountBalance"
+import CardTokenList from "@src/app/wallet/CardTokenList"
 import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
+import { useAccountBalance } from "@src/hooks/useAccountBalance"
+import { useTokensStore } from "@src/providers/TokensStoreProvider"
+import type { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 
 export interface EmptyTokenBalance {
   name: string

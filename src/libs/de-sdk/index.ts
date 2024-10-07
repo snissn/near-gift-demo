@@ -1,8 +1,8 @@
+import { estimateProviders } from "@src/libs/de-sdk/providers"
 import type {
   DataEstimateRequest,
   SwapEstimateProviderResponse,
 } from "@src/libs/de-sdk/types/interfaces"
-import { estimateProviders } from "@src/libs/de-sdk/providers"
 
 import { getSettings, setSettings } from "./settings"
 

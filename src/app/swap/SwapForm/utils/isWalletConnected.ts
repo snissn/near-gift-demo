@@ -1,9 +1,9 @@
-import parseDefuseAsset from "@src/utils/parseDefuseAsset"
-import { MapsEnum } from "@src/libs/de-sdk/utils/maps"
 import {
   CONNECTOR_BTC_MAINNET,
   CONNECTOR_ETH_BASE,
 } from "@src/constants/contracts"
+import { MapsEnum } from "@src/libs/de-sdk/utils/maps"
+import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 
 export default function isWalletConnected(defuse_asset_id: string): string {
   const to = parseDefuseAsset(defuse_asset_id)

@@ -3,8 +3,8 @@
 import { Popover } from "@radix-ui/themes"
 import React, { useCallback, useEffect } from "react"
 
-import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import Widget from "@src/components/History/Widget"
+import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 
 import HistoryButton from "./HistoryButton"
 

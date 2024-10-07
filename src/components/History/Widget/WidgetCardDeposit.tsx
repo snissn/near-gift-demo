@@ -2,12 +2,12 @@
 
 import { Text } from "@radix-ui/themes"
 
+import WidgetCardLink from "@src/components/History/Widget/WidgetCardLink"
 import AssetComboIcon from "@src/components/Network/AssetComboIcon"
+import { useActiveHover } from "@src/hooks/useActiveHover"
+import useShortAccountId from "@src/hooks/useShortAccountId"
 import type { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import { smallBalanceToFormat } from "@src/utils/token"
-import WidgetCardLink from "@src/components/History/Widget/WidgetCardLink"
-import useShortAccountId from "@src/hooks/useShortAccountId"
-import { useActiveHover } from "@src/hooks/useActiveHover"
 
 type Props = {
   accountId: string

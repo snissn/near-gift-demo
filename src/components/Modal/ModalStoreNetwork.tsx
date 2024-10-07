@@ -1,17 +1,17 @@
 "use client"
 
-import React, { useState } from "react"
-import Image from "next/image"
-import { Text, Tooltip } from "@radix-ui/themes"
 import { InfoCircledIcon } from "@radix-ui/react-icons"
+import { Text, Tooltip } from "@radix-ui/themes"
+import Image from "next/image"
+import React, { useState } from "react"
 
-import { useModalStore } from "@src/providers/ModalStoreProvider"
 import Button from "@src/components/Button/Button"
+import { handleValidateAccount } from "@src/components/Modal/ModalConnectNetworks"
 import ModalDialog from "@src/components/Modal/ModalDialog"
 import Network from "@src/components/Network/Network"
-import { networkLabelAdapter } from "@src/utils/network"
-import { handleValidateAccount } from "@src/components/Modal/ModalConnectNetworks"
+import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { useTokensStore } from "@src/providers/TokensStoreProvider"
+import { networkLabelAdapter } from "@src/utils/network"
 
 export type ModalStoreNetworkPayload = {
   storeKey: string

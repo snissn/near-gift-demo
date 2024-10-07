@@ -1,8 +1,8 @@
 import { useMutation } from "@tanstack/react-query"
 
 import {
-  getPublishAtomicNearIntent,
   type PublishAtomicNearIntentProps,
+  getPublishAtomicNearIntent,
 } from "@src/api/intent"
 
 const intentKey = "intent"

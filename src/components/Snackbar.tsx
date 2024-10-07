@@ -1,9 +1,9 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
 import * as Toast from "@radix-ui/react-toast"
 import { Text } from "@radix-ui/themes"
 import Image from "next/image"
+import React, { useEffect, useState } from "react"
 
 import { useNotificationStore } from "@src/providers/NotificationProvider"
 import type { Notification } from "@src/stores/notificationStore"

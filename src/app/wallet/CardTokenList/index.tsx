@@ -1,5 +1,5 @@
-import type { EmptyTokenBalance } from "@src/app/wallet/page"
 import CardToken from "@src/app/wallet/CardToken"
+import type { EmptyTokenBalance } from "@src/app/wallet/page"
 import type { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 
 type Props = {

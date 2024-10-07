@@ -9,9 +9,9 @@ import React, {
   type FormEventHandler,
 } from "react"
 import type {
-  UseFormRegister,
   FieldValues,
   UseFormHandleSubmit,
+  UseFormRegister,
 } from "react-hook-form"
 
 import { FieldComboInputRegistryName } from "@src/components/Form/FieldComboInput"
