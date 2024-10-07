@@ -42,11 +42,11 @@ export interface NetworkTokenWithSwapRoute extends NetworkToken {
 }
 
 export enum QueueTransactions {
-  "DEPOSIT" = "deposit",
-  "WITHDRAW" = "withdraw",
-  "STORAGE_DEPOSIT_TOKEN_IN" = "storageDepositTokenIn",
-  "STORAGE_DEPOSIT_TOKEN_OUT" = "storageDepositTokenOut",
-  "CREATE_INTENT" = "createIntent",
+  DEPOSIT = "deposit",
+  WITHDRAW = "withdraw",
+  STORAGE_DEPOSIT_TOKEN_IN = "storageDepositTokenIn",
+  STORAGE_DEPOSIT_TOKEN_OUT = "storageDepositTokenOut",
+  CREATE_INTENT = "createIntent",
 }
 
 export interface Result<T> {
@@ -169,8 +169,8 @@ export interface NearIntentCreate {
 }
 
 enum Status {
-  "Available",
-  "available",
+  Available,
+  available,
 }
 
 export interface NearIntent1CreateCrossChain {
