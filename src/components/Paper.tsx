@@ -17,9 +17,7 @@ const Paper = ({ children, title, description }: Props) => {
             </span>
           )}
         </div>
-        <div className="rounded-[1rem] p-5 shadow-paper bg-white dark:shadow-paper-dark dark:bg-black-800">
-          {children}
-        </div>
+        <div className="flex justify-center">{children}</div>
       </div>
     </div>
   )

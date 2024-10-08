@@ -3,7 +3,7 @@
 import type React from "react"
 import { type PropsWithChildren, useEffect } from "react"
 
-import { useGetTokensBalance } from "@src/hooks/useGetTokensBalance"
+// import { useGetTokensBalance } from "@src/hooks/useGetTokensBalance"
 import { useCombinedTokensListAdapter } from "@src/hooks/useTokensListAdapter"
 import { useTokensStore } from "@src/providers/TokensStoreProvider"
 
@@ -18,15 +18,16 @@ export function withTokensBalance<T extends React.ComponentType>(
     ...rest
   }) => {
     const { data: dataTokenList } = useCombinedTokensListAdapter()
-    const { data: dataTokensBalance } = useGetTokensBalance(dataTokenList)
+    // TODO: Getting balances has to be revised in new architecture
+    // const { data: dataTokensBalance } = useGetTokensBalance(dataTokenList)
     const { updateTokens } = useTokensStore((state) => state)
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
     useEffect(() => {
-      if (dataTokensBalance) {
-        updateTokens(dataTokensBalance)
+      if (dataTokenList) {
+        updateTokens(dataTokenList)
       }
-    }, [dataTokensBalance])
+    }, [dataTokenList])
 
     return (
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
