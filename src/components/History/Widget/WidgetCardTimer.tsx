@@ -1,7 +1,7 @@
-import React from "react"
+import clsx from "clsx"
 import dayjs from "dayjs"
 import duration from "dayjs/plugin/duration"
-import clsx from "clsx"
+import React from "react"
 
 import { useDaysTimer } from "@src/hooks/useTimer"
 dayjs.extend(duration)

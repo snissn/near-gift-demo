@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react"
 
-import { useQueryCollector } from "@src/hooks/useQuery"
-import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
-import { HistoryData } from "@src/stores/historyStore"
 import { NEAR_COLLECTOR_KEY } from "@src/constants/contracts"
 import { useHistoryLatest } from "@src/hooks/useHistoryLatest"
+import { useQueryCollector } from "@src/hooks/useQuery"
 import { adapterIntent0, adapterIntent1 } from "@src/libs/de-sdk/utils/adapters"
+import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
+import type { HistoryData } from "@src/stores/historyStore"
 
 export interface CollectorHook {
   getTransactions: () => Promise<HistoryData[]>
@@ -30,27 +30,13 @@ export const useHistoryCollector = (collectorHooks: CollectorHook[]) => {
       const getTransactionHistories = allTransactions.flat()
       const getHistoryFromLocal = localStorage.getItem(NEAR_COLLECTOR_KEY)
       let getHistoryFromStore: HistoryData[] = []
-      data.forEach((value) => getHistoryFromStore.push(value))
+
+      for (const value of data.values()) getHistoryFromStore.push(value)
 
       // Do merge as we suppose that this is initial fetch
       if (!getHistoryFromStore.length && getHistoryFromLocal) {
         const parsedData: { data: HistoryData[] } =
           JSON.parse(getHistoryFromLocal)
-
-        // TODO Could be removed in some period of time
-        // Due to resolve backward compatible issue, temporary we have to check outdated history key `clientId`
-        parsedData.data.forEach((el) => {
-          const _clientId = (el as unknown as { clientId: string })?.clientId
-          if (_clientId) {
-            return {
-              ...el,
-              intentId: _clientId,
-            }
-          }
-          return {
-            ...el,
-          }
-        })
 
         if (Array.isArray(parsedData.data)) {
           getHistoryFromStore = [
@@ -83,6 +69,7 @@ export const useHistoryCollector = (collectorHooks: CollectorHook[]) => {
     }
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     if (data.size) {
       runTransactionCollector()

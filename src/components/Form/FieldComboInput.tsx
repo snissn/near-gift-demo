@@ -1,18 +1,18 @@
-import React from "react"
-import {
-  Path,
-  FieldValues,
-  FieldErrors,
+import clsx from "clsx"
+import type React from "react"
+import type {
   FieldError,
+  FieldErrors,
+  FieldValues,
+  Path,
   UseFormRegister,
 } from "react-hook-form"
-import clsx from "clsx"
 
-import AssetsSelect from "@src/components/Network/SelectAssets"
-import { NetworkToken } from "@src/types/interfaces"
 import BlockMultiBalances, {
-  BlockMultiBalancesProps,
+  type BlockMultiBalancesProps,
 } from "@src/components/Block/BlockMultiBalances"
+import AssetsSelect from "@src/components/Network/SelectAssets"
+import type { NetworkToken } from "@src/types/interfaces"
 
 interface Props<T extends FieldValues> {
   fieldName: Path<T>
@@ -125,14 +125,14 @@ const FieldComboInput = <T extends FieldValues>({
           disabled && "text-black-200 pointer-events-none placeholder-black-200"
         )}
       />
-      {errors && errors[fieldName] ? (
+      {errors?.[fieldName] ? (
         <span className="absolute bottom-4 left-5 text-sm font-medium text-red-400">
           {(errors[fieldName] as FieldError).message}
         </span>
       ) : null}
       {price && price !== "0" && errors && !errors[fieldName] ? (
         <span className="absolute flex flex-nowrap items-center gap-2 bottom-4 left-5 text-sm font-medium text-secondary">
-          ~${parseFloat(price).toFixed(2)}
+          ~${Number.parseFloat(price).toFixed(2)}
           {label && label}
         </span>
       ) : null}

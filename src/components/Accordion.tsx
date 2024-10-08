@@ -1,5 +1,5 @@
-import React from "react"
 import Image from "next/image"
+import type React from "react"
 
 type Props = {
   leftHeaderElement?: React.ReactNode
@@ -8,7 +8,10 @@ type Props = {
 
 const Accordion = ({ leftHeaderElement, rightHeaderElement }: Props) => {
   return (
-    <button className="w-full flex justify-between items-center my-5 bg-gray-300 rounded-[10px] px-5 py-3">
+    <button
+      type={"button"}
+      className="w-full flex justify-between items-center my-5 bg-gray-300 rounded-[10px] px-5 py-3"
+    >
       <div className="flex justify-center items-center gap-2.5">
         {leftHeaderElement}
       </div>

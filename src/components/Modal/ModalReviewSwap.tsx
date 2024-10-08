@@ -1,31 +1,31 @@
 "use client"
 
 import { Blockquote, Text } from "@radix-ui/themes"
+import { formatUnits, parseUnits } from "ethers"
 import Image from "next/image"
 import React, { useEffect, useState } from "react"
-import { formatUnits, parseUnits } from "ethers"
 
-import ModalDialog from "@src/components/Modal/ModalDialog"
-import {
-  NetworkToken,
-  ContractIdEnum,
-  BlockchainEnum,
-} from "@src/types/interfaces"
-import { useModalStore } from "@src/providers/ModalStoreProvider"
+import { balanceToDecimal } from "@src/app/swap/SwapForm/service/balanceTo"
+import { getBalanceNearAllowedToSwap } from "@src/app/swap/SwapForm/service/getBalanceNearAllowedToSwap"
 import Button from "@src/components/Button/Button"
 import CardSwap from "@src/components/Card/CardSwap"
-import { ModalType } from "@src/stores/modalStore"
-import { useTimer } from "@src/hooks/useTimer"
-import { useTimeFormatMinutes } from "@src/hooks/useTimeFormat"
-import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
-import { smallBalanceToFormat } from "@src/utils/token"
-import { useCalculateTokenToUsd } from "@src/hooks/useCalculateTokenToUsd"
-import parseDefuseAsset from "@src/utils/parseDefuseAsset"
-import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import { getBalanceNearAllowedToSwap } from "@src/app/swap/SwapForm/service/getBalanceNearAllowedToSwap"
+import ModalDialog from "@src/components/Modal/ModalDialog"
 import { NEAR_TOKEN_META, W_NEAR_TOKEN_META } from "@src/constants/tokens"
-import { balanceToDecimal } from "@src/app/swap/SwapForm/service/balanceTo"
+import { useCalculateTokenToUsd } from "@src/hooks/useCalculateTokenToUsd"
+import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
+import { useTimeFormatMinutes } from "@src/hooks/useTimeFormat"
+import { useTimer } from "@src/hooks/useTimer"
+import { useModalStore } from "@src/providers/ModalStoreProvider"
+import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import { ModalType } from "@src/stores/modalStore"
+import {
+  BlockchainEnum,
+  ContractIdEnum,
+  type NetworkToken,
+} from "@src/types/interfaces"
 import { sendGaEvent } from "@src/utils/googleAnalytics"
+import parseDefuseAsset from "@src/utils/parseDefuseAsset"
+import { smallBalanceToFormat } from "@src/utils/token"
 
 export type ModalReviewSwapPayload = {
   tokenIn: string
@@ -92,7 +92,7 @@ const ModalReviewSwap = () => {
       const formattedOut = bestEstimate
         ? formatUnits(
             BigInt(bestEstimate.amount_out),
-            convertPayload.selectedTokenOut.decimals!
+            convertPayload.selectedTokenOut.decimals
           )
         : "0"
       setConvertPayload({ ...convertPayload, tokenOut: formattedOut })
@@ -106,6 +106,7 @@ const ModalReviewSwap = () => {
     }
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `calculateTokenToUsdTokenIn` and `calculateTokenToUsdTokenOut` are not stable references
   useEffect(() => {
     calculateTokenToUsdTokenIn(
       convertPayload.tokenIn,
@@ -147,6 +148,7 @@ const ModalReviewSwap = () => {
     setModalType(ModalType.MODAL_CONFIRM_SWAP, payload)
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     void handleCheckNativeBalance()
   }, [])
@@ -165,7 +167,7 @@ const ModalReviewSwap = () => {
               </Text>
             </div>
           </div>
-          <button className="shrink-0" onClick={onCloseModal}>
+          <button type={"button"} className="shrink-0" onClick={onCloseModal}>
             <Image
               src="/static/icons/close.svg"
               alt="Close Icon"

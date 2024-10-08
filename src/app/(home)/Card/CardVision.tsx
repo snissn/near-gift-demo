@@ -1,7 +1,7 @@
-import { ReactNode } from "react"
-import clsx from "clsx"
 import { Text } from "@radix-ui/themes"
+import clsx from "clsx"
 import Image from "next/image"
+import type { ReactNode } from "react"
 
 type Props = {
   title: string | ReactNode
@@ -46,7 +46,7 @@ const CardVision = ({
         )}
       </div>
       <div className="relative basis-4/12 grow h-[262px] md:h-auto lg:py-5 pointer-events-none">
-        <div className={clsx("w-full h-full bg-no-repeat", background)}></div>
+        <div className={clsx("w-full h-full bg-no-repeat", background)} />
         {cover && (
           <div className="absolute -top-2/4 left-[14px] translate-y-1/2 w-[calc(100%-28px)] h-[calc(100%-14px)] md:w-[calc(100%-128px)] md:h-full flex justify-center items-center">
             <Image

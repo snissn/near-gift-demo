@@ -1,18 +1,18 @@
 "use client"
 
-import { Button, Text } from "@radix-ui/themes"
 import { Cross1Icon } from "@radix-ui/react-icons"
+import { Button, Text } from "@radix-ui/themes"
 
+import WidgetCardLink from "@src/components/History/Widget/WidgetCardLink"
+import WidgetCardMask from "@src/components/History/Widget/WidgetCardMask"
 import AssetComboIcon from "@src/components/Network/AssetComboIcon"
+import { useActiveHover } from "@src/hooks/useActiveHover"
+import { HistoryStatus } from "@src/stores/historyStore"
 import {
   BlockchainEnum,
-  NetworkTokenWithSwapRoute,
+  type NetworkTokenWithSwapRoute,
 } from "@src/types/interfaces"
-import { HistoryStatus } from "@src/stores/historyStore"
 import { smallBalanceToFormat } from "@src/utils/token"
-import WidgetCardMask from "@src/components/History/Widget/WidgetCardMask"
-import WidgetCardLink from "@src/components/History/Widget/WidgetCardLink"
-import { useActiveHover } from "@src/hooks/useActiveHover"
 
 enum CardSwapStatusEnum {
   PENDING = "Pending",
@@ -67,25 +67,26 @@ const WidgetCardSwap = ({
   let explorerUrl = ""
   switch (selectedTokenOut?.chainName ?? "") {
     case BlockchainEnum.Near:
-      explorerUrl = NEAR_EXPLORER + "/txns/" + hash
+      explorerUrl = `${NEAR_EXPLORER}/txns/${hash}`
       break
     case BlockchainEnum.Eth:
       if (proof) {
-        explorerUrl = BASE_EXPLORER + "/tx/" + proof
+        explorerUrl = `${BASE_EXPLORER}/tx/${proof}`
         break
       }
-      explorerUrl = NEAR_EXPLORER + "/txns/" + hash
+      explorerUrl = `${NEAR_EXPLORER}/txns/${hash}`
       break
     case BlockchainEnum.Btc:
       if (proof) {
-        explorerUrl = BITCOIN_EXPLORER + "/tx/" + proof
+        explorerUrl = `${BITCOIN_EXPLORER}/tx/${proof}`
         break
       }
-      explorerUrl = NEAR_EXPLORER + "/txns/" + hash
+      explorerUrl = `${NEAR_EXPLORER}/txns/${hash}`
       break
   }
 
   return (
+    // biome-ignore lint/a11y/useKeyWithMouseEvents lint/a11y/useKeyWithClickEvents: <reason>
     <div
       onClick={() => window.open(explorerUrl)}
       onMouseOver={handleMouseOver}

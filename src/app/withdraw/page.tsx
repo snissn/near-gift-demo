@@ -1,14 +1,14 @@
 "use client"
 
-import { FieldValues, useForm } from "react-hook-form"
 import React from "react"
+import { type FieldValues, useForm } from "react-hook-form"
 
-import Paper from "@src/components/Paper"
+import Button from "@src/components/Button/Button"
 import Form from "@src/components/Form"
 import FieldComboInput from "@src/components/Form/FieldComboInput"
 import FieldTextInput from "@src/components/Form/FieldTextInput"
-import Button from "@src/components/Button/Button"
-import { NetworkToken } from "@src/types/interfaces"
+import Paper from "@src/components/Paper"
+import type { NetworkToken } from "@src/types/interfaces"
 
 type FormValues = {
   tokenIn: string
@@ -38,13 +38,13 @@ export default function Withdraw() {
           balance="515.22"
           selected={{ name: "AURORA" } as NetworkToken}
         />
-        <div className="h-[10px]"></div>
+        <div className="h-[10px]" />
         <FieldTextInput
           fieldName="walletTo"
           label="To"
           placeholder="Enter wallet address"
         />
-        <div className="h-[20px]"></div>
+        <div className="h-[20px]" />
         <Button type="submit" size="lg" fullWidth disabled>
           Coming soon
         </Button>

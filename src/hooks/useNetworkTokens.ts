@@ -1,5 +1,5 @@
 import { useTokensStore } from "@src/providers/TokensStoreProvider"
-import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
+import type { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 
 export const useNetworkTokens = () => {
   const { data: networkTokens } = useTokensStore((state) => state)
@@ -13,13 +13,13 @@ export const useNetworkTokens = () => {
       return result
     }
 
-    networkTokens.forEach((token) => {
-      tokenId.forEach((id) => {
+    for (const token of networkTokens.values()) {
+      for (const id of tokenId) {
         if (token.address?.toLowerCase() === id.toLowerCase()) {
           result.push(token)
         }
-      })
-    })
+      }
+    }
 
     return result
   }

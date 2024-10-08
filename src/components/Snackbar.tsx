@@ -1,12 +1,12 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
 import * as Toast from "@radix-ui/react-toast"
 import { Text } from "@radix-ui/themes"
 import Image from "next/image"
+import React, { useEffect, useState } from "react"
 
 import { useNotificationStore } from "@src/providers/NotificationProvider"
-import { Notification } from "@src/stores/notificationStore"
+import type { Notification } from "@src/stores/notificationStore"
 
 const Snackbar = () => {
   const { data, deleteNotification } = useNotificationStore((state) => state)
@@ -15,9 +15,9 @@ const Snackbar = () => {
   useEffect(() => {
     if (data.size) {
       const newOpenNotifications: Notification[] = []
-      data.forEach((value) => {
+      for (const value of data.values()) {
         newOpenNotifications.push(value)
-      })
+      }
       setOpenNotifications(newOpenNotifications)
     }
   }, [data])
@@ -58,7 +58,7 @@ const Snackbar = () => {
             asChild
             altText="Close notification"
           >
-            <button>
+            <button type={"button"}>
               <Image
                 src="/static/icons/close.svg"
                 width={12}

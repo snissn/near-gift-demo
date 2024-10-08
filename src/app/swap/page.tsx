@@ -1,7 +1,7 @@
 "use client"
 
-import React from "react"
 import { SwapWidget } from "@defuse-protocol/defuse-sdk"
+import React from "react"
 
 import Paper from "@src/components/Paper"
 import { LIST_TOKENS } from "@src/constants/tokens"

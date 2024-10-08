@@ -1,8 +1,8 @@
-import axios, { AxiosRequestConfig } from "axios"
+import axios, { type AxiosRequestConfig } from "axios"
 
 import { REGISTRAR_ID_REF_FINANCE } from "@src/libs/de-sdk/providers/refFinanceProvider"
 
-import {
+import type {
   DataEstimateRequest,
   SwapEstimateProviderResponse,
 } from "../types/interfaces"
@@ -22,7 +22,7 @@ const getExchangesList = () => {
   }
   const id = "coinbase"
   return axios
-    .get(`https://pro-api.coingecko.com/api/v3/exchanges/list`, config)
+    .get("https://pro-api.coingecko.com/api/v3/exchanges/list", config)
     .then((resp) => resp.data)
 }
 

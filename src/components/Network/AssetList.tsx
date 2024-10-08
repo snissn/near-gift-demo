@@ -1,15 +1,15 @@
-import React, { ReactNode } from "react"
 import { Text } from "@radix-ui/themes"
 import clsx from "clsx"
 import Image from "next/image"
+import React, { type ReactNode } from "react"
 
-import AssetComboIcon from "@src/components/Network/AssetComboIcon"
-import { NetworkToken } from "@src/types/interfaces"
-import { TokenListWithNotSelectableToken } from "@src/components/Modal/ModalSelectAssets"
 import {
-  balanceToDecimal,
   balanceToCurrency,
+  balanceToDecimal,
 } from "@src/app/swap/SwapForm/service/balanceTo"
+import type { TokenListWithNotSelectableToken } from "@src/components/Modal/ModalSelectAssets"
+import AssetComboIcon from "@src/components/Network/AssetComboIcon"
+import type { NetworkToken } from "@src/types/interfaces"
 
 type Props = {
   title?: string
@@ -82,12 +82,14 @@ const AssetList = ({
           i
         ) => (
           <button
+            // biome-ignore lint/suspicious/noArrayIndexKey: <reason>
             key={i}
+            type={"button"}
             className={clsx(
               "flex justify-between items-center gap-3 p-2.5 rounded-md hover:bg-gray-950 dark:hover:bg-black-950",
               isNotSelectable && "opacity-50 pointer-events-none"
             )}
-            onClick={() => handleSelectToken && handleSelectToken(assets[i])}
+            onClick={() => handleSelectToken?.(assets[i])}
           >
             <AssetComboIcon
               name={name as string}

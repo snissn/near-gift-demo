@@ -1,4 +1,4 @@
-import { Settings } from "@src/libs/de-sdk/types/interfaces"
+import type { Settings } from "@src/libs/de-sdk/types/interfaces"
 
 let settings: Settings = {
   providerIds: [],

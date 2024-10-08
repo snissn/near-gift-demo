@@ -1,7 +1,7 @@
 "use client"
-import Image from "next/image"
 import clsx from "clsx"
-import { ButtonHTMLAttributes } from "react"
+import Image from "next/image"
+import type { ButtonHTMLAttributes } from "react"
 
 type Props = {
   active?: boolean

@@ -1,24 +1,24 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
-import { EnterIcon, CopyIcon } from "@radix-ui/react-icons"
+import { CopyIcon, EnterIcon } from "@radix-ui/react-icons"
 import { Button, Separator, Text } from "@radix-ui/themes"
-import { CopyToClipboard } from "react-copy-to-clipboard"
 import clsx from "clsx"
+import React, { useEffect, useState } from "react"
+import { CopyToClipboard } from "react-copy-to-clipboard"
 
-import { useConnectWallet } from "@src/hooks/useConnectWallet"
-import { MapsEnum } from "@src/libs/de-sdk/utils/maps"
-import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import { getChainIconFromId } from "@src/hooks/useTokensListAdapter"
 import NetworkIcon from "@src/components/Network/NetworkIcon"
-import useShortAccountId from "@src/hooks/useShortAccountId"
-import { useModalStore } from "@src/providers/ModalStoreProvider"
-import { ModalType } from "@src/stores/modalStore"
 import {
   CONNECTOR_BTC_MAINNET,
   CONNECTOR_ETH_BASE,
 } from "@src/constants/contracts"
+import { useConnectWallet } from "@src/hooks/useConnectWallet"
+import useShortAccountId from "@src/hooks/useShortAccountId"
+import { getChainIconFromId } from "@src/hooks/useTokensListAdapter"
+import { MapsEnum } from "@src/libs/de-sdk/utils/maps"
+import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { useTokensStore } from "@src/providers/TokensStoreProvider"
+import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import { ModalType } from "@src/stores/modalStore"
 
 type WalletConnectionState = {
   chainIcon: string
@@ -55,7 +55,7 @@ const WalletConnectionsConnector = ({
   const { shortAccountId } = useShortAccountId(accountId ?? "")
   return (
     <div className="flex flex-col justify-between items-center gap-2.5">
-      {!index ? <Separator orientation="horizontal" size="4" /> : <div></div>}
+      {!index ? <Separator orientation="horizontal" size="4" /> : <div />}
       <div className="w-full flex justify-between items-center">
         <div className="flex justify-center items-center gap-4">
           <NetworkIcon
@@ -76,6 +76,7 @@ const WalletConnectionsConnector = ({
           <div className="flex justify-center items-center gap-2.5">
             <CopyToClipboard onCopy={onCopy} text={accountId ?? ""}>
               <button
+                type={"button"}
                 className={clsx(
                   "w-[32px] h-[32px] flex justify-center items-center rounded-full border border-gray-500 dark:border-white",
                   isCopied && "bg-primary border-0 text-white"
@@ -85,6 +86,7 @@ const WalletConnectionsConnector = ({
               </button>
             </CopyToClipboard>
             <button
+              type={"button"}
               onClick={onDisconnect}
               className="w-[32px] h-[32px] flex justify-center items-center rounded-full bg-white-200 dark:border dark:border-white"
             >

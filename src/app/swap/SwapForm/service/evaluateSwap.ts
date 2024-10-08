@@ -1,12 +1,12 @@
 import { formatUnits } from "ethers"
 
-import { swapEstimateRefFinanceProvider } from "@src/libs/de-sdk/providers/refFinanceProvider"
-import { NetworkToken } from "@src/types/interfaces"
 import { NEAR_TOKEN_META, W_NEAR_TOKEN_META } from "@src/constants/tokens"
+import { swapEstimateRefFinanceProvider } from "@src/libs/de-sdk/providers/refFinanceProvider"
+import type { NetworkToken } from "@src/types/interfaces"
 
 export enum EvaluateResultEnum {
-  BEST,
-  LOW,
+  BEST = 0,
+  LOW = 1,
 }
 
 const ESTIMATE_DIFFERENCE_PERCENTAGE = 2
@@ -22,14 +22,14 @@ const getSwapEstimateFromRefFinance = async (
 ): Promise<EvaluateResultEnum | null> => {
   try {
     const result = await swapEstimateRefFinanceProvider({
-      tokenIn: prepareRefAddressData(tokenIn.address!),
-      tokenOut: prepareRefAddressData(tokenOut.address!),
+      tokenIn: prepareRefAddressData(tokenIn.address),
+      tokenOut: prepareRefAddressData(tokenOut.address),
       amountIn,
     })
 
     if (result === "0") return null
     const refFinancePrice = +result
-    const bestOutN = +formatUnits(BigInt(bestOut), tokenOut.decimals!)
+    const bestOutN = +formatUnits(BigInt(bestOut), tokenOut.decimals)
     if (bestOutN > refFinancePrice) {
       return EvaluateResultEnum.BEST
     }

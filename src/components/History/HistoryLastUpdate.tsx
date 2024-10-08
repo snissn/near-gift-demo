@@ -1,10 +1,10 @@
+import { Spinner } from "@radix-ui/themes"
 import clsx from "clsx"
 import { useEffect, useState } from "react"
-import { Spinner } from "@radix-ui/themes"
 
-import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import WidgetCard from "@src/components/History/Widget/WidgetCard"
-import { HistoryData } from "@src/stores/historyStore"
+import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
+import type { HistoryData } from "@src/stores/historyStore"
 
 const SCHEDULER_30_SEC = 30000
 
@@ -44,8 +44,9 @@ const HistoryLastUpdate = () => {
     return () => {
       togglePreview(undefined)
     }
-  }, [active])
+  }, [active, togglePreview])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `handleFindHistory` is not a stable reference
   useEffect(() => {
     if (activePreview && data.size) {
       handleFindHistory(activePreview)

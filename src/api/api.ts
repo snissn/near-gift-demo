@@ -20,6 +20,7 @@ export const useInterceptors = () => {
     requestPayload: string,
     notificationType: NotificationType
   ) => {
+    // biome-ignore lint/suspicious/noImplicitAnyLet: <reason>
     let payload
     try {
       payload = JSON.parse(requestPayload)
@@ -73,13 +74,13 @@ export const useInterceptors = () => {
   XMLHttpRequest.prototype.open = function (
     method: string,
     url: string | URL,
-    async: boolean = true,
+    async = true,
     username?: string | null,
     password?: string | null
   ) {
     this._method = method
     this._url = url.toString()
-    open.call(this, method, url, async, username, password)
+    open.call(this, method, url, Boolean(async), username, password)
   }
 
   XMLHttpRequest.prototype.send = function (body) {

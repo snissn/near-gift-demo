@@ -1,19 +1,20 @@
 "use client"
 
-import React, { PropsWithChildren } from "react"
 import { usePathname } from "next/navigation"
+import type React from "react"
+import type { PropsWithChildren } from "react"
 
+import { useInterceptors } from "@src/api/api"
+import History from "@src/components/History"
+import HistoryLastUpdate from "@src/components/History/HistoryLastUpdate"
+import Footer from "@src/components/Layout/Footer"
+import Header from "@src/components/Layout/Header"
+import NavbarMobile from "@src/components/NavbarMobile"
+import PageBackground from "@src/components/PageBackground"
+import Snackbar from "@src/components/Snackbar"
+import { LINKS_HEADER } from "@src/constants/routes"
 import { withHistory } from "@src/hocs/withHistory"
 import { withTokensBalance } from "@src/hocs/withTokensBalance"
-import Header from "@src/components/Layout/Header"
-import Footer from "@src/components/Layout/Footer"
-import PageBackground from "@src/components/PageBackground"
-import NavbarMobile from "@src/components/NavbarMobile"
-import History from "@src/components/History"
-import { LINKS_HEADER } from "@src/constants/routes"
-import HistoryLastUpdate from "@src/components/History/HistoryLastUpdate"
-import Snackbar from "@src/components/Snackbar"
-import { useInterceptors } from "@src/api/api"
 
 const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   useInterceptors()

@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
 import dayjs from "dayjs"
+import { useEffect, useRef, useState } from "react"
 
 export const useTimer = (
   initialTime: number,
@@ -20,12 +20,13 @@ export const useTimer = (
     setIsRunning(true)
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     if (!isRunning) return
 
     if (timeLeft <= 0) {
       setIsRunning(false)
-      callbackRef.current && callbackRef.current().then(resetTimer)
+      callbackRef.current?.().then(resetTimer)
       return
     }
 
@@ -49,6 +50,7 @@ export const useDaysTimer = (timestamp: number): string => {
 
   const [secondsLeft, setSecondsLeft] = useState(calculateTimeLeft)
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     if (secondsLeft <= 0) return
 

@@ -2,18 +2,19 @@
 
 import { Text } from "@radix-ui/themes"
 
-import AssetComboIcon from "@src/components/Network/AssetComboIcon"
-import { NearTX, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
-import { smallBalanceToFormat } from "@src/utils/token"
 import WidgetCardLink from "@src/components/History/Widget/WidgetCardLink"
-import { TransactionMethod } from "@src/types/solver0"
+import AssetComboIcon from "@src/components/Network/AssetComboIcon"
 import { useActiveHover } from "@src/hooks/useActiveHover"
+import type { NearTX, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
+import { TransactionMethod } from "@src/types/solver0"
+import { smallBalanceToFormat } from "@src/utils/token"
 
 enum CardFailedStatusEnum {
   SWAP = "Swap",
 }
 
 enum CardFailedActionEnum {
+  // biome-ignore lint/style/useLiteralEnumMembers: <reason>
   FT_TRANSFER_CALL = TransactionMethod.FT_TRANSFER_CALL,
 }
 
@@ -52,9 +53,10 @@ const WidgetCardFailed = ({
   }
 
   return (
+    // biome-ignore lint/a11y/useKeyWithMouseEvents lint/a11y/useKeyWithClickEvents: <reason>
     <div
       onClick={() => {
-        window.open(NEAR_EXPLORER + "/txns/" + hash)
+        window.open(`${NEAR_EXPLORER}/txns/${hash}`)
       }}
       onMouseOver={handleMouseOver}
       onMouseLeave={handleMouseLeave}

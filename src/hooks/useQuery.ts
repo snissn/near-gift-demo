@@ -1,19 +1,24 @@
 "use client"
 
-import { useCallback } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { useCallback } from "react"
 
-import { CollectorHook } from "@src/hooks/useHistoryCollector"
-import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import {
   getNearBlockById,
   getNearTransactionDetails,
 } from "@src/api/transaction"
-import { HistoryData } from "@src/stores/historyStore"
-import { NearBlock, NearTX, NetworkToken, Result } from "@src/types/interfaces"
+import type { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
 import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
-import { ModalConfirmSwapPayload } from "@src/components/Modal/ModalConfirmSwap"
+import type { CollectorHook } from "@src/hooks/useHistoryCollector"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
+import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import type { HistoryData } from "@src/stores/historyStore"
+import type {
+  NearBlock,
+  NearTX,
+  NetworkToken,
+  Result,
+} from "@src/types/interfaces"
 
 interface HistoryFromLocal {
   tokenIn?: string
@@ -57,8 +62,8 @@ export const useQueryCollector = (): CollectorHook => {
 
   const cleanupQuery = (keys: string[]) => {
     const params = new URLSearchParams(searchParams.toString())
-    keys.forEach((key) => params.delete(key))
-    router.replace(pathname + "?" + params)
+    for (const key of keys) params.delete(key)
+    router.replace(`${pathname}?${params}`)
   }
 
   const handleCleanupQuery = () => {
@@ -86,6 +91,7 @@ export const useQueryCollector = (): CollectorHook => {
     }
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   const getTransactions = useCallback(async (): Promise<HistoryData[]> => {
     try {
       const intentId = searchParams.get(UseQueryCollectorKeys.INTENT_ID)
@@ -143,7 +149,8 @@ export const useQueryCollector = (): CollectorHook => {
         const result: HistoryData[] = []
         txDatas.forEach((txData, i) => {
           if (i === txDatas.length - 1) {
-            togglePreview(txData!.hash)
+            assert(txData, "txData is not defined")
+            togglePreview(txData.hash)
           }
           if (txData) {
             result.push({
@@ -172,5 +179,11 @@ export const useQueryCollector = (): CollectorHook => {
 
   return {
     getTransactions,
+  }
+}
+
+function assert(condition: unknown, msg: string): asserts condition {
+  if (!condition) {
+    throw new Error(msg)
   }
 }

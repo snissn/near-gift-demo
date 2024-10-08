@@ -1,4 +1,4 @@
-import { ethers, Contract } from "ethers"
+import { Contract, ethers } from "ethers"
 
 import { Erc20Abi } from "@src/abis/erc20"
 

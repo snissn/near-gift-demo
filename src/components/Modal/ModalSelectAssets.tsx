@@ -1,20 +1,23 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
 import { Text } from "@radix-ui/themes"
+import { useCallback, useEffect, useState } from "react"
 
-import ModalDialog from "@src/components/Modal/ModalDialog"
-import SearchBar from "@src/components/SearchBar"
-import AssetList from "@src/components/Network/AssetList"
-import { NetworkToken, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
-import { useModalStore } from "@src/providers/ModalStoreProvider"
-import { ModalType } from "@src/stores/modalStore"
-import { useTokensStore } from "@src/providers/TokensStoreProvider"
-import { sortByTopBalances, tieNativeToWrapToken } from "@src/utils/tokenList"
 import { useDiscoverDefuseAssets } from "@src/api/hooks/token/useDiscoverDefuseAssets"
+import ModalDialog from "@src/components/Modal/ModalDialog"
+import AssetList from "@src/components/Network/AssetList"
+import SearchBar from "@src/components/SearchBar"
+import { useModalStore } from "@src/providers/ModalStoreProvider"
+import { useTokensStore } from "@src/providers/TokensStoreProvider"
+import type { ModalType } from "@src/stores/modalStore"
+import type {
+  NetworkToken,
+  NetworkTokenWithSwapRoute,
+} from "@src/types/interfaces"
 import { debouncePromise } from "@src/utils/debouncePromise"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 import { tokenMetaAdapter } from "@src/utils/token"
+import { sortByTopBalances, tieNativeToWrapToken } from "@src/utils/tokenList"
 
 export type ModalSelectAssetsPayload = {
   modalType?: ModalType.MODAL_SELECT_ASSETS
@@ -50,7 +53,7 @@ const ModalSelectAssets = () => {
 
   const filterPattern = (asset: NetworkToken) =>
     parseDefuseAsset(asset.defuse_asset_id)
-      ?.contractId!.toLocaleUpperCase()
+      ?.contractId.toLocaleUpperCase()
       .includes(searchValue.toLocaleUpperCase())
 
   const handleSelectToken = (token: NetworkToken) => {
@@ -69,6 +72,7 @@ const ModalSelectAssets = () => {
     []
   )
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     const discoverAssetList = dataDiscover?.result?.tokens
     if (discoverAssetList?.length) {
@@ -86,11 +90,13 @@ const ModalSelectAssets = () => {
     }
   }, [dataDiscover])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     if (!searchValue) return
     void debouncedGetDiscoverDefuseAssets(searchValue)
   }, [searchValue])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     if (!data.size && !isLoading) {
       return
@@ -102,7 +108,7 @@ const ModalSelectAssets = () => {
 
     const getAssetList: TokenListWithNotSelectableToken[] = []
     const getAssetListWithBalances: TokenListWithNotSelectableToken[] = []
-    data.forEach((value) => {
+    for (const value of data.values()) {
       // Filtration by routes should happen only at "tokenIn" and for including in search it is enough to have only one route available.
       // We do not filter "tokenOut" allow solver router to find a proposition to swap
       if (fieldName === "tokenIn" && !value?.routes?.length) {
@@ -124,7 +130,7 @@ const ModalSelectAssets = () => {
         })
       }
       getAssetList.push({ ...value, isNotSelectable })
-    })
+    }
     setAssetList(tieNativeToWrapToken(getAssetList).sort(sortByTopBalances))
     setAssetListWithBalances(
       tieNativeToWrapToken(getAssetListWithBalances).sort(sortByTopBalances)
@@ -169,6 +175,7 @@ const ModalSelectAssets = () => {
           {searchValue && (
             <div className="flex justify-center items-center">
               <button
+                type={"button"}
                 onClick={handleSearchClear}
                 className="mb-2.5 px-3 py-1.5 bg-red-100 rounded-full"
               >

@@ -1,5 +1,5 @@
-import { PropsWithChildren } from "react"
 import clsx from "clsx"
+import type { PropsWithChildren } from "react"
 
 interface Props extends PropsWithChildren {
   title: string

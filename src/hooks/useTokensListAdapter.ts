@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 
-import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
-import { SupportedTokens } from "@src/types/solver0"
 import { getSupportTokenListSolver0 } from "@src/api/intent"
+import type { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
+import type { SupportedTokens } from "@src/types/solver0"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 
 export interface SolverHook {
@@ -72,6 +72,7 @@ export const useTokensListAdapter = (solversHook: SolverHook[]) => {
     }
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     getTokensList()
   }, [])

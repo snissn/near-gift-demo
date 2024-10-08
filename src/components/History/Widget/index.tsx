@@ -2,12 +2,12 @@
 
 import React from "react"
 
-import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
+import WidgetCardTransaction from "@src/components/History/Widget/WidgetCardTransaction"
 import WidgetEmpty from "@src/components/History/Widget/WidgetEmpty"
 import WidgetTransactionsList from "@src/components/History/Widget/WidgetTransactionsList"
-import WidgetCardTransaction from "@src/components/History/Widget/WidgetCardTransaction"
-import { HistoryData } from "@src/stores/historyStore"
+import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import type { HistoryData } from "@src/stores/historyStore"
 
 const Widget = () => {
   const { accountId } = useWalletSelector()
@@ -18,14 +18,14 @@ const Widget = () => {
 
   const getHistoryFromStore: HistoryData[] = []
   if (data.size) {
-    data.forEach((setOfData) => {
+    for (const setOfData of data.values()) {
       if (
         typeof setOfData === "object" &&
         !setOfData?.isClosed &&
         accountId === setOfData.details?.transaction?.signer_id
       )
         getHistoryFromStore.push(setOfData)
-    })
+    }
   }
 
   return (

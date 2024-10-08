@@ -1,5 +1,5 @@
-import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 import { BlockchainEnum } from "@src/types/interfaces"
+import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 
 export function isForeignNetworkToken(defuseAssetId: string): boolean {
   const keys = defuseAssetId.split(":")

@@ -1,6 +1,6 @@
-import Image from "next/image"
-import { MouseEvent, PropsWithChildren } from "react"
 import clsx from "clsx"
+import Image from "next/image"
+import type { MouseEvent, PropsWithChildren } from "react"
 
 interface Props extends PropsWithChildren {
   onClick?: (e: MouseEvent<HTMLButtonElement>) => void
@@ -20,6 +20,7 @@ const ButtonIcon = ({
 }: Props) => {
   return (
     <button
+      type={"button"}
       className={clsx(
         "flex justify-center items-center w-[40px] h-[40px] rounded-md overflow-hidden bg-white dark:bg-black",
         className && className

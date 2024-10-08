@@ -1,7 +1,7 @@
 "use client"
 
-import { ComponentType } from "react"
 import clsx from "clsx"
+import type { ComponentType } from "react"
 
 type Props<T> = {
   Component: ComponentType<T>
@@ -18,6 +18,7 @@ const WidgetDataList = <T,>({ data, className, Component }: Props<T>) => {
       )}
     >
       {data.map((props, index) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: <reason>
         <Component {...props} key={index} />
       ))}
     </div>

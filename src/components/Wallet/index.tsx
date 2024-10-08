@@ -1,18 +1,18 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import { CountdownTimerIcon } from "@radix-ui/react-icons"
 import { Button, Popover, Spinner, Switch, Text } from "@radix-ui/themes"
 import clsx from "clsx"
-import { CountdownTimerIcon } from "@radix-ui/react-icons"
+import React, { useState, useEffect } from "react"
 
-import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import type { Account } from "@src/types/interfaces"
+import WalletConnections from "@src/components/Wallet/WalletConnections"
+import WalletTabs from "@src/components/Wallet/WalletTabs"
+import { useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useGetAccount } from "@src/hooks/useGetAccount"
 import useShortAccountId from "@src/hooks/useShortAccountId"
-import WalletTabs from "@src/components/Wallet/WalletTabs"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
-import { useConnectWallet } from "@src/hooks/useConnectWallet"
-import WalletConnections from "@src/components/Wallet/WalletConnections"
+import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import type { Account } from "@src/types/interfaces"
 
 const TURN_OFF_APPS = process?.env?.turnOffApps === "true" ?? true
 
@@ -45,6 +45,7 @@ const ConnectWallet = () => {
       <Spinner loading={isLoading} />
     ) : (
       <button
+        type={"button"}
         onClick={handleSignIn}
         className={clsx(
           "rounded-full text-white px-4 py-2.5 text-sm",
@@ -64,6 +65,7 @@ const ConnectWallet = () => {
       <Popover.Root>
         <Popover.Trigger>
           <button
+            type={"button"}
             className="rounded-full bg-gray-200 text-black-400 text-sm px-3 py-1.5 dark:bg-gray-1000 dark:text-gray-100"
             disabled={TURN_OFF_APPS}
           >

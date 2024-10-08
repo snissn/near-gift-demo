@@ -1,10 +1,10 @@
 import { Text } from "@radix-ui/themes"
-import Link from "next/link"
-import Image from "next/image"
-import React from "react"
 import clsx from "clsx"
+import Image from "next/image"
+import Link from "next/link"
+import React from "react"
 
-import { JobsDetails } from "@src/types/interfaces"
+import type { JobsDetails } from "@src/types/interfaces"
 
 const CardJob = ({ team, position, link, applicationLink }: JobsDetails) => {
   const animationStyle =

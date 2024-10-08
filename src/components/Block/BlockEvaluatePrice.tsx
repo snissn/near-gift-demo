@@ -1,12 +1,12 @@
 "use client"
 
-import React from "react"
 import { InfoCircledIcon } from "@radix-ui/react-icons"
 import { Tooltip } from "@radix-ui/themes"
 import clsx from "clsx"
+import React from "react"
 
-import { SwapEstimateProviderResponse } from "@src/libs/de-sdk/types/interfaces"
-import { NetworkToken } from "@src/types/interfaces"
+import type { SwapEstimateProviderResponse } from "@src/libs/de-sdk/types/interfaces"
+import type { NetworkToken } from "@src/types/interfaces"
 import { tokenBalanceToFormatUnits } from "@src/utils/token"
 
 import { EvaluateResultEnum } from "../../app/swap/SwapForm/service/evaluateSwap"
@@ -45,7 +45,7 @@ const BlockEvaluatePrice = ({
                           Rate{" "}
                           {tokenBalanceToFormatUnits({
                             balance: result.amount_out,
-                            decimals: tokenOut.decimals!,
+                            decimals: tokenOut.decimals,
                           })}{" "}
                           from {result.solver_id}
                         </span>
