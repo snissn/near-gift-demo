@@ -1,6 +1,10 @@
 import { withSentryConfig } from "@sentry/nextjs"
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  eslint: {
+    // We check the code quality in the CI pipeline
+    ignoreDuringBuilds: true,
+  },
   webpack: (config) => {
     config.resolve = {
       ...config.resolve,
