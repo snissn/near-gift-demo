@@ -232,7 +232,7 @@ const ModalConfirmSwap = () => {
       return
     }
 
-    const newIntentId = generateIntentID()
+    const newIntentId = await generateIntentID()
 
     if (
       handleBatchCreateSwapQuery({
