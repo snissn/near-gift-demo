@@ -238,10 +238,10 @@
   resolved "https://registry.yarnpkg.com/@biomejs/cli-win32-x64/-/cli-win32-x64-1.9.3.tgz#1cbc269dcd5f29b034cb7f5982353c1cc3629318"
   integrity sha512-cQMy2zanBkVLpmmxXdK6YePzmZx0s5Z7KEnwmrW54rcXK3myCNbQa09SwGZ8i/8sLw0H9F3X7K4rxVNGU8/D4Q==
 
-"@defuse-protocol/defuse-sdk@^1.1.3":
-  version "1.1.3"
-  resolved "https://npm.pkg.github.com/download/@defuse-protocol/defuse-sdk/1.1.3/0e51c9f63c316baac35ee1ab0c0786cc0e9936b0#0e51c9f63c316baac35ee1ab0c0786cc0e9936b0"
-  integrity sha512-+CalCIZ8Mh9woAdxUbNrNUSXhNHheezhSzeX/u9Yd+BR8c4CR5r8USr317b3mlcH8PEw5rJp9cJZZogARe5boA==
+"@defuse-protocol/defuse-sdk@^1.1.6":
+  version "1.1.6"
+  resolved "https://npm.pkg.github.com/download/@defuse-protocol/defuse-sdk/1.1.6/c510b17ba0e54c3ef8d62aaf0afc9cba4b138f06#c510b17ba0e54c3ef8d62aaf0afc9cba4b138f06"
+  integrity sha512-35ppOEtG217vfTLOJU86w+4Tryq0NIsItaMGMxCAqu+t2kdtAgan54hL9I4zlH80w0KBFD3j+i+MPu/8qeZeEQ==
   dependencies:
     "@defuse-protocol/swap-facade" "^1.0.0"
     "@near-eth/client" "^1.12.0"
