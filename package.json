@@ -11,7 +11,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@defuse-protocol/defuse-sdk": "^1.1.6",
+    "@defuse-protocol/defuse-sdk": "^1.2.0",
     "@near-eth/aurora-erc20": "^2.8.0",
     "@near-eth/aurora-ether": "^3.0.0",
     "@near-eth/aurora-nep141": "^1.5.3",
@@ -50,6 +50,7 @@
     "@sentry/nextjs": "^8",
     "@tanstack/react-query": "^5.44.0",
     "@tanstack/react-query-devtools": "^5.44.0",
+    "@xstate/react": "^4.1.3",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "axios": "^1.7.2",
