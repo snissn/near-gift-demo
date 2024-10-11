@@ -238,10 +238,10 @@
   resolved "https://registry.yarnpkg.com/@biomejs/cli-win32-x64/-/cli-win32-x64-1.9.3.tgz#1cbc269dcd5f29b034cb7f5982353c1cc3629318"
   integrity sha512-cQMy2zanBkVLpmmxXdK6YePzmZx0s5Z7KEnwmrW54rcXK3myCNbQa09SwGZ8i/8sLw0H9F3X7K4rxVNGU8/D4Q==
 
-"@defuse-protocol/defuse-sdk@^1.2.0":
-  version "1.2.0"
-  resolved "https://npm.pkg.github.com/download/@defuse-protocol/defuse-sdk/1.2.0/449112cab62621b6d280e357cea3e44cd4e58967#449112cab62621b6d280e357cea3e44cd4e58967"
-  integrity sha512-Jn9skvkzpVMxpbLdKKhH/3H30OkIxsJSbmkIzMX7n8ntC558LkzBtGfdiTjiVMpQw/lT+q5PUZIVo18TLCx/ag==
+"@defuse-protocol/defuse-sdk@^1.4.0":
+  version "1.4.0"
+  resolved "https://npm.pkg.github.com/download/@defuse-protocol/defuse-sdk/1.4.0/3726d421bc917c2ca5ea5346ba958049573f1fb6#3726d421bc917c2ca5ea5346ba958049573f1fb6"
+  integrity sha512-IcOkTrZYYCxjhK5TKUljOFjL3ajV1EjMAGty/QjfCaTlPIw8RtCMnJf+vUHStNBnToMNdkZvnkXUhaQZkW2XmA==
   dependencies:
     "@defuse-protocol/swap-facade" "^1.0.3"
     "@radix-ui/react-checkbox" "^1.1.1"
