@@ -1,13 +1,17 @@
 "use client"
 
 import { SwapWidget } from "@defuse-protocol/defuse-sdk"
+import { formatUnits } from "viem"
 
 import Paper from "@src/components/Paper"
 import { LIST_TOKENS } from "@src/constants/tokens"
 import { useNearWalletActions } from "@src/hooks/useNearWalletActions"
+import { useNotificationStore } from "@src/providers/NotificationProvider"
+import { NotificationType } from "@src/stores/notificationStore"
 
 export default function Swap() {
   const { signMessage } = useNearWalletActions()
+  const setNotification = useNotificationStore((state) => state.setNotification)
 
   return (
     <Paper
@@ -27,6 +31,13 @@ export default function Swap() {
           }
 
           return { type: "NEP141", signatureData: sig }
+        }}
+        onSuccessSwap={({ amountOut, tokenOut }) => {
+          setNotification({
+            id: crypto.randomUUID(),
+            message: `Transaction complete! You received ${formatUnits(amountOut, tokenOut.decimals)} ${tokenOut.symbol}`,
+            type: NotificationType.SUCCESS,
+          })
         }}
       />
     </Paper>
