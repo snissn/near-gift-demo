@@ -238,10 +238,10 @@
   resolved "https://registry.yarnpkg.com/@biomejs/cli-win32-x64/-/cli-win32-x64-1.9.3.tgz#1cbc269dcd5f29b034cb7f5982353c1cc3629318"
   integrity sha512-cQMy2zanBkVLpmmxXdK6YePzmZx0s5Z7KEnwmrW54rcXK3myCNbQa09SwGZ8i/8sLw0H9F3X7K4rxVNGU8/D4Q==
 
-"@defuse-protocol/defuse-sdk@^1.5.0":
-  version "1.5.0"
-  resolved "https://npm.pkg.github.com/download/@defuse-protocol/defuse-sdk/1.5.0/3ba5feacdc178053fbb48ebf6d7b4aeee911f01c#3ba5feacdc178053fbb48ebf6d7b4aeee911f01c"
-  integrity sha512-9tmW5g1nWiqZWXSpuwpSA78EZc4smcKsTVFpnirIJ569v1mP7fE0XrwB2+q2LgwqnSG5AYzdhYGPZqmq62LoRQ==
+"@defuse-protocol/defuse-sdk@^1.9.0":
+  version "1.9.0"
+  resolved "https://npm.pkg.github.com/download/@defuse-protocol/defuse-sdk/1.9.0/30ba795e90734d43d1033d6826fefb5ae78422b3#30ba795e90734d43d1033d6826fefb5ae78422b3"
+  integrity sha512-Vu6/eQU6/t8gmIY/DDvq6VTVPzg0O7foHkWreVKWgVpH1hyk/cy+DyCIDYQSDV1Q71aRDUxkpPd9UMzhaV9lKg==
   dependencies:
     "@defuse-protocol/swap-facade" "^1.0.3"
     "@radix-ui/react-checkbox" "^1.1.1"
@@ -256,6 +256,7 @@
     axios "^1.7.7"
     clsx "^2.1.1"
     ethers "^6.13.2"
+    qrcode.react "^4.0.1"
     react "^18.3.1"
     react-dom "^18.3.1"
     react-hook-form "^7.52.1"
@@ -10217,6 +10218,11 @@ punycode@^2.1.0, punycode@^2.1.1:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.3.1.tgz#027422e2faec0b25e1549c3e1bd8309b9133b6e5"
   integrity sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==
 
+qrcode.react@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/qrcode.react/-/qrcode.react-4.0.1.tgz#1caf1d3f45bf1b6d9cf800cb0f0d671f6a89e68f"
+  integrity sha512-Lpj0tPBn561WiQ3QQWXbkx8xTtB8BZkJeMZWLJIL8iaPBCoWzW1IpCeU3gY5MDqsb0+efCvEGkl9O0naP64crA==
+
 qrcode@1.5.3:
   version "1.5.3"
   resolved "https://registry.yarnpkg.com/qrcode/-/qrcode-1.5.3.tgz#03afa80912c0dccf12bc93f615a535aad1066170"
@@ -11847,9 +11853,9 @@ verror@1.10.0:
     extsprintf "^1.2.0"
 
 viem@^2.18.1:
-  version "2.21.19"
-  resolved "https://registry.yarnpkg.com/viem/-/viem-2.21.19.tgz#5e1a7efc45903d83306416ffa2e3a11ed23cd924"
-  integrity sha512-FdlkN+UI1IU5sYOmzvygkxsUNjDRD5YHht3gZFu2X9xFv6Z3h9pXq9ycrYQ3F17lNfb41O2Ot4/aqbUkwOv9dA==
+  version "2.21.28"
+  resolved "https://registry.yarnpkg.com/viem/-/viem-2.21.28.tgz#5823305008ca5c4feb40b6014261fac141c256e2"
+  integrity sha512-CbS2Ldq+SdZYYSG+P4oNLi1s6xq7JnZoJsIkMhFcZUMRz3w2J1OvC1izUp6E1/Zp/XXo3wt6g/Ae+f3SGzup2A==
   dependencies:
     "@adraffy/ens-normalize" "1.11.0"
     "@noble/curves" "1.6.0"
@@ -12433,6 +12439,6 @@ zustand@^4.5.2:
     use-sync-external-store "1.2.2"
 
 zustand@^5.0.0-rc.2:
-  version "5.0.0-rc.2"
-  resolved "https://registry.yarnpkg.com/zustand/-/zustand-5.0.0-rc.2.tgz#d28d95ffb6f0b20cadbaea39210f18446a5bf989"
-  integrity sha512-o2Nwuvnk8vQBX7CcHL8WfFkZNJdxB/VKeWw0tNglw8p4cypsZ3tRT7rTRTDNeUPFS0qaMBRSKe+fVwL5xpcE3A==
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/zustand/-/zustand-5.0.0.tgz#71f8aaecf185592a3ba2743d7516607361899da9"
+  integrity sha512-LE+VcmbartOPM+auOjCCLQOsQ05zUTp8RkgwRzefUk+2jISdMMFnxvyTjA4YNWr5ZGXYbVsEMZosttuxUBkojQ==
