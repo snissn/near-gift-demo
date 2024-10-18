@@ -2,7 +2,10 @@
 
 import type { WalletSelector } from "@near-wallet-selector/core"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import { deserializeSignMessageParams } from "@src/utils/myNearWalletAdapter"
+import {
+  deserializeSignAndSendTransactionsParams,
+  deserializeSignMessageParams,
+} from "@src/utils/myNearWalletAdapter"
 import { useEffect } from "react"
 
 export default function MyNearWalletGateway() {
@@ -17,6 +20,16 @@ export default function MyNearWalletGateway() {
       return
     }
 
+    if (url.searchParams.get("errorCode")) {
+      relayResultToOpenerError(url)
+      return
+    }
+
+    if (url.searchParams.get("transactionHashes")) {
+      relayResultToOpenerTransactionHashes(url)
+      return
+    }
+
     switch (url.searchParams.get("action")) {
       case "signMessage":
         void signMessage(url, selector).catch(console.error)
@@ -24,6 +37,9 @@ export default function MyNearWalletGateway() {
       case "sendTransaction":
         // todo: implement transaction sending
         throw new Error("not implemented")
+      case "signAndSendTransactions":
+        void signAndSendTransactions(url, selector).catch(console.error)
+        break
       default:
         console.warn("Unknown action", {
           action: url.searchParams.get("action"),
@@ -45,6 +61,47 @@ function relayResultToOpener(url: URL) {
     )
     window.close()
   }
+}
+
+function relayResultToOpenerError(url: URL) {
+  if (window.opener) {
+    window.opener.postMessage(
+      {
+        errorCode: url.searchParams.get("errorCode"),
+        errorMessage: url.searchParams.get("errorMessage"),
+      },
+      window.location.origin
+    )
+    window.close()
+  }
+}
+
+function relayResultToOpenerTransactionHashes(url: URL) {
+  if (window.opener) {
+    window.opener.postMessage(
+      {
+        transactionHashes: url.searchParams.get("transactionHashes"),
+      },
+      window.location.origin
+    )
+    window.close()
+  }
+}
+
+async function signAndSendTransactions(
+  url: URL,
+  walletSelector: WalletSelector
+) {
+  const paramsComponent = url.searchParams.get("params")
+  if (paramsComponent == null) {
+    throw new Error("Missing params")
+  }
+  const params = deserializeSignAndSendTransactionsParams(
+    decodeURIComponent(paramsComponent)
+  )
+
+  const wallet = await walletSelector.wallet()
+  await wallet.signAndSendTransactions(params)
 }
 
 async function signMessage(url: URL, walletSelector: WalletSelector) {

@@ -1,6 +1,12 @@
-import type { SignMessageMethod } from "@near-wallet-selector/core/src/lib/wallet/wallet.types"
+import type {
+  BrowserWalletBehaviour,
+  SignMessageMethod,
+} from "@near-wallet-selector/core/src/lib/wallet/wallet.types"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import { signMessageInNewWindow } from "@src/utils/myNearWalletAdapter"
+import {
+  signAndSendTransactionsInNewWindow,
+  signMessageInNewWindow,
+} from "@src/utils/myNearWalletAdapter"
 
 export function useNearWalletActions() {
   const { selector } = useWalletSelector()
@@ -19,5 +25,22 @@ export function useNearWalletActions() {
 
       return wallet.signMessage(params)
     }) satisfies SignMessageMethod["signMessage"],
+
+    signAndSendTransactions: (async (params) => {
+      try {
+        const wallet = await selector.wallet()
+        // MyNearWallet uses redirect-based signing
+        if (wallet.id === "my-near-wallet") {
+          return await signAndSendTransactionsInNewWindow({
+            params,
+            signal: new AbortController().signal,
+          })
+        }
+        return await wallet.signAndSendTransactions(params)
+      } catch (error) {
+        console.error(error)
+      }
+      // @ts-expect-error TODO: fix this
+    }) satisfies BrowserWalletBehaviour["signAndSendTransactions"],
   }
 }

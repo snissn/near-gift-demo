@@ -1,8 +1,16 @@
+import type { WalletSelector } from "@near-wallet-selector/core"
 import type {
   SignMessageParams,
   SignedMessage,
 } from "@near-wallet-selector/core/src/lib/wallet/wallet.types"
 import { z } from "zod"
+
+// Define substitute types
+type SignAndSendTransactionsParams = Parameters<
+  // @ts-expect-error TODO: fix this
+  WalletSelector["signAndSendTransactions"]
+>[0]
+type TransactionHashes = string
 
 const signedMessageSchema = z.object({
   accountId: z.string(),
@@ -23,7 +31,17 @@ const signMessageSchema = z.object({
   state: z.string().optional(),
 })
 
-const windowMessageSchema = z.union([signedMessageSchema, errorSchema])
+const windowMessageSchema = z.union([
+  signedMessageSchema,
+  errorSchema,
+  z.object({
+    errorCode: z.string(),
+    errorMessage: z.string(),
+  }),
+  z.object({
+    transactionHashes: z.string(),
+  }),
+])
 
 export const signMessageInNewWindow = async ({
   params,
@@ -69,9 +87,70 @@ export const signMessageInNewWindow = async ({
   })
 }
 
+export const signAndSendTransactionsInNewWindow = async ({
+  params,
+  signal,
+}: {
+  signal: AbortSignal
+  params: SignAndSendTransactionsParams
+}): Promise<TransactionHashes> => {
+  const completeAbortCtrl = new AbortController()
+
+  const promise = new Promise<TransactionHashes>((resolve, reject) => {
+    openWindowWithMessageHandler({
+      url: makeSignAndSendTransactionsUrl(params),
+      onMessage: (message) => {
+        const parsedMessage = windowMessageSchema.safeParse(message)
+
+        if (!parsedMessage.success) {
+          reject(new Error("Invalid message", { cause: parsedMessage.error }))
+          return
+        }
+
+        switch (true) {
+          case "transactionHashes" in parsedMessage.data:
+            resolve(parsedMessage.data.transactionHashes)
+            return
+          case "errorCode" in parsedMessage.data:
+            reject(new Error(parsedMessage.data.errorMessage))
+            return
+          default:
+            throw new Error("exhaustive check")
+        }
+      },
+      onClose: () => {
+        reject(new Error("Window closed"))
+      },
+      signal: AbortSignal.any([signal, completeAbortCtrl.signal]),
+    })
+  })
+
+  return promise
+}
+
 function makeSignUrl(params: SignMessageParams) {
   const serializedParams = serializeSignMessageParams(params)
   return `/my-near-wallet-gateway/?action=signMessage&params=${encodeURIComponent(serializedParams)}`
+}
+
+function makeSignAndSendTransactionsUrl(params: SignAndSendTransactionsParams) {
+  const serializedParams = serializeSignAndSendTransactionsParams(params)
+  return `/my-near-wallet-gateway/?action=signAndSendTransactions&params=${encodeURIComponent(serializedParams)}`
+}
+
+export function serializeSignAndSendTransactionsParams(
+  params: SignAndSendTransactionsParams
+) {
+  const encodedParams = {
+    ...params,
+  }
+  return JSON.stringify(encodedParams)
+}
+
+export function deserializeSignAndSendTransactionsParams(
+  params: string
+): SignAndSendTransactionsParams {
+  return JSON.parse(params)
 }
 
 export function serializeSignMessageParams(params: SignMessageParams) {

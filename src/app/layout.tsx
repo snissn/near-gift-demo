@@ -17,8 +17,8 @@ import { WalletSelectorProvider } from "@src/providers/WalletSelectorProvider"
 import "@radix-ui/themes/styles.css"
 import "@near-wallet-selector/modal-ui/styles.css"
 import "@near-wallet-selector/account-export/styles.css"
-import "../styles/global.scss"
 import "@defuse-protocol/defuse-sdk/styles"
+import "../styles/global.scss"
 
 const DEV_MODE = process?.env?.NEXT_PUBLIC_DEV_MODE === "true" ?? false
 
