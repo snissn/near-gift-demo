@@ -10,7 +10,7 @@ type SignAndSendTransactionsParams = Parameters<
   // @ts-expect-error TODO: fix this
   WalletSelector["signAndSendTransactions"]
 >[0]
-type TransactionHashes = string[]
+type TransactionHashes = string
 
 const signedMessageSchema = z.object({
   accountId: z.string(),
@@ -31,7 +31,17 @@ const signMessageSchema = z.object({
   state: z.string().optional(),
 })
 
-const windowMessageSchema = z.union([signedMessageSchema, errorSchema])
+const windowMessageSchema = z.union([
+  signedMessageSchema,
+  errorSchema,
+  z.object({
+    errorCode: z.string(),
+    errorMessage: z.string(),
+  }),
+  z.object({
+    transactionHashes: z.string(),
+  }),
+])
 
 export const signMessageInNewWindow = async ({
   params,
@@ -99,10 +109,10 @@ export const signAndSendTransactionsInNewWindow = async ({
 
         switch (true) {
           case "transactionHashes" in parsedMessage.data:
-            resolve(parsedMessage?.data?.transactionHashes as TransactionHashes)
+            resolve(parsedMessage.data.transactionHashes)
             return
-          case "error" in parsedMessage.data:
-            reject(new Error(parsedMessage.data.error))
+          case "errorCode" in parsedMessage.data:
+            reject(new Error(parsedMessage.data.errorMessage))
             return
           default:
             throw new Error("exhaustive check")

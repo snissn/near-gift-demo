@@ -20,6 +20,16 @@ export default function MyNearWalletGateway() {
       return
     }
 
+    if (url.searchParams.get("errorCode")) {
+      relayResultToOpenerError(url)
+      return
+    }
+
+    if (url.searchParams.get("transactionHashes")) {
+      relayResultToOpenerTransactionHashes(url)
+      return
+    }
+
     switch (url.searchParams.get("action")) {
       case "signMessage":
         void signMessage(url, selector).catch(console.error)
@@ -47,6 +57,31 @@ function relayResultToOpener(url: URL) {
   if (window.opener) {
     window.opener.postMessage(
       queryStringToObject(url.hash),
+      window.location.origin
+    )
+    window.close()
+  }
+}
+
+function relayResultToOpenerError(url: URL) {
+  if (window.opener) {
+    window.opener.postMessage(
+      {
+        errorCode: url.searchParams.get("errorCode"),
+        errorMessage: url.searchParams.get("errorMessage"),
+      },
+      window.location.origin
+    )
+    window.close()
+  }
+}
+
+function relayResultToOpenerTransactionHashes(url: URL) {
+  if (window.opener) {
+    window.opener.postMessage(
+      {
+        transactionHashes: url.searchParams.get("transactionHashes"),
+      },
       window.location.origin
     )
     window.close()
