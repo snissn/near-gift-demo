@@ -2,7 +2,10 @@
 
 import type { WalletSelector } from "@near-wallet-selector/core"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import { deserializeSignMessageParams } from "@src/utils/myNearWalletAdapter"
+import {
+  deserializeSignAndSendTransactionsParams,
+  deserializeSignMessageParams,
+} from "@src/utils/myNearWalletAdapter"
 import { useEffect } from "react"
 
 export default function MyNearWalletGateway() {
@@ -24,6 +27,9 @@ export default function MyNearWalletGateway() {
       case "sendTransaction":
         // todo: implement transaction sending
         throw new Error("not implemented")
+      case "signAndSendTransactions":
+        void signAndSendTransactions(url, selector).catch(console.error)
+        break
       default:
         console.warn("Unknown action", {
           action: url.searchParams.get("action"),
@@ -45,6 +51,22 @@ function relayResultToOpener(url: URL) {
     )
     window.close()
   }
+}
+
+async function signAndSendTransactions(
+  url: URL,
+  walletSelector: WalletSelector
+) {
+  const paramsComponent = url.searchParams.get("params")
+  if (paramsComponent == null) {
+    throw new Error("Missing params")
+  }
+  const params = deserializeSignAndSendTransactionsParams(
+    decodeURIComponent(paramsComponent)
+  )
+
+  const wallet = await walletSelector.wallet()
+  await wallet.signAndSendTransactions(params)
 }
 
 async function signMessage(url: URL, walletSelector: WalletSelector) {
