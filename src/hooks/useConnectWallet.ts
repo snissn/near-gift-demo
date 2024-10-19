@@ -45,5 +45,6 @@ export const useConnectWallet = (): ConnectWalletAction => {
     handleSignOut,
     handleSwitchWallet,
     handleSwitchAccount,
+    connect: {},
   }
 }

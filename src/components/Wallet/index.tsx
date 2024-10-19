@@ -11,7 +11,9 @@ import { useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useGetAccount } from "@src/hooks/useGetAccount"
 import useShortAccountId from "@src/hooks/useShortAccountId"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
+import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import { ModalType } from "@src/stores/modalStore"
 import type { Account } from "@src/types/interfaces"
 
 const TURN_OFF_APPS = process?.env?.turnOffApps === "true" ?? true
@@ -23,7 +25,7 @@ const ConnectWallet = () => {
   const [account, setAccount] = useState<Account | null>(null)
   const { shortAccountId } = useShortAccountId(accountId as string)
   const { openWidget } = useHistoryStore((state) => state)
-  const { handleSignIn, handleSignOut } = useConnectWallet()
+  const { setModalType } = useModalStore((state) => state)
 
   useEffect(() => {
     if (!accountId) {
@@ -40,13 +42,17 @@ const ConnectWallet = () => {
 
   const handleTradeHistory = () => openWidget()
 
+  const handleSelectWallet = () => {
+    setModalType(ModalType.MODAL_SELECT_WALLET)
+  }
+
   if (!account || TURN_OFF_APPS || isLoading) {
     return isLoading ? (
       <Spinner loading={isLoading} />
     ) : (
       <button
         type={"button"}
-        onClick={handleSignIn}
+        onClick={handleSelectWallet}
         className={clsx(
           "rounded-full text-white px-4 py-2.5 text-sm",
           TURN_OFF_APPS ? "bg-gray-500" : "bg-primary"
