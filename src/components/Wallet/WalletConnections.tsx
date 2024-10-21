@@ -11,7 +11,7 @@ import {
   CONNECTOR_BTC_MAINNET,
   CONNECTOR_ETH_BASE,
 } from "@src/constants/contracts"
-import { useConnectWallet } from "@src/hooks/useConnectWallet"
+import { SignInType, useConnectWallet } from "@src/hooks/useConnectWallet"
 import useShortAccountId from "@src/hooks/useShortAccountId"
 import { getChainIconFromId } from "@src/hooks/useTokensListAdapter"
 import { MapsEnum } from "@src/libs/de-sdk/utils/maps"
@@ -37,7 +37,7 @@ type WalletConnectionActions = {
 
 const connections: MapsEnum[] = [
   MapsEnum.NEAR_MAINNET,
-  MapsEnum.ETH_BASE,
+  MapsEnum.EVM_ETHEREUM,
   MapsEnum.BTC_MAINNET,
 ]
 
@@ -113,8 +113,8 @@ const WalletConnectionsConnector = ({
 }
 
 const WalletConnections = () => {
+  const { state, signOut } = useConnectWallet()
   const { accountId } = useWalletSelector()
-  const { handleSignOut } = useConnectWallet()
   const [copyWalletAddress, setCopyWalletAddress] = useState<MapsEnum>()
   const { setModalType } = useModalStore((state) => state)
   const { triggerTokenUpdate } = useTokensStore((state) => state)
@@ -148,13 +148,16 @@ const WalletConnections = () => {
         Connections
       </Text>
       {connections.map((connector, i) => {
-        let defuse_asset_id = ""
+        const defuse_asset_id = ""
         let chainIcon = ""
-        let chainName = ""
-        let accountIdFromLocal = ""
-        let storeKey = ""
+        const chainName = ""
+        const accountIdFromLocal = ""
+        const storeKey = ""
         switch (connector) {
           case MapsEnum.NEAR_MAINNET:
+            if (state?.keyStore !== SignInType.NearWalletSelector) {
+              return null
+            }
             return (
               <WalletConnectionsConnector
                 accountId={accountId}
@@ -164,46 +167,37 @@ const WalletConnections = () => {
                 onCopy={() => setCopyWalletAddress(MapsEnum.NEAR_MAINNET)}
                 isCopied={copyWalletAddress === MapsEnum.NEAR_MAINNET}
                 onDisconnect={() => {
-                  handleSignOut()
+                  signOut({ id: SignInType.NearWalletSelector })
                   triggerTokenUpdate()
                 }}
                 key={connector}
                 index={i}
               />
             )
-          case MapsEnum.ETH_BASE:
-            defuse_asset_id = `${MapsEnum.ETH_BASE}:0`
-            accountIdFromLocal = handleGetConnector(CONNECTOR_ETH_BASE)
-            chainIcon = getChainIconFromId(defuse_asset_id)
-            chainName = "eth"
-            storeKey = CONNECTOR_ETH_BASE
+          case MapsEnum.EVM_ETHEREUM:
+            if (state?.keyStore !== SignInType.WalletConnect) {
+              return null
+            }
+            chainIcon = getChainIconFromId("eth")
             return (
               <WalletConnectionsConnector
-                accountId={accountIdFromLocal}
-                chainLabel="Base"
-                chainName={chainName}
+                accountId={(state?.address as string) ?? null}
+                chainLabel={state?.network ?? ""}
+                chainName="eth"
                 chainIcon={chainIcon}
-                onCopy={() => setCopyWalletAddress(MapsEnum.ETH_BASE)}
-                isCopied={copyWalletAddress === MapsEnum.ETH_BASE}
-                onDisconnect={() => handleDisconnectSideWallet(storeKey)}
-                onConnect={() =>
-                  setModalType(ModalType.MODAL_STORE_NETWORK, {
-                    storeKey,
-                    defuse_asset_id,
-                    chainIcon,
-                    chainName,
-                  })
-                }
+                onCopy={() => setCopyWalletAddress(MapsEnum.EVM_ETHEREUM)}
+                isCopied={copyWalletAddress === MapsEnum.EVM_ETHEREUM}
+                onDisconnect={() => signOut({ id: SignInType.WalletConnect })}
+                onConnect={() => {}}
                 key={connector}
                 index={i}
               />
             )
           case MapsEnum.BTC_MAINNET:
-            defuse_asset_id = `${MapsEnum.BTC_MAINNET}:0`
-            accountIdFromLocal = handleGetConnector(CONNECTOR_BTC_MAINNET)
-            chainIcon = getChainIconFromId(defuse_asset_id)
-            chainName = "btc"
-            storeKey = CONNECTOR_BTC_MAINNET
+            if (state?.keyStore !== SignInType.Bitcoin) {
+              return null
+            }
+            chainIcon = getChainIconFromId("btc:mainnet")
             return (
               <WalletConnectionsConnector
                 accountId={accountIdFromLocal}

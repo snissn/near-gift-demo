@@ -1,25 +1,26 @@
 "use client"
 
-import { InfoCircledIcon } from "@radix-ui/react-icons"
-import { Button, Text, Tooltip } from "@radix-ui/themes"
+import { Button, Text } from "@radix-ui/themes"
 import Image from "next/image"
-import React, { useState } from "react"
+import React from "react"
 
 import ModalDialog from "@src/components/Modal/ModalDialog"
-import { useConnectWallet } from "@src/hooks/useConnectWallet"
+import { SignInType, useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
+import type { Connector } from "wagmi"
 
 const ModalSelectWallet = () => {
-  const { onCloseModal, payload } = useModalStore((state) => state)
-  const { handleSignIn } = useConnectWallet()
+  const { onCloseModal } = useModalStore((state) => state)
+  const { signIn, connectors } = useConnectWallet()
 
   const handleNearWalletSelector = () => {
-    handleSignIn()
+    signIn({ id: SignInType.NearWalletSelector, params: undefined })
     onCloseModal()
   }
 
-  const handleWalletConnect = () => {
-    console.log("handleWalletConnect")
+  const handleWalletConnect = (connector: Connector) => {
+    signIn({ id: SignInType.WalletConnect, params: { connector } })
+    onCloseModal()
   }
 
   return (
@@ -59,20 +60,21 @@ const ModalSelectWallet = () => {
             </Text>
           </Button>
           <Button
-            onClick={handleWalletConnect}
+            key={connectors[0].id}
+            onClick={() => handleWalletConnect(connectors[0])}
             size="4"
             radius="medium"
             variant="soft"
             color="gray"
           >
             <Image
-              src="/static/icons/wallet-connect-v2.svg"
+              src="/static/icons/logo-meta-mask.svg"
               alt="Wallet Connect"
               width={24}
               height={24}
             />
             <Text size="2" weight="bold">
-              Wallet Connect
+              MetaMask
             </Text>
           </Button>
         </div>

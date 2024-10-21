@@ -1,44 +1,25 @@
 "use client"
 
 import { CountdownTimerIcon } from "@radix-ui/react-icons"
-import { Button, Popover, Spinner, Switch, Text } from "@radix-ui/themes"
+import { Button, Popover, Text } from "@radix-ui/themes"
 import clsx from "clsx"
-import React, { useState, useEffect } from "react"
+import React from "react"
 
 import WalletConnections from "@src/components/Wallet/WalletConnections"
 import WalletTabs from "@src/components/Wallet/WalletTabs"
 import { useConnectWallet } from "@src/hooks/useConnectWallet"
-import { useGetAccount } from "@src/hooks/useGetAccount"
 import useShortAccountId from "@src/hooks/useShortAccountId"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
-import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { ModalType } from "@src/stores/modalStore"
-import type { Account } from "@src/types/interfaces"
 
 const TURN_OFF_APPS = process?.env?.turnOffApps === "true" ?? true
 
 const ConnectWallet = () => {
-  const { selector, accountId } = useWalletSelector()
-  const { getAccount } = useGetAccount({ accountId, selector })
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [account, setAccount] = useState<Account | null>(null)
-  const { shortAccountId } = useShortAccountId(accountId as string)
+  const { state } = useConnectWallet()
+  const { shortAccountId } = useShortAccountId(state.address ?? "")
   const { openWidget } = useHistoryStore((state) => state)
   const { setModalType } = useModalStore((state) => state)
-
-  useEffect(() => {
-    if (!accountId) {
-      return setAccount(null)
-    }
-
-    setIsLoading(true)
-
-    getAccount().then((nextAccount) => {
-      setAccount(nextAccount)
-      setIsLoading(false)
-    })
-  }, [accountId, getAccount])
 
   const handleTradeHistory = () => openWidget()
 
@@ -46,10 +27,8 @@ const ConnectWallet = () => {
     setModalType(ModalType.MODAL_SELECT_WALLET)
   }
 
-  if (!account || TURN_OFF_APPS || isLoading) {
-    return isLoading ? (
-      <Spinner loading={isLoading} />
-    ) : (
+  if (!state.address || TURN_OFF_APPS) {
+    return (
       <button
         type={"button"}
         onClick={handleSelectWallet}
