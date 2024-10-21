@@ -1,9 +1,10 @@
 "use client"
 
-import type { Network } from "@near-wallet-selector/core"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import { useCallback, useEffect, useState } from "react"
+import type { SignAndSendTransactionsParams } from "@src/utils/myNearWalletAdapter"
+import { useEffect, useState } from "react"
 import { type Connector, useAccount, useConnect, useDisconnect } from "wagmi"
+import { useNearWalletActions } from "./useNearWalletActions"
 
 export enum SignInType {
   NearWalletSelector = "near-wallet-selector",
@@ -26,14 +27,23 @@ interface ConnectWalletAction {
   }: { id: SignInType; message: string }) => Promise<void>
   sendTransaction: ({
     id,
-    transaction,
-  }: { id: SignInType; transaction: string }) => Promise<void>
+    type,
+    transactions,
+  }: {
+    id: SignInType
+    type: SendTransactionType
+    transactions: SignAndSendTransactionsParams
+  }) => Promise<void>
   connectors: Connector[]
   state: {
     keyStore: string | undefined
     network: string | undefined
     address: string | undefined
   }
+}
+
+export enum SendTransactionType {
+  SignAndSendTransactions = "signAndSendTransactions",
 }
 
 export const useConnectWallet = (): ConnectWalletAction => {
@@ -47,6 +57,7 @@ export const useConnectWallet = (): ConnectWalletAction => {
     address: undefined,
   })
   const { selector, modal, accountId } = useWalletSelector()
+  const { signAndSendTransactions } = useNearWalletActions()
   const { connectors, connect } = useConnect()
   const { disconnect } = useDisconnect()
   const { address, chain } = useAccount()
@@ -163,11 +174,26 @@ export const useConnectWallet = (): ConnectWalletAction => {
       message,
     }: { id: SignInType; message: string }) => {},
 
-    // TODO: Implement this
     sendTransaction: async ({
       id,
-      transaction,
-    }: { id: SignInType; transaction: string }) => {},
+      type,
+      transactions,
+    }: {
+      id: SignInType
+      type: SendTransactionType
+      transactions: SignAndSendTransactionsParams
+    }) => {
+      await abstractExecutor({
+        [SignInType.NearWalletSelector]: {
+          executor: async () => {
+            if (type === SendTransactionType.SignAndSendTransactions) {
+              await signAndSendTransactions({ transactions })
+            }
+          },
+          params: undefined,
+        },
+      })(id)
+    },
 
     connectors: connectors as Connector[],
     state,

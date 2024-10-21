@@ -6,7 +6,7 @@ import type {
 import { z } from "zod"
 
 // Define substitute types
-type SignAndSendTransactionsParams = Parameters<
+export type SignAndSendTransactionsParams = Parameters<
   // @ts-expect-error TODO: fix this
   WalletSelector["signAndSendTransactions"]
 >[0]

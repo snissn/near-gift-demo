@@ -4,19 +4,25 @@ import React from "react"
 
 import { DepositWidget } from "@defuse-protocol/defuse-sdk"
 import Paper from "@src/components/Paper"
-import { useNearWalletActions } from "@src/hooks/useNearWalletActions"
+import {
+  SendTransactionType,
+  SignInType,
+  useConnectWallet,
+} from "@src/hooks/useConnectWallet"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 
 export default function Deposit() {
-  const { signAndSendTransactions } = useNearWalletActions()
-  const { accountId, selector } = useWalletSelector()
+  const { state, sendTransaction } = useConnectWallet()
+  const { selector } = useWalletSelector()
   return (
     <Paper title="Deposit">
       <DepositWidget
-        accountId={accountId || ""}
+        accountId={state.address || ""}
         signAndSendTransactionsNear={async (transactions) => {
           assert(selector, "Wallet selector is not found")
-          const transactionResult = await signAndSendTransactions({
+          const transactionResult = await sendTransaction({
+            id: SignInType.NearWalletSelector,
+            type: SendTransactionType.SignAndSendTransactions,
             transactions,
           })
           // TODO: handle transaction result
