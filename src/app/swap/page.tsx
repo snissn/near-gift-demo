@@ -7,9 +7,11 @@ import Paper from "@src/components/Paper"
 import { LIST_TOKENS } from "@src/constants/tokens"
 import { useNearWalletActions } from "@src/hooks/useNearWalletActions"
 import { useNotificationStore } from "@src/providers/NotificationProvider"
+import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { NotificationType } from "@src/stores/notificationStore"
 
 export default function Swap() {
+  const { accountId } = useWalletSelector()
   const { signMessage } = useNearWalletActions()
   const setNotification = useNotificationStore((state) => state.setNotification)
 
@@ -20,6 +22,7 @@ export default function Swap() {
     >
       <SwapWidget
         tokenList={LIST_TOKENS}
+        userAddress={accountId}
         signMessage={async (params) => {
           const sig = await signMessage({
             ...params.NEP141,
