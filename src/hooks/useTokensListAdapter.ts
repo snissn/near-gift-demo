@@ -15,8 +15,10 @@ export const getChainIconFromId = (defuseAssetId: string): string => {
   switch (chain.toLowerCase()) {
     case "near":
       return "/static/icons/network/near.svg"
-    case "eth":
+    case "base":
       return "/static/icons/network/base.svg"
+    case "eth":
+      return "/static/icons/network/ethereum.svg"
     case "btc":
       return "/static/icons/network/btc.svg"
     default:

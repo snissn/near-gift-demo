@@ -14,11 +14,13 @@ import { ModalStoreProvider } from "@src/providers/ModalStoreProvider"
 import { NotificationStoreProvider } from "@src/providers/NotificationProvider"
 import { TokensStoreProvider } from "@src/providers/TokensStoreProvider"
 import { WalletSelectorProvider } from "@src/providers/WalletSelectorProvider"
+import { WagmiProvider } from "wagmi"
 import "@radix-ui/themes/styles.css"
 import "@near-wallet-selector/modal-ui/styles.css"
 import "@near-wallet-selector/account-export/styles.css"
 import "@defuse-protocol/defuse-sdk/styles"
 import "../styles/global.scss"
+import { config } from "@src/config/wagmi"
 
 const DEV_MODE = process?.env?.NEXT_PUBLIC_DEV_MODE === "true" ?? false
 
@@ -32,27 +34,29 @@ const RootLayout = ({
   return (
     <html lang="en">
       <body>
-        <SwapWidgetProvider>
-          <NotificationStoreProvider>
-            <QueryClientProvider client={queryClient}>
-              <WalletSelectorProvider>
-                <ThemeProvider attribute="class">
-                  <Theme>
-                    <HistoryStoreProvider>
-                      <TokensStoreProvider>
-                        <ModalStoreProvider>
-                          {children}
-                          <Modal />
-                        </ModalStoreProvider>
-                      </TokensStoreProvider>
-                    </HistoryStoreProvider>
-                  </Theme>
-                </ThemeProvider>
-              </WalletSelectorProvider>
-              {DEV_MODE && <ReactQueryDevtools initialIsOpen={false} />}
-            </QueryClientProvider>
-          </NotificationStoreProvider>
-        </SwapWidgetProvider>
+        <WagmiProvider config={config}>
+          <SwapWidgetProvider>
+            <NotificationStoreProvider>
+              <QueryClientProvider client={queryClient}>
+                <WalletSelectorProvider>
+                  <ThemeProvider attribute="class">
+                    <Theme>
+                      <HistoryStoreProvider>
+                        <TokensStoreProvider>
+                          <ModalStoreProvider>
+                            {children}
+                            <Modal />
+                          </ModalStoreProvider>
+                        </TokensStoreProvider>
+                      </HistoryStoreProvider>
+                    </Theme>
+                  </ThemeProvider>
+                </WalletSelectorProvider>
+                {DEV_MODE && <ReactQueryDevtools initialIsOpen={false} />}
+              </QueryClientProvider>
+            </NotificationStoreProvider>
+          </SwapWidgetProvider>
+        </WagmiProvider>
       </body>
       <GoogleAnalytics gaId="G-WNE3NB46KM" />
     </html>

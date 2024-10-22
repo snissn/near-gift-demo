@@ -26,7 +26,7 @@ const nextConfig = {
     turnOffLanding: process.env.NEXT_PUBLIC_TURN_OFF_LANDING,
     solverRelay: process.env.NEXT_PUBLIC_SOLVER_RELAY_API,
     coingeckoApiKey: process.env.COINGECKO_API_KEY,
-    walletConnectProjectId: process.env.WALLET_CONNECT_PROJECT_ID,
+    walletConnectProjectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
     appUrl: process.env.NEXT_PUBLIC_APP_URL,
     nearExplorer: process.env.NEXT_PUBLIC_NEAR_EXPLORER,
     baseExplorer: process.env.NEXT_PUBLIC_BASE_EXPLORER,

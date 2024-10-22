@@ -15,7 +15,7 @@ import {
   CONNECTOR_BTC_MAINNET,
   CONNECTOR_ETH_BASE,
 } from "@src/constants/contracts"
-import { useConnectWallet } from "@src/hooks/useConnectWallet"
+import { SignInType, useConnectWallet } from "@src/hooks/useConnectWallet"
 import { MapsEnum } from "@src/libs/de-sdk/utils/maps"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { useTokensStore } from "@src/providers/TokensStoreProvider"
@@ -68,7 +68,7 @@ const handleGetStoreKey = (defuse_asset_id: string) => {
   const result = parseDefuseAsset(defuse_asset_id)
   if (!result) return ""
   switch (`${result.blockchain}:${result.network}`) {
-    case MapsEnum.ETH_BASE:
+    case MapsEnum.EVM_BASE:
       return CONNECTOR_ETH_BASE
     case MapsEnum.BTC_MAINNET:
       return CONNECTOR_BTC_MAINNET
@@ -86,7 +86,7 @@ const ModalConnectNetworks = () => {
   const { accountId } = useWalletSelector()
   const { triggerTokenUpdate } = useTokensStore((state) => state)
 
-  const { handleSignIn, handleSignOut } = useConnectWallet()
+  const { signIn, signOut } = useConnectWallet()
   const [convertPayload] = useState<ModalConnectNetworksPayload>(
     payload as ModalConnectNetworksPayload
   )
@@ -158,9 +158,13 @@ const ModalConnectNetworks = () => {
                 account={accountFrom}
                 onConnect={() => {
                   onCloseModal()
-                  handleSignIn()
+                  signIn({
+                    id: SignInType.NearWalletSelector,
+                  })
                 }}
-                onDisconnect={handleSignOut}
+                onDisconnect={() =>
+                  signOut({ id: SignInType.NearWalletSelector })
+                }
               />
             ) : (
               <Network
@@ -197,9 +201,13 @@ const ModalConnectNetworks = () => {
                 account={accountTo}
                 onConnect={() => {
                   onCloseModal()
-                  handleSignIn()
+                  signIn({
+                    id: SignInType.NearWalletSelector,
+                  })
                 }}
-                onDisconnect={handleSignOut}
+                onDisconnect={() =>
+                  signOut({ id: SignInType.NearWalletSelector })
+                }
               />
             ) : (
               <Network

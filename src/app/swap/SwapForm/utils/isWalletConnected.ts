@@ -11,7 +11,7 @@ export default function isWalletConnected(defuse_asset_id: string): string {
   const noAccountId = ""
 
   switch (toNetworkId) {
-    case MapsEnum.ETH_BASE: {
+    case MapsEnum.EVM_BASE: {
       const getEthBaseFromLocal = localStorage.getItem(CONNECTOR_ETH_BASE)
       if (!getEthBaseFromLocal) return noAccountId
       return getEthBaseFromLocal
