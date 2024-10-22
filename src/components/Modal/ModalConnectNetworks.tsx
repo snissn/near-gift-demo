@@ -160,7 +160,6 @@ const ModalConnectNetworks = () => {
                   onCloseModal()
                   signIn({
                     id: SignInType.NearWalletSelector,
-                    params: undefined,
                   })
                 }}
                 onDisconnect={() =>
@@ -204,7 +203,6 @@ const ModalConnectNetworks = () => {
                   onCloseModal()
                   signIn({
                     id: SignInType.NearWalletSelector,
-                    params: undefined,
                   })
                 }}
                 onDisconnect={() =>

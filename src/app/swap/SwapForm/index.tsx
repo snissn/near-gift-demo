@@ -119,7 +119,7 @@ export default function Swap() {
       return
     }
     if (!accountId) {
-      return signIn({ id: SignInType.NearWalletSelector, params: undefined })
+      return signIn({ id: SignInType.NearWalletSelector })
     }
     let hasUnsetTokens = false
     if (!selectTokenIn) {
