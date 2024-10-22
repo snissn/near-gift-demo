@@ -14,12 +14,12 @@ const ModalSelectWallet = () => {
   const { signIn, connectors } = useConnectWallet()
 
   const handleNearWalletSelector = () => {
-    signIn({ id: SignInType.NearWalletSelector, params: undefined })
+    signIn({ id: SignInType.NearWalletSelector })
     onCloseModal()
   }
 
   const handleWalletConnect = (connector: Connector) => {
-    signIn({ id: SignInType.WalletConnect, params: { connector } })
+    signIn({ id: SignInType.Wagmi, connector })
     onCloseModal()
   }
 

@@ -22,7 +22,6 @@ export default function Deposit() {
           assert(selector, "Wallet selector is not found")
           const transactionResult = await sendTransaction({
             id: SignInType.NearWalletSelector,
-            type: SendTransactionType.SignAndSendTransactions,
             transactions,
           })
           // TODO: handle transaction result

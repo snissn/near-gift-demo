@@ -155,7 +155,7 @@ const WalletConnections = () => {
         const storeKey = ""
         switch (connector) {
           case MapsEnum.NEAR_MAINNET:
-            if (state?.keyStore !== SignInType.NearWalletSelector) {
+            if (state.signInType !== SignInType.NearWalletSelector) {
               return null
             }
             return (
@@ -175,7 +175,7 @@ const WalletConnections = () => {
               />
             )
           case MapsEnum.EVM_ETHEREUM:
-            if (state?.keyStore !== SignInType.WalletConnect) {
+            if (state.signInType !== SignInType.Wagmi) {
               return null
             }
             chainIcon = getChainIconFromId("eth")
@@ -187,34 +187,8 @@ const WalletConnections = () => {
                 chainIcon={chainIcon}
                 onCopy={() => setCopyWalletAddress(MapsEnum.EVM_ETHEREUM)}
                 isCopied={copyWalletAddress === MapsEnum.EVM_ETHEREUM}
-                onDisconnect={() => signOut({ id: SignInType.WalletConnect })}
+                onDisconnect={() => signOut({ id: SignInType.Wagmi })}
                 onConnect={() => {}}
-                key={connector}
-                index={i}
-              />
-            )
-          case MapsEnum.BTC_MAINNET:
-            if (state?.keyStore !== SignInType.Bitcoin) {
-              return null
-            }
-            chainIcon = getChainIconFromId("btc:mainnet")
-            return (
-              <WalletConnectionsConnector
-                accountId={accountIdFromLocal}
-                chainLabel="Bitcoin"
-                chainName={chainName}
-                chainIcon={chainIcon}
-                onCopy={() => setCopyWalletAddress(MapsEnum.BTC_MAINNET)}
-                isCopied={copyWalletAddress === MapsEnum.BTC_MAINNET}
-                onDisconnect={() => handleDisconnectSideWallet(storeKey)}
-                onConnect={() =>
-                  setModalType(ModalType.MODAL_STORE_NETWORK, {
-                    storeKey,
-                    defuse_asset_id,
-                    chainIcon,
-                    chainName,
-                  })
-                }
                 key={connector}
                 index={i}
               />
