@@ -43,16 +43,29 @@ const windowMessageSchema = z.union([
   }),
 ])
 
+interface SignOutput {
+  signatureData: SignedMessage
+  signedData: SignMessageParams
+}
+
 export const signMessageInNewWindow = async ({
   params,
   signal,
 }: {
   signal: AbortSignal
   params: SignMessageParams
-}): Promise<SignedMessage> => {
+}): Promise<SignOutput> => {
   const completeAbortCtrl = new AbortController()
 
-  const promise = new Promise<SignedMessage>((resolve, reject) => {
+  /**
+   * It is important to specify callbackUrl, otherwise near wallet SDK will
+   * implicitly set `callbackUrl` to the current URL. As a result, the NEP-413
+   * message will be different from ours, and we won't be able to verify the
+   * signature.
+   */
+  params = { ...params, callbackUrl: getGatewayURL() }
+
+  const promise = new Promise<SignOutput>((resolve, reject) => {
     openWindowWithMessageHandler({
       url: makeSignUrl(params),
       onMessage: (message) => {
@@ -65,7 +78,7 @@ export const signMessageInNewWindow = async ({
 
         switch (true) {
           case "signature" in parsedMessage.data:
-            resolve(parsedMessage.data)
+            resolve({ signatureData: parsedMessage.data, signedData: params })
             return
           case "error" in parsedMessage.data:
             reject(new Error(parsedMessage.data.error))
@@ -128,14 +141,18 @@ export const signAndSendTransactionsInNewWindow = async ({
   return promise
 }
 
+function getGatewayURL() {
+  return `${window.location.origin}/my-near-wallet-gateway`
+}
+
 function makeSignUrl(params: SignMessageParams) {
   const serializedParams = serializeSignMessageParams(params)
-  return `/my-near-wallet-gateway/?action=signMessage&params=${encodeURIComponent(serializedParams)}`
+  return `${getGatewayURL()}/?action=signMessage&params=${encodeURIComponent(serializedParams)}`
 }
 
 function makeSignAndSendTransactionsUrl(params: SignAndSendTransactionsParams) {
   const serializedParams = serializeSignAndSendTransactionsParams(params)
-  return `/my-near-wallet-gateway/?action=signAndSendTransactions&params=${encodeURIComponent(serializedParams)}`
+  return `${getGatewayURL()}/?action=signAndSendTransactions&params=${encodeURIComponent(serializedParams)}`
 }
 
 export function serializeSignAndSendTransactionsParams(

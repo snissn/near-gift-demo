@@ -1,6 +1,7 @@
 import type {
   BrowserWalletBehaviour,
-  SignMessageMethod,
+  SignMessageParams,
+  SignedMessage,
 } from "@near-wallet-selector/core/src/lib/wallet/wallet.types"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import {
@@ -12,19 +13,32 @@ export function useNearWalletActions() {
   const { selector } = useWalletSelector()
 
   return {
-    signMessage: (async (params) => {
+    signMessage: async (
+      params: SignMessageParams
+    ): Promise<{
+      signatureData: SignedMessage
+      signedData: SignMessageParams
+    }> => {
       const wallet = await selector.wallet()
 
       // MyNearWallet uses redirect-based signing
-      if (wallet.id === "my-near-wallet") {
+      if (wallet.type === "browser") {
         return signMessageInNewWindow({
           params,
           signal: new AbortController().signal,
         })
       }
 
-      return wallet.signMessage(params)
-    }) satisfies SignMessageMethod["signMessage"],
+      const signatureData = await wallet.signMessage(params)
+      if (!signatureData) {
+        throw new Error("No signature")
+      }
+
+      return {
+        signatureData,
+        signedData: params,
+      }
+    },
 
     signAndSendTransactions: (async (params) => {
       try {
