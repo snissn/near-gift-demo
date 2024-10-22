@@ -24,16 +24,12 @@ export default function Swap() {
         tokenList={LIST_TOKENS}
         userAddress={accountId}
         signMessage={async (params) => {
-          const sig = await signMessage({
-            ...params.NEP141,
-            nonce: Buffer.from(params.NEP141.nonce),
+          const { signatureData, signedData } = await signMessage({
+            ...params.NEP413,
+            nonce: Buffer.from(params.NEP413.nonce),
           })
 
-          if (!sig) {
-            throw new Error("No signature")
-          }
-
-          return { type: "NEP141", signatureData: sig }
+          return { type: "NEP413", signatureData, signedData }
         }}
         onSuccessSwap={({ amountOut, tokenOut }) => {
           setNotification({
