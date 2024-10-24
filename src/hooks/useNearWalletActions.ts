@@ -1,9 +1,9 @@
 import type {
-  BrowserWalletBehaviour,
   SignMessageParams,
   SignedMessage,
 } from "@near-wallet-selector/core/src/lib/wallet/wallet.types"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import type { SignAndSendTransactionsParams } from "@src/types/interfaces"
 import {
   signAndSendTransactionsInNewWindow,
   signMessageInNewWindow,
@@ -40,21 +40,21 @@ export function useNearWalletActions() {
       }
     },
 
-    signAndSendTransactions: (async (params) => {
-      try {
-        const wallet = await selector.wallet()
-        // MyNearWallet uses redirect-based signing
-        if (wallet.id === "my-near-wallet") {
-          return await signAndSendTransactionsInNewWindow({
-            params,
-            signal: new AbortController().signal,
-          })
-        }
-        return await wallet.signAndSendTransactions(params)
-      } catch (error) {
-        console.error(error)
+    signAndSendTransactions: async (params: SignAndSendTransactionsParams) => {
+      const wallet = await selector.wallet()
+      // MyNearWallet uses redirect-based signing
+      if (wallet.id === "my-near-wallet") {
+        return signAndSendTransactionsInNewWindow({
+          params,
+          signal: new AbortController().signal,
+        })
       }
-      // @ts-expect-error TODO: fix this
-    }) satisfies BrowserWalletBehaviour["signAndSendTransactions"],
+      const outcome = await wallet.signAndSendTransactions(params)
+      if (!outcome) {
+        throw new Error("No outcome")
+      }
+
+      return outcome
+    },
   }
 }

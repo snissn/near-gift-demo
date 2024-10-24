@@ -2,7 +2,7 @@
 
 import type { FinalExecutionOutcome } from "@near-wallet-selector/core"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import type { SignAndSendTransactionsParams } from "@src/utils/myNearWalletAdapter"
+import type { SignAndSendTransactionsParams } from "@src/types/interfaces"
 import { useEffect, useState } from "react"
 import { type Connector, useAccount, useConnect, useDisconnect } from "wagmi"
 import { useNearWalletActions } from "./useNearWalletActions"
@@ -31,7 +31,7 @@ interface ConnectWalletAction {
   signMessage: (params: { id: SignInType; message: string }) => Promise<void>
   sendTransaction: (params: {
     id: SignInType
-    transactions: SignAndSendTransactionsParams
+    transactions: SignAndSendTransactionsParams["transactions"]
   }) => Promise<string | FinalExecutionOutcome[]>
   connectors: Connector[]
   state: State
@@ -132,10 +132,9 @@ export const useConnectWallet = (): ConnectWalletAction => {
       message,
     }: { id: SignInType; message: string }) => {},
 
-    sendTransaction: async (params: {
-      id: SignInType
-      transactions: SignAndSendTransactionsParams
-    }): Promise<string | FinalExecutionOutcome[]> => {
+    sendTransaction: async (
+      params
+    ): Promise<string | FinalExecutionOutcome[]> => {
       const strategies = {
         [SignInType.NearWalletSelector]: async () =>
           await signAndSendTransactions({
