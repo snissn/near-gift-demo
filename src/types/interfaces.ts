@@ -1,3 +1,4 @@
+import type { Transaction } from "@near-wallet-selector/core/src/lib/wallet/transactions.types"
 import type { AccountView } from "near-api-js/lib/providers/provider"
 
 import type { HistoryStatus } from "@src/stores/historyStore"
@@ -267,4 +268,14 @@ export interface BitcoinPriceInUsdEntity {
   bitcoin: {
     usd: number
   }
+}
+
+type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+
+// Copy from @near-wallet-selector/core/src/lib/wallet/wallet.types
+export interface SignAndSendTransactionsParams {
+  /**
+   * NEAR Transactions(s) to sign and send to the network. You can find more information on `Transaction` {@link https://github.com/near/wallet-selector/blob/main/packages/core/docs/api/transactions.md | here}.
+   */
+  transactions: Array<Optional<Transaction, "signerId">>
 }
