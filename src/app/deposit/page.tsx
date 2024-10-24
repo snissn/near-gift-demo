@@ -15,7 +15,7 @@ export default function Deposit() {
       <DepositWidget
         tokenList={LIST_TOKENS}
         accountId={state.address || ""}
-        sendTransaction={async (transactions) => {
+        sendTransactionNear={async (transactions) => {
           const transactionResult = await sendTransaction({
             id: SignInType.NearWalletSelector,
             transactions,
