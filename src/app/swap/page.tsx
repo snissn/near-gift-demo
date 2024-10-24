@@ -12,7 +12,7 @@ import { NotificationType } from "@src/stores/notificationStore"
 
 export default function Swap() {
   const { accountId } = useWalletSelector()
-  const { signMessage } = useNearWalletActions()
+  const { signMessage, signAndSendTransactions } = useNearWalletActions()
   const setNotification = useNotificationStore((state) => state.setNotification)
 
   return (
@@ -23,6 +23,20 @@ export default function Swap() {
       <SwapWidget
         tokenList={LIST_TOKENS}
         userAddress={accountId}
+        sendNearTransaction={async (tx) => {
+          const result = await signAndSendTransactions({ transactions: [tx] })
+
+          if (typeof result === "string") {
+            return { txHash: result }
+          }
+
+          const outcome = result[0]
+          if (!outcome) {
+            throw new Error("No outcome")
+          }
+
+          return { txHash: outcome.transaction.hash }
+        }}
         signMessage={async (params) => {
           const { signatureData, signedData } = await signMessage({
             ...params.NEP413,

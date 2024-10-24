@@ -1,15 +1,11 @@
-import type { WalletSelector } from "@near-wallet-selector/core"
 import type {
   SignMessageParams,
   SignedMessage,
 } from "@near-wallet-selector/core/src/lib/wallet/wallet.types"
 import { z } from "zod"
 
-// Define substitute types
-export type SignAndSendTransactionsParams = Parameters<
-  // @ts-expect-error TODO: fix this
-  WalletSelector["signAndSendTransactions"]
->[0]
+import type { SignAndSendTransactionsParams } from "@src/types/interfaces"
+
 type TransactionHashes = string
 
 const signedMessageSchema = z.object({
