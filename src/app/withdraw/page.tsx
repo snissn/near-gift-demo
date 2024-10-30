@@ -19,7 +19,7 @@ export default function Withdraw() {
       <WithdrawWidget
         tokenList={LIST_TOKENS}
         accountId={state.address || ""}
-        // TODO: implement signMessage
+        // @ts-expect-error this is mock function
         signMessage={async (params: unknown) => {
           console.log("params", params)
 
