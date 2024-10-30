@@ -9,7 +9,6 @@ import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { ModalType } from "../../stores/modalStore"
 
 import ModalSelectAssets from "./ModalSelectAssets"
-import ModalSelectWallet from "./ModalSelectWallet"
 
 const Modal = () => {
   const { modalType } = useModalStore((state) => state)
@@ -25,8 +24,6 @@ const Modal = () => {
       return <ModalConnectNetworks />
     case ModalType.MODAL_STORE_NETWORK:
       return <ModalStoreNetwork />
-    case ModalType.MODAL_SELECT_WALLET:
-      return <ModalSelectWallet />
   }
 }
 
