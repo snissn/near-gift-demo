@@ -35,6 +35,8 @@ const nextConfig = {
     socialX: process.env.NEXT_PUBLIC_LINK_X,
     socialDiscord: process.env.NEXT_PUBLIC_LINK_DISCORD,
     socialDocs: process.env.NEXT_PUBLIC_LINK_DOCS,
+    // Feature flags
+    turnOffEvmWallets: process.env.NEXT_PUBLIC_TURN_OFF_EVM_WALLETS,
     // Specific [Keys] has to be below.
     NEAR_ENV: process.env.NEAR_ENV,
     SOLVER_RELAY_0_URL: process.env.SOLVER_RELAY_0_URL,
