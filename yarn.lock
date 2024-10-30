@@ -257,13 +257,14 @@
     preact "^10.16.0"
     sha.js "^2.4.11"
 
-"@defuse-protocol/defuse-sdk@^1.29.1":
-  version "1.29.1"
-  resolved "https://npm.pkg.github.com/download/@defuse-protocol/defuse-sdk/1.29.1/5f84bc8de0135c7091a31c7608ff9611f6fccf98#5f84bc8de0135c7091a31c7608ff9611f6fccf98"
-  integrity sha512-1S4pmZ63SpRrES1fvHV5Y8ys/1iErgkbQ+fIEB9vm+eLDklOFcyaLPq1dcCg+/e7ni21A3qFUhGSfcXgu77BFQ==
+"@defuse-protocol/defuse-sdk@^1.30.0":
+  version "1.30.0"
+  resolved "https://npm.pkg.github.com/download/@defuse-protocol/defuse-sdk/1.30.0/2cbd75bade34f6775734b4373a4c7757cb64105c#2cbd75bade34f6775734b4373a4c7757cb64105c"
+  integrity sha512-nKT+d68+0Y8+C9zVzIvsM2/xo3otgPqyyDrKJlBvMtUomWop6aPCsnE1xGklpugMrNNaQvd/T7JCvn6vGBKe3A==
   dependencies:
     "@defuse-protocol/swap-facade" "^1.0.3"
     "@radix-ui/react-checkbox" "^1.1.1"
+    "@radix-ui/react-dialog" "1.1.1"
     "@radix-ui/react-icons" "^1.3.0"
     "@radix-ui/react-select" "^2.1.2"
     "@radix-ui/react-slot" "^1.1.0"
@@ -278,6 +279,7 @@
     axios "^1.7.7"
     clsx "^2.1.1"
     ethers "^6.13.2"
+    near-api-js "^0.44.2"
     qrcode.react "^4.0.1"
     react "^18.3.1"
     react-copy-to-clipboard "^5.1.0"
@@ -9964,7 +9966,7 @@ near-abi@0.1.1:
   dependencies:
     "@types/json-schema" "^7.0.11"
 
-near-api-js@0.44.2:
+near-api-js@0.44.2, near-api-js@^0.44.2:
   version "0.44.2"
   resolved "https://registry.yarnpkg.com/near-api-js/-/near-api-js-0.44.2.tgz#e451f68f2c56bd885c7b918db5818a3e6e9423d0"
   integrity sha512-eMnc4V+geggapEUa3nU2p8HSHn/njtloI4P2mceHQWO8vDE1NGpnAw8FuTBrLmXSgIv9m6oocgFc9t3VNf5zwg==
