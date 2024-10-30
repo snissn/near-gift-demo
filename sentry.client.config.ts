@@ -11,6 +11,9 @@ Sentry.init({
   replaysSessionSampleRate: 0.05,
   replaysOnErrorSampleRate: 0.05,
   integrations: [
+    Sentry.captureConsoleIntegration({
+      levels: ["info", "warn", "error", "assert"],
+    }),
     // eslint-disable-next-line import/namespace
     Sentry.replayIntegration({
       maskAllText: true,
