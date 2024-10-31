@@ -1,6 +1,6 @@
-import { parseUnits } from "ethers"
-import * as borsh from "borsh"
 import Ajv from "ajv"
+import * as borsh from "borsh"
+import { parseUnits } from "ethers"
 
 import {
   CONTRACTS_REGISTER,
@@ -9,20 +9,20 @@ import {
   INDEXER,
   MAX_GAS_TRANSACTION,
 } from "@src/constants/contracts"
-import { MapCreateIntentProps } from "@src/libs/de-sdk/utils/maps"
 import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
-import { swapSchema } from "@src/utils/schema"
-import {
-  NearIntent1CreateCrossChain,
-  NearIntent1CreateSingleChain,
-  ContractIdEnum,
-} from "@src/types/interfaces"
-import parseDefuseAsset from "@src/utils/parseDefuseAsset"
-import { TransactionMethod } from "@src/types/solver0"
 import {
   msgSchemaCreateIntent1CrossChain,
   msgSchemaCreateIntent1SingleChain,
 } from "@src/libs/de-sdk/utils/jsonValidations"
+import type { MapCreateIntentProps } from "@src/libs/de-sdk/utils/maps"
+import {
+  ContractIdEnum,
+  type NearIntent1CreateCrossChain,
+  type NearIntent1CreateSingleChain,
+} from "@src/types/interfaces"
+import { TransactionMethod } from "@src/types/solver0"
+import parseDefuseAsset from "@src/utils/parseDefuseAsset"
+import { swapSchema } from "@src/utils/schema"
 
 const REFERRAL_ACCOUNT = process.env.REFERRAL_ACCOUNT ?? ""
 
@@ -31,9 +31,10 @@ export const prepareCreateIntent0 = (inputs: MapCreateIntentProps) => {
   const tokenNearNative = LIST_NATIVE_TOKENS.find(
     (token) => token.defuse_asset_id === "near:mainnet:native"
   )
+  assert(tokenNearNative, "Native token not found")
   const receiverIdIn = isNativeTokenIn
-    ? tokenNearNative!.routes
-      ? tokenNearNative!.routes[0]
+    ? tokenNearNative.routes
+      ? tokenNearNative.routes[0]
       : ""
     : inputs.selectedTokenIn.address
 
@@ -74,7 +75,8 @@ export const prepareCreateIntent0 = (inputs: MapCreateIntentProps) => {
       },
     },
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+  // biome-ignore lint/suspicious/noExplicitAny: <reason>
   const msgBorsh = borsh.serialize(swapSchema as any, msg)
 
   return {
@@ -132,7 +134,7 @@ export const prepareCreateIntent1CrossChain = (
   const isValid = validate(msg)
   if (!isValid) {
     console.log("Validation errors:", validate.errors)
-    throw new Error(`Validation schema errors`)
+    throw new Error("Validation schema errors")
   }
 
   const params = {}
@@ -210,7 +212,7 @@ export const prepareCreateIntent1SingleChain = (
   const isValid = validate(msg)
   if (!isValid) {
     console.log("Validation errors:", validate.errors)
-    throw new Error(`Validation schema errors`)
+    throw new Error("Validation schema errors")
   }
 
   const params = {}
@@ -248,5 +250,11 @@ export const prepareCreateIntent1SingleChain = (
         params,
       },
     ],
+  }
+}
+
+function assert(condition: unknown, msg?: string): asserts condition {
+  if (!condition) {
+    throw new Error(msg)
   }
 }

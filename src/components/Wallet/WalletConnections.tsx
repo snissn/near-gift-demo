@@ -1,24 +1,24 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
-import { EnterIcon, CopyIcon } from "@radix-ui/react-icons"
+import { CopyIcon, EnterIcon } from "@radix-ui/react-icons"
 import { Button, Separator, Text } from "@radix-ui/themes"
-import { CopyToClipboard } from "react-copy-to-clipboard"
 import clsx from "clsx"
+import React, { useEffect, useState } from "react"
+import { CopyToClipboard } from "react-copy-to-clipboard"
 
-import { useConnectWallet } from "@src/hooks/useConnectWallet"
-import { MapsEnum } from "@src/libs/de-sdk/utils/maps"
-import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import { getChainIconFromId } from "@src/hooks/useTokensListAdapter"
 import NetworkIcon from "@src/components/Network/NetworkIcon"
-import useShortAccountId from "@src/hooks/useShortAccountId"
-import { useModalStore } from "@src/providers/ModalStoreProvider"
-import { ModalType } from "@src/stores/modalStore"
 import {
   CONNECTOR_BTC_MAINNET,
   CONNECTOR_ETH_BASE,
 } from "@src/constants/contracts"
+import { SignInType, useConnectWallet } from "@src/hooks/useConnectWallet"
+import useShortAccountId from "@src/hooks/useShortAccountId"
+import { getChainIconFromId } from "@src/hooks/useTokensListAdapter"
+import { MapsEnum } from "@src/libs/de-sdk/utils/maps"
+import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { useTokensStore } from "@src/providers/TokensStoreProvider"
+import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import { ModalType } from "@src/stores/modalStore"
 
 type WalletConnectionState = {
   chainIcon: string
@@ -37,7 +37,7 @@ type WalletConnectionActions = {
 
 const connections: MapsEnum[] = [
   MapsEnum.NEAR_MAINNET,
-  MapsEnum.ETH_BASE,
+  MapsEnum.EVM_ETHEREUM,
   MapsEnum.BTC_MAINNET,
 ]
 
@@ -55,7 +55,7 @@ const WalletConnectionsConnector = ({
   const { shortAccountId } = useShortAccountId(accountId ?? "")
   return (
     <div className="flex flex-col justify-between items-center gap-2.5">
-      {!index ? <Separator orientation="horizontal" size="4" /> : <div></div>}
+      {!index ? <Separator orientation="horizontal" size="4" /> : <div />}
       <div className="w-full flex justify-between items-center">
         <div className="flex justify-center items-center gap-4">
           <NetworkIcon
@@ -76,6 +76,7 @@ const WalletConnectionsConnector = ({
           <div className="flex justify-center items-center gap-2.5">
             <CopyToClipboard onCopy={onCopy} text={accountId ?? ""}>
               <button
+                type={"button"}
                 className={clsx(
                   "w-[32px] h-[32px] flex justify-center items-center rounded-full border border-gray-500 dark:border-white",
                   isCopied && "bg-primary border-0 text-white"
@@ -85,6 +86,7 @@ const WalletConnectionsConnector = ({
               </button>
             </CopyToClipboard>
             <button
+              type={"button"}
               onClick={onDisconnect}
               className="w-[32px] h-[32px] flex justify-center items-center rounded-full bg-white-200 dark:border dark:border-white"
             >
@@ -111,8 +113,8 @@ const WalletConnectionsConnector = ({
 }
 
 const WalletConnections = () => {
+  const { state, signOut } = useConnectWallet()
   const { accountId } = useWalletSelector()
-  const { handleSignOut } = useConnectWallet()
   const [copyWalletAddress, setCopyWalletAddress] = useState<MapsEnum>()
   const { setModalType } = useModalStore((state) => state)
   const { triggerTokenUpdate } = useTokensStore((state) => state)
@@ -146,13 +148,16 @@ const WalletConnections = () => {
         Connections
       </Text>
       {connections.map((connector, i) => {
-        let defuse_asset_id = ""
+        const defuse_asset_id = ""
         let chainIcon = ""
-        let chainName = ""
-        let accountIdFromLocal = ""
-        let storeKey = ""
+        const chainName = ""
+        const accountIdFromLocal = ""
+        const storeKey = ""
         switch (connector) {
           case MapsEnum.NEAR_MAINNET:
+            if (state.signInType !== SignInType.NearWalletSelector) {
+              return null
+            }
             return (
               <WalletConnectionsConnector
                 accountId={accountId}
@@ -162,63 +167,28 @@ const WalletConnections = () => {
                 onCopy={() => setCopyWalletAddress(MapsEnum.NEAR_MAINNET)}
                 isCopied={copyWalletAddress === MapsEnum.NEAR_MAINNET}
                 onDisconnect={() => {
-                  handleSignOut()
+                  signOut({ id: SignInType.NearWalletSelector })
                   triggerTokenUpdate()
                 }}
                 key={connector}
                 index={i}
               />
             )
-          case MapsEnum.ETH_BASE:
-            defuse_asset_id = `${MapsEnum.ETH_BASE}:0`
-            accountIdFromLocal = handleGetConnector(CONNECTOR_ETH_BASE)
-            chainIcon = getChainIconFromId(defuse_asset_id)
-            chainName = "eth"
-            storeKey = CONNECTOR_ETH_BASE
+          case MapsEnum.EVM_ETHEREUM:
+            if (state.signInType !== SignInType.Wagmi) {
+              return null
+            }
+            chainIcon = getChainIconFromId("eth")
             return (
               <WalletConnectionsConnector
-                accountId={accountIdFromLocal}
-                chainLabel="Base"
-                chainName={chainName}
+                accountId={(state?.address as string) ?? null}
+                chainLabel={state?.network ?? ""}
+                chainName="eth"
                 chainIcon={chainIcon}
-                onCopy={() => setCopyWalletAddress(MapsEnum.ETH_BASE)}
-                isCopied={copyWalletAddress === MapsEnum.ETH_BASE}
-                onDisconnect={() => handleDisconnectSideWallet(storeKey)}
-                onConnect={() =>
-                  setModalType(ModalType.MODAL_STORE_NETWORK, {
-                    storeKey,
-                    defuse_asset_id,
-                    chainIcon,
-                    chainName,
-                  })
-                }
-                key={connector}
-                index={i}
-              />
-            )
-          case MapsEnum.BTC_MAINNET:
-            defuse_asset_id = `${MapsEnum.BTC_MAINNET}:0`
-            accountIdFromLocal = handleGetConnector(CONNECTOR_BTC_MAINNET)
-            chainIcon = getChainIconFromId(defuse_asset_id)
-            chainName = "btc"
-            storeKey = CONNECTOR_BTC_MAINNET
-            return (
-              <WalletConnectionsConnector
-                accountId={accountIdFromLocal}
-                chainLabel="Bitcoin"
-                chainName={chainName}
-                chainIcon={chainIcon}
-                onCopy={() => setCopyWalletAddress(MapsEnum.BTC_MAINNET)}
-                isCopied={copyWalletAddress === MapsEnum.BTC_MAINNET}
-                onDisconnect={() => handleDisconnectSideWallet(storeKey)}
-                onConnect={() =>
-                  setModalType(ModalType.MODAL_STORE_NETWORK, {
-                    storeKey,
-                    defuse_asset_id,
-                    chainIcon,
-                    chainName,
-                  })
-                }
+                onCopy={() => setCopyWalletAddress(MapsEnum.EVM_ETHEREUM)}
+                isCopied={copyWalletAddress === MapsEnum.EVM_ETHEREUM}
+                onDisconnect={() => signOut({ id: SignInType.Wagmi })}
+                onConnect={() => {}}
                 key={connector}
                 index={i}
               />

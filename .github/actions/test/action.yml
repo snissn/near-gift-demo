@@ -1,7 +1,10 @@
 name: "CI test"
 description: "Each pull request to the stage branch has to be passed by types and linter check"
 
-on: workflow_call
+inputs:
+  gh_token:
+    description: "GitHub token"
+    required: true
 
 runs:
   using: composite
@@ -10,6 +13,10 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version-file: package.json
+    - name: Setup NPM token
+      run: |
+        echo "//npm.pkg.github.com/:_authToken=${{ inputs.gh_token }}" >> .npmrc
+      shell: bash
     - name: Install
       run: yarn install --frozen-lockfile --non-interactive --prefer-offline
       shell: bash
@@ -17,5 +24,5 @@ runs:
       run: yarn run typecheck
       shell: bash
     - name: Lint
-      run: yarn run lint
+      run: yarn run check
       shell: bash

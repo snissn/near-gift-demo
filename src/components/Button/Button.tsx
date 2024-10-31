@@ -1,7 +1,13 @@
-import { ReactNode, ButtonHTMLAttributes } from "react"
-import { FieldValues, UseFormRegister } from "react-hook-form"
+import {
+  Button,
+  type ButtonProps,
+  Spinner,
+  Text,
+  type TextProps,
+} from "@radix-ui/themes"
 import clsx from "clsx"
-import { Button, Text, ButtonProps, TextProps, Spinner } from "@radix-ui/themes"
+import type { ButtonHTMLAttributes, ReactNode } from "react"
+import { type FieldValues, UseFormRegister } from "react-hook-form"
 
 interface Props<T extends FieldValues>
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "color"> {

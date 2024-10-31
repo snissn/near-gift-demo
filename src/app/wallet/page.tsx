@@ -1,19 +1,19 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
 import { Spinner } from "@radix-ui/themes"
 import { formatUnits } from "ethers"
+import React, { useEffect, useState } from "react"
 
 import CardBalance from "@src/app/wallet/CardBalance"
-import CardTokenList from "@src/app/wallet/CardTokenList"
 import {
   nearTokenList,
   otherTokenList,
 } from "@src/app/wallet/CardBalance/mocks"
-import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
-import { useTokensStore } from "@src/providers/TokensStoreProvider"
-import { useAccountBalance } from "@src/hooks/useAccountBalance"
+import CardTokenList from "@src/app/wallet/CardTokenList"
 import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
+import { useAccountBalance } from "@src/hooks/useAccountBalance"
+import { useTokensStore } from "@src/providers/TokensStoreProvider"
+import type { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 
 export interface EmptyTokenBalance {
   name: string
@@ -33,16 +33,18 @@ export default function Wallet() {
 
   const [balanceNear, setBalanceNear] = useState<string | undefined>()
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `getAccountBalance` is not a stable reference
   useEffect(() => {
     const tokenNearNative = LIST_NATIVE_TOKENS.find(
       (token) => token.defuse_asset_id === "near:mainnet:native"
     )
-
     ;(async () => {
+      assert(tokenNearNative, "Token not found")
+
       const { balance } = await getAccountBalance()
       const formattedAmountOut = formatUnits(
         BigInt(balance),
-        tokenNearNative!.decimals as number
+        tokenNearNative.decimals as number
       )
       setBalanceNear(formattedAmountOut)
     })()
@@ -52,14 +54,14 @@ export default function Wallet() {
     }
 
     const getAssetListWithBalances: NetworkTokenWithSwapRoute[] = []
-    data.forEach((value) => {
+    for (const value of data.values()) {
       if (value?.balance) {
         getAssetListWithBalances.push({
           ...value,
           balance: value?.balance,
         })
       }
-    })
+    }
 
     setAssetListWithBalances(getAssetListWithBalances)
   }, [data])
@@ -94,4 +96,10 @@ export default function Wallet() {
       </div>
     </div>
   )
+}
+
+function assert(condition: unknown, msg?: string): asserts condition {
+  if (!condition) {
+    throw new Error(msg)
+  }
 }

@@ -1,4 +1,4 @@
-import { EmptyTokenBalance } from "@src/app/wallet/page"
+import type { EmptyTokenBalance } from "@src/app/wallet/page"
 
 export const nearTokenList: EmptyTokenBalance[] = [
   {

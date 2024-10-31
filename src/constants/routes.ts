@@ -16,6 +16,6 @@ export type NavigationLinks = {
 
 export const LINKS_HEADER: NavigationLinks[] = [
   { href: Navigation.SWAP, label: "Swap" },
-  { href: Navigation.DEPOSIT, label: "Deposit", comingSoon: true },
-  { href: Navigation.WITHDRAW, label: "Withdraw", comingSoon: true },
+  { href: Navigation.DEPOSIT, label: "Deposit" },
+  { href: Navigation.WITHDRAW, label: "Withdraw" },
 ]

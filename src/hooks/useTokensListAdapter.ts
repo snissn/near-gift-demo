@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 
-import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
-import { SupportedTokens } from "@src/types/solver0"
 import { getSupportTokenListSolver0 } from "@src/api/intent"
+import type { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
+import type { SupportedTokens } from "@src/types/solver0"
 import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 
 export interface SolverHook {
@@ -15,8 +15,10 @@ export const getChainIconFromId = (defuseAssetId: string): string => {
   switch (chain.toLowerCase()) {
     case "near":
       return "/static/icons/network/near.svg"
-    case "eth":
+    case "base":
       return "/static/icons/network/base.svg"
+    case "eth":
+      return "/static/icons/network/ethereum.svg"
     case "btc":
       return "/static/icons/network/btc.svg"
     default:
@@ -72,6 +74,7 @@ export const useTokensListAdapter = (solversHook: SolverHook[]) => {
     }
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     getTokensList()
   }, [])

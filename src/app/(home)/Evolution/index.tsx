@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
 import { Text } from "@radix-ui/themes"
+import { useEffect, useRef, useState } from "react"
 
 import Section from "@src/app/(home)/Section"
+import TableInfrastructure from "@src/app/(home)/Table/TableInfrastructure"
 import { infrastructureData } from "@src/app/(home)/mocks"
 import useResize from "@src/hooks/useResize"
-import TableInfrastructure from "@src/app/(home)/Table/TableInfrastructure"
 
 const Evolution = () => {
   const divRef = useRef<HTMLDivElement>(null)
@@ -14,10 +14,8 @@ const Evolution = () => {
   const [containerWidth, setContainerWidth] = useState<number>(0)
 
   useEffect(() => {
-    setContainerWidth(
-      divRef.current ? (divRef.current!.offsetWidth as number) : 0
-    )
-  }, [divRef.current, width])
+    setContainerWidth(divRef.current ? divRef.current.offsetWidth : 0)
+  }, [])
 
   return (
     <Section title="The Evolution of Trading Platforms">

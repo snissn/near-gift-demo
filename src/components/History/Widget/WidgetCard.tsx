@@ -1,27 +1,27 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
-import Image from "next/image"
-import { Spinner, Text } from "@radix-ui/themes"
-import Link from "next/link"
-import { formatUnits } from "ethers"
 import { ArrowTopRightIcon, Cross1Icon } from "@radix-ui/react-icons"
+import { Spinner, Text } from "@radix-ui/themes"
+import { formatUnits } from "ethers"
+import Image from "next/image"
+import Link from "next/link"
+import React, { useEffect, useState } from "react"
 
-import { HistoryData, HistoryStatus } from "@src/stores/historyStore"
+import { balanceToDecimal } from "@src/app/swap/SwapForm/service/balanceTo"
 import Button from "@src/components/Button/Button"
-import { NearTX, QueueTransactions } from "@src/types/interfaces"
 import { WidgetCardTimer } from "@src/components/History/Widget/WidgetCardTimer"
+import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
+import { useNetworkTokens } from "@src/hooks/useNetworkTokens"
+import { useSwap } from "@src/hooks/useSwap"
+import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
+import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import { type HistoryData, HistoryStatus } from "@src/stores/historyStore"
+import { type NearTX, QueueTransactions } from "@src/types/interfaces"
+import { TransactionMethod } from "@src/types/solver0"
 import {
   smallBalanceToFormat,
   tokenBalanceToFormatUnits,
 } from "@src/utils/token"
-import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
-import { useNetworkTokens } from "@src/hooks/useNetworkTokens"
-import { useSwap } from "@src/hooks/useSwap"
-import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
-import { TransactionMethod } from "@src/types/solver0"
-import { balanceToDecimal } from "@src/app/swap/SwapForm/service/balanceTo"
 
 const NEAR_EXPLORER = process?.env?.nearExplorer ?? ""
 const PLACEHOLDER = "XX"
@@ -75,14 +75,14 @@ const WidgetCard = ({
             }
 
           case HistoryStatus.ROLLED_BACK:
-          case HistoryStatus.INTENT_1_ROLLED_BACK:
+          case HistoryStatus.INTENT_1_ROLLED_BACK: {
             const tokensData = getTokensDataByIds([
               details?.recoverDetails?.send?.token_id ?? "",
             ])
             if (!tokensData.length && !details?.tokenIn) {
               return {
-                title: `Rolled back!`,
-                subTitle: `Swap rolled request is completed.`,
+                title: "Rolled back!",
+                subTitle: "Swap rolled request is completed.",
               }
             }
             const tokenIn = tokensData.length
@@ -92,16 +92,17 @@ const WidgetCard = ({
                 })
               : "0"
             return {
-              title: `Swap rolled back!`,
-              subTitle: `You received back ${(parseFloat(tokenInValue) ? tokenInValue : smallBalanceToFormat(tokenIn)) ?? PLACEHOLDER} ${(details?.selectedTokenIn?.symbol || tokensData[0]?.symbol) ?? PLACEHOLDER}.`,
+              title: "Swap rolled back!",
+              subTitle: `You received back ${(Number.parseFloat(tokenInValue) ? tokenInValue : smallBalanceToFormat(tokenIn)) ?? PLACEHOLDER} ${(details?.selectedTokenIn?.symbol || tokensData[0]?.symbol) ?? PLACEHOLDER}.`,
             }
+          }
 
           // to support new intent
           // TODO : remove all stuff related to old Intents
           case HistoryStatus.COMPLETED:
           case HistoryStatus.INTENT_1_EXECUTED:
             return {
-              title: `Transaction complete!`,
+              title: "Transaction complete!",
               subTitle: `You received ${smallBalanceToFormat(tokenOutValue) ?? PLACEHOLDER} ${details?.selectedTokenOut?.symbol ?? PLACEHOLDER}.`,
             }
 
@@ -140,7 +141,7 @@ const WidgetCard = ({
           title: `Storage deposit on ${details?.transaction?.receiver_id ?? PLACEHOLDER} by ${details?.transaction?.signer_id ?? PLACEHOLDER}`,
         }
 
-      case QueueTransactions.DEPOSIT:
+      case QueueTransactions.DEPOSIT: {
         let title = "Wrapped complete!"
         let subTitle = ""
         const extractMsg = details?.recoverDetails?.msg?.split(" ")
@@ -149,9 +150,9 @@ const WidgetCard = ({
           const tokenNearNative = LIST_NATIVE_TOKENS.find(
             (token) => token.defuse_asset_id === "near:mainnet:native"
           )
+          assert(tokenNearNative, "Token not found")
           const formattedAmount = smallBalanceToFormat(
-            formatUnits(BigInt(amount), tokenNearNative!.decimals as number) ??
-              ""
+            formatUnits(BigInt(amount), tokenNearNative.decimals) ?? ""
           )
           title = `${action} complete!`
           subTitle = `Wrapped ${formattedAmount} ${tokenIn} to ${formattedAmount} w${tokenIn}`
@@ -161,24 +162,24 @@ const WidgetCard = ({
           title,
           subTitle,
         }
+      }
 
-      case QueueTransactions.WITHDRAW:
+      case QueueTransactions.WITHDRAW: {
         const amount = details?.recoverDetails?.amount
-          ? details?.recoverDetails!.amount
+          ? details?.recoverDetails.amount
           : "0"
         const tokenNearNative = LIST_NATIVE_TOKENS.find(
           (token) => token.defuse_asset_id === "near:mainnet:native"
         )
+        assert(tokenNearNative, "Token not found")
         const formattedAmount = smallBalanceToFormat(
-          formatUnits(
-            BigInt(amount as string),
-            tokenNearNative!.decimals as number
-          ) ?? ""
+          formatUnits(BigInt(amount as string), tokenNearNative.decimals) ?? ""
         )
         return {
-          title: `Withdraw complete!`,
-          subTitle: `Unwrapped ${formattedAmount} w${tokenNearNative!.symbol} to ${formattedAmount} ${tokenNearNative!.symbol}`,
+          title: "Transaction complete!",
+          subTitle: `Unwrapped ${formattedAmount} w${tokenNearNative.symbol} to ${formattedAmount} ${tokenNearNative.symbol}`,
         }
+      }
 
       default:
         return { title: "Unknown" }
@@ -211,7 +212,7 @@ const WidgetCard = ({
 
   const handleCloseHistory = () => {
     if (onCloseHistory) {
-      return onCloseHistory && onCloseHistory()
+      return onCloseHistory()
     }
     closeHistoryItem(hash)
   }
@@ -220,10 +221,11 @@ const WidgetCard = ({
     await callRequestRollbackIntent({ id: intentId })
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
-    if (details && details?.transaction) {
+    if (details?.transaction) {
       const typeQueueTransactions = handleGetTypeOfQueueTransactions(
-        details!.transaction as NearTX["transaction"]
+        details.transaction as NearTX["transaction"]
       )
       const { title, subTitle } = handlePrepareMeta(
         details,
@@ -269,6 +271,7 @@ const WidgetCard = ({
 
         {withCloseHistory && (
           <button
+            type={"button"}
             onClick={handleCloseHistory}
             className="h-[24px] w-[24px] flex justify-center items-center dark:bg-black-800 rounded-md"
           >
@@ -277,7 +280,7 @@ const WidgetCard = ({
         )}
       </div>
       <Text size="1" weight="bold" className="mb-1">
-        {title.length > 37 ? title.substring(0, 37) + "..." : title}
+        {title.length > 37 ? `${title.substring(0, 37)}...` : title}
       </Text>
       <Text size="1" className="mb-3">
         {subTitle && subTitle}
@@ -305,7 +308,7 @@ const WidgetCard = ({
         ) : null}
         <Link
           className="h-[32px] flex items-center gap-[4px] border border-gray-600 rounded-[3px] cursor-pointer px-3"
-          href={NEAR_EXPLORER + "/txns/" + hash}
+          href={`${NEAR_EXPLORER}/txns/${hash}`}
           rel="noopener noreferrer"
           target="_blank"
         >
@@ -327,3 +330,9 @@ const WidgetCard = ({
 }
 
 export default WidgetCard
+
+function assert(condition: unknown, msg?: string): asserts condition {
+  if (!condition) {
+    throw new Error(msg)
+  }
+}

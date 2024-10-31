@@ -1,9 +1,9 @@
-import React from "react"
 import { Text } from "@radix-ui/themes"
 import Image from "next/image"
+import React from "react"
 
-import { NetworkToken } from "@src/types/interfaces"
 import AssetComboIcon from "@src/components/Network/AssetComboIcon"
+import type { NetworkToken } from "@src/types/interfaces"
 
 type Type = {
   amountIn: string

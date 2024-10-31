@@ -1,6 +1,7 @@
 "use client"
 
-import React, { PropsWithChildren, useEffect } from "react"
+import type React from "react"
+import { type PropsWithChildren, useEffect } from "react"
 
 import { useCombinedHistoryCollector } from "@src/hooks/useHistoryCollector"
 
@@ -16,6 +17,7 @@ export function withHistory<T extends React.ComponentType>(
   }) => {
     const { runTransactionCollector } = useCombinedHistoryCollector()
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
     useEffect(() => {
       void runTransactionCollector()
     }, [])

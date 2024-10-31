@@ -1,5 +1,5 @@
 import { INDEXER } from "@src/constants/contracts"
-import { CallRequestIntentProps } from "@src/hooks/useSwap"
+import type { CallRequestIntentProps } from "@src/hooks/useSwap"
 import {
   prepareCreateIntent1CrossChain,
   prepareCreateIntent1SingleChain,
@@ -8,7 +8,8 @@ import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 
 export enum MapsEnum {
   NEAR_MAINNET = "near:mainnet",
-  ETH_BASE = "eth:8453",
+  EVM_ETHEREUM = "evm:1",
+  EVM_BASE = "evm:8453",
   BTC_MAINNET = "btc:mainnet",
 }
 
@@ -25,7 +26,7 @@ export interface MapCreateIntentProps {
   solverId?: string
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: <reason>
 export type MapCreateIntentResult = [number, any][]
 
 /**
@@ -55,14 +56,14 @@ export const mapCreateIntentTransactionCall = (
       switch (toNetworkId) {
         case MapsEnum.NEAR_MAINNET:
           return [[INDEXER.INTENT_1, prepareCreateIntent1SingleChain(inputs)]]
-        case MapsEnum.ETH_BASE:
+        case MapsEnum.EVM_BASE:
           return [[INDEXER.INTENT_1, prepareCreateIntent1CrossChain(inputs)]]
         case MapsEnum.BTC_MAINNET:
           return [[INDEXER.INTENT_1, prepareCreateIntent1CrossChain(inputs)]]
         default:
           return []
       }
-    case MapsEnum.ETH_BASE:
+    case MapsEnum.EVM_BASE:
       return [[INDEXER.INTENT_1, prepareCreateIntent1CrossChain(inputs)]]
     default:
       return []

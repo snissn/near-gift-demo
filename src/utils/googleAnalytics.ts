@@ -1,4 +1,4 @@
-import { AnalyticsData, AnalyticsEvent } from "@src/types/analytics"
+import type { AnalyticsData, AnalyticsEvent } from "@src/types/analytics"
 
 export const SHOULD_SEND_ANALYTICS = process.env.environment === "production"
 

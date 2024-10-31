@@ -1,11 +1,17 @@
-import { v4 as uuidv4 } from "uuid"
+export async function sha256(msg: string) {
+  // Convert the message string to an array of bytes
+  const msgBuffer = new TextEncoder().encode(msg)
 
-import { createHash } from "crypto"
+  // Generate the hash
+  const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer)
 
-export function sha256(msg: string) {
-  return createHash("sha256").update(msg).digest("hex")
+  // Convert the hash to hex string
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("")
+
+  return hashHex
 }
 
-export function generateIntentID(): string {
-  return sha256(uuidv4())
+export function generateIntentID(): Promise<string> {
+  return sha256(crypto.randomUUID())
 }

@@ -1,10 +1,10 @@
 "use client"
 
-import { useModalStore } from "@src/providers/ModalStoreProvider"
-import ModalReviewSwap from "@src/components/Modal/ModalReviewSwap"
 import ModalConfirmSwap from "@src/components/Modal/ModalConfirmSwap"
 import ModalConnectNetworks from "@src/components/Modal/ModalConnectNetworks"
+import ModalReviewSwap from "@src/components/Modal/ModalReviewSwap"
 import ModalStoreNetwork from "@src/components/Modal/ModalStoreNetwork"
+import { useModalStore } from "@src/providers/ModalStoreProvider"
 
 import { ModalType } from "../../stores/modalStore"
 

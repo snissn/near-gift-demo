@@ -1,10 +1,10 @@
-import type { Config } from "tailwindcss"
-import defaultTheme from "tailwindcss/defaultTheme"
-import colors from "tailwindcss/colors"
-import plugin from "tailwindcss/plugin"
 import forms from "@tailwindcss/forms"
-import typography from "@tailwindcss/typography"
 import lineClamp from "@tailwindcss/line-clamp"
+import typography from "@tailwindcss/typography"
+import type { Config } from "tailwindcss"
+import colors from "tailwindcss/colors"
+import defaultTheme from "tailwindcss/defaultTheme"
+import plugin from "tailwindcss/plugin"
 
 const config: Config = {
   darkMode: "selector",
@@ -163,7 +163,7 @@ const config: Config = {
     forms,
     typography,
     lineClamp,
-    plugin(function ({ addUtilities }) {
+    plugin(({ addUtilities }) => {
       const newUtilities = {
         ".hide-scrollbar": {
           "scrollbar-width": "none",

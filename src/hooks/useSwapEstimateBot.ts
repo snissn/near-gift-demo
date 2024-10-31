@@ -3,7 +3,7 @@
 import { useState } from "react"
 
 import { concurrentEstimateSwap } from "@src/libs/de-sdk"
-import {
+import type {
   DataEstimateRequest,
   SolverQuoteData,
   SwapEstimateProviderResponse,

@@ -10,6 +10,7 @@ export const useModalSearchParams = () => {
   const { setModalType } = useModalStore((state) => state)
   const searchParams = useSearchParams()
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     const modalType = searchParams.get("modalType") as string | null
     if (

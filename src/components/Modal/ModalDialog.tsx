@@ -1,14 +1,14 @@
+import { Dialog } from "@radix-ui/themes"
 import {
-  PropsWithChildren,
+  type PropsWithChildren,
   useCallback,
   useEffect,
   useRef,
   useState,
 } from "react"
-import { Dialog } from "@radix-ui/themes"
 
-import { useModalStore } from "@src/providers/ModalStoreProvider"
 import useScreenWidth from "@src/hooks/useScreenWidth"
+import { useModalStore } from "@src/providers/ModalStoreProvider"
 
 const ModalDialog = ({ children }: PropsWithChildren) => {
   const { onCloseModal } = useModalStore((state) => state)
@@ -35,11 +35,11 @@ const ModalDialog = ({ children }: PropsWithChildren) => {
     return () => {
       containerWidthRef.current = 0
     }
-  }, [divRef.current?.offsetWidth])
+  }, [])
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
-      <Dialog.Title></Dialog.Title>
+      <Dialog.Title />
       <Dialog.Content
         maxWidth={screenWidth < 768 ? "100%" : defaultMaxWidth}
         className="p-0 dark:bg-black-800"

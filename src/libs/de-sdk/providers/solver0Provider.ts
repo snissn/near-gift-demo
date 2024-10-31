@@ -1,7 +1,7 @@
-import axios, { AxiosRequestConfig } from "axios"
+import axios, { type AxiosRequestConfig } from "axios"
 import { v4 } from "uuid"
 
-import {
+import type {
   DataEstimateRequest,
   SwapEstimateProviderResponse,
 } from "@src/libs/de-sdk/types/interfaces"

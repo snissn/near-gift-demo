@@ -2,12 +2,12 @@
 
 import { Text } from "@radix-ui/themes"
 
-import AssetComboIcon from "@src/components/Network/AssetComboIcon"
-import { smallBalanceToFormat } from "@src/utils/token"
 import WidgetCardLink from "@src/components/History/Widget/WidgetCardLink"
-import useShortAccountId from "@src/hooks/useShortAccountId"
-import { useActiveHover } from "@src/hooks/useActiveHover"
+import AssetComboIcon from "@src/components/Network/AssetComboIcon"
 import { NEAR_TOKEN_META } from "@src/constants/tokens"
+import { useActiveHover } from "@src/hooks/useActiveHover"
+import useShortAccountId from "@src/hooks/useShortAccountId"
+import { smallBalanceToFormat } from "@src/utils/token"
 
 type Props = {
   receiverId: string
@@ -22,9 +22,10 @@ const WidgetCardStorageDeposit = ({ receiverId, amount, hash }: Props) => {
   const { shortAccountId } = useShortAccountId(receiverId)
 
   return (
+    // biome-ignore lint/a11y/useKeyWithMouseEvents lint/a11y/useKeyWithClickEvents: <reason>
     <div
       onClick={() => {
-        window.open(NEAR_EXPLORER + "/txns/" + hash)
+        window.open(`${NEAR_EXPLORER}/txns/${hash}`)
       }}
       onMouseOver={handleMouseOver}
       onMouseLeave={handleMouseLeave}

@@ -1,4 +1,7 @@
-import { NetworkToken, NetworkTokenWithSwapRoute } from "@src/types/interfaces"
+import type {
+  NetworkToken,
+  NetworkTokenWithSwapRoute,
+} from "@src/types/interfaces"
 
 const environment = process.env.environment || "production"
 
@@ -224,6 +227,190 @@ export const LIST_NETWORKS_TOKENS: NetworkToken[] =
   environment === "development"
     ? listNetworksTokensTestnet
     : listNetworksTokensMainnet
+
+export const LIST_TOKENS = [
+  {
+    unifiedAssetId: "usdc",
+    decimals: 6,
+    symbol: "USDC",
+    name: "USD Coin",
+    icon: "https://assets.coingecko.com/coins/images/6319/standard/usdc.png",
+    groupedTokens: [
+      {
+        defuseAssetId:
+          "nep141:17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
+        address:
+          "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
+        decimals: 6,
+        icon: "https://assets.coingecko.com/coins/images/6319/standard/usdc.png",
+        chainId: "mainnet",
+        chainIcon: "/static/icons/network/near.svg",
+        chainName: "near",
+        routes: [],
+        symbol: "USDC",
+        name: "USDC",
+      },
+      {
+        defuseAssetId:
+          "nep141:eth-0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.duse.near",
+        address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        decimals: 6,
+        icon: "https://assets.coingecko.com/coins/images/6319/standard/usdc.png",
+        chainId: "1",
+        chainIcon: "/static/icons/network/ethereum.svg",
+        chainName: "eth",
+        routes: [],
+        symbol: "USDC",
+        name: "USDC",
+      },
+      {
+        defuseAssetId:
+          "nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.duse.near",
+        address: "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+        decimals: 6,
+        icon: "https://assets.coingecko.com/coins/images/6319/standard/usdc.png",
+        chainId: "8453",
+        chainIcon: "/static/icons/network/base.svg",
+        chainName: "base",
+        routes: [],
+        symbol: "USDC",
+        name: "USDC",
+      },
+      {
+        defuseAssetId:
+          "nep141:arbitrum-0xaf88d065e77c8cc2239327c5edb3a432268e5831.duse.near",
+        address: "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+        decimals: 6,
+        icon: "https://assets.coingecko.com/coins/images/6319/standard/usdc.png",
+        chainId: "8453",
+        chainIcon: "/static/icons/network/arbitrum.svg",
+        chainName: "arbitrum",
+        routes: [],
+        symbol: "USDC",
+        name: "USDC",
+      },
+    ],
+  },
+  {
+    unifiedAssetId: "usdt",
+    decimals: 6,
+    symbol: "USDT",
+    name: "Tether USD",
+    icon: "https://assets.coingecko.com/coins/images/325/standard/Tether.png",
+    groupedTokens: [
+      {
+        defuseAssetId: "nep141:usdt.tether-token.near",
+        address: "usdt.tether-token.near",
+        decimals: 6,
+        icon: "https://assets.coingecko.com/coins/images/325/standard/Tether.png",
+        chainId: "mainnet",
+        chainIcon: "/static/icons/network/near.svg",
+        chainName: "near",
+        routes: [],
+        symbol: "USDT",
+        name: "USDt",
+      },
+    ],
+  },
+  {
+    unifiedAssetId: "eth",
+    decimals: 18,
+    symbol: "ETH",
+    name: "ETH",
+    icon: "https://assets.coingecko.com/coins/images/279/standard/ethereum.png",
+    groupedTokens: [
+      {
+        defuseAssetId: "nep141:aurora",
+        address: "aurora",
+        decimals: 18,
+        icon: "https://assets.coingecko.com/coins/images/279/standard/ethereum.png",
+        chainId: "mainnet",
+        chainIcon: "/static/icons/network/near.svg",
+        chainName: "near",
+        routes: ["near:mainnet:aurora"],
+        symbol: "ETH",
+        name: "ETH",
+      },
+      {
+        defuseAssetId: "nep141:eth-native.duse.near",
+        type: "native" as const,
+        address: "native",
+        decimals: 18,
+        icon: "https://assets.coingecko.com/coins/images/279/standard/ethereum.png",
+        chainId: "",
+        chainIcon: "/static/icons/network/ethereum.svg",
+        chainName: "eth",
+        routes: [],
+        symbol: "ETH",
+        name: "ETH",
+      },
+      {
+        defuseAssetId: "nep141:base-native.duse.near",
+        type: "native" as const,
+        address: "native",
+        decimals: 18,
+        icon: "https://assets.coingecko.com/coins/images/279/standard/ethereum.png",
+        chainId: "",
+        chainIcon: "/static/icons/network/base.svg",
+        chainName: "base",
+        routes: [],
+        symbol: "ETH",
+        name: "ETH",
+      },
+      {
+        defuseAssetId: "nep141:arbitrum-native.duse.near",
+        type: "native" as const,
+        address: "native",
+        decimals: 18,
+        icon: "https://assets.coingecko.com/coins/images/279/standard/ethereum.png",
+        chainId: "",
+        chainIcon: "/static/icons/network/arbitrum.svg",
+        chainName: "arbitrum",
+        routes: [],
+        symbol: "ETH",
+        name: "ETH",
+      },
+    ],
+  },
+  {
+    defuseAssetId:
+      "nep141:aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near",
+    address: "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near",
+    decimals: 18,
+    icon: "https://assets.coingecko.com/coins/images/20582/standard/aurora.jpeg?1696519989",
+    chainId: "mainnet",
+    chainIcon: "/static/icons/network/near.svg",
+    chainName: "near",
+    routes: [],
+    symbol: "AURORA",
+    name: "Aurora",
+  },
+  {
+    defuseAssetId: "nep141:wrap.near",
+    address: "wrap.near",
+    decimals: 24,
+    icon: "https://assets.coingecko.com/coins/images/10365/standard/near.jpg",
+    chainId: "mainnet",
+    chainIcon: "/static/icons/network/near.svg",
+    chainName: "near",
+    routes: [],
+    symbol: "NEAR",
+    name: "Near",
+  },
+  {
+    defuseAssetId: "nep141:btc-native.duse.near",
+    type: "native" as const,
+    address: "native",
+    decimals: 8,
+    icon: "https://assets.coingecko.com/coins/images/1/standard/bitcoin.png?1696501400",
+    chainId: "",
+    chainIcon: "/static/icons/network/btc.svg",
+    chainName: "bitcoin",
+    routes: [],
+    symbol: "BTC",
+    name: "Bitcoin",
+  },
+]
 
 const listNativeTokensTestnet = [
   {

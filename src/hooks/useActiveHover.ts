@@ -1,6 +1,7 @@
 "use client"
 
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import type React from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import { debounce } from "@src/utils/debounce"
 
@@ -26,12 +27,14 @@ export const useActiveHover = () => {
   useEffect(() => {
     if (isActive && eventRef.current) {
       const timeoutId = setTimeout(() => {
+        if (eventRef.current == null) return
+
         const elementUnderCursor = document.elementFromPoint(
-          eventRef.current!.clientX,
-          eventRef.current!.clientY
+          eventRef.current.clientX,
+          eventRef.current.clientY
         )
 
-        const targetElement = eventRef.current!.target as Element
+        const targetElement = eventRef.current.target as Element
 
         if (elementUnderCursor && !targetElement.contains(elementUnderCursor)) {
           setIsActive(false)

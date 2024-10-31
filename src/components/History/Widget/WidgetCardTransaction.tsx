@@ -2,19 +2,19 @@
 
 import React from "react"
 
-import { HistoryData, HistoryStatus } from "@src/stores/historyStore"
-import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
-import { useSwap } from "@src/hooks/useSwap"
-import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import WidgetCardSwap from "@src/components/History/Widget/WidgetCardSwap"
+import { safeBalanceToDecimal } from "@src/app/swap/SwapForm/service/balanceTo"
+import WidgetCardDeposit from "@src/components/History/Widget/WidgetCardDeposit"
+import WidgetCardFailed from "@src/components/History/Widget/WidgetCardFailed"
 import WidgetCardLoading from "@src/components/History/Widget/WidgetCardLoading"
 import WidgetCardRollback from "@src/components/History/Widget/WidgetCardRollback"
-import WidgetCardFailed from "@src/components/History/Widget/WidgetCardFailed"
-import WidgetCardWithdraw from "@src/components/History/Widget/WidgetCardWithdraw"
-import WidgetCardDeposit from "@src/components/History/Widget/WidgetCardDeposit"
 import WidgetCardStorageDeposit from "@src/components/History/Widget/WidgetCardStorageDeposit"
-import { safeBalanceToDecimal } from "@src/app/swap/SwapForm/service/balanceTo"
+import WidgetCardSwap from "@src/components/History/Widget/WidgetCardSwap"
+import WidgetCardWithdraw from "@src/components/History/Widget/WidgetCardWithdraw"
 import { NEAR_TOKEN_META } from "@src/constants/tokens"
+import { useSwap } from "@src/hooks/useSwap"
+import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import { type HistoryData, HistoryStatus } from "@src/stores/historyStore"
+import type { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 
 type Props = {
   onCloseHistory?: () => void
@@ -54,14 +54,12 @@ const WidgetCardTransaction = ({
       }
       return (
         <WidgetCardFailed
-          actions={details!.transaction!.actions}
+          actions={details.transaction.actions}
           tokenIn={tokenInValue}
           tokenOut={tokenOutValue}
-          selectedTokenIn={
-            details!.selectedTokenIn as NetworkTokenWithSwapRoute
-          }
+          selectedTokenIn={details.selectedTokenIn as NetworkTokenWithSwapRoute}
           selectedTokenOut={
-            details!.selectedTokenOut as NetworkTokenWithSwapRoute
+            details.selectedTokenOut as NetworkTokenWithSwapRoute
           }
           hash={hash}
         />
@@ -82,15 +80,13 @@ const WidgetCardTransaction = ({
           intentId={intentId}
           tokenIn={tokenInValue}
           tokenOut={tokenOutValue}
-          selectedTokenIn={
-            details!.selectedTokenIn as NetworkTokenWithSwapRoute
-          }
+          selectedTokenIn={details.selectedTokenIn as NetworkTokenWithSwapRoute}
           selectedTokenOut={
-            details!.selectedTokenOut as NetworkTokenWithSwapRoute
+            details.selectedTokenOut as NetworkTokenWithSwapRoute
           }
           timestamp={timestamp}
           handleCloseIntent={callRequestRollbackIntent}
-          receiverId={details!.recoverDetails?.receiverId ?? ""}
+          receiverId={details.recoverDetails?.receiverId ?? ""}
         />
       )
 
@@ -101,37 +97,36 @@ const WidgetCardTransaction = ({
       }
       return (
         <WidgetCardRollback
-          actions={details!.transaction!.actions}
+          actions={details.transaction.actions}
           tokenIn={tokenInValue}
           tokenOut={tokenOutValue}
-          selectedTokenIn={
-            details!.selectedTokenIn as NetworkTokenWithSwapRoute
-          }
+          selectedTokenIn={details.selectedTokenIn as NetworkTokenWithSwapRoute}
           selectedTokenOut={
-            details!.selectedTokenOut as NetworkTokenWithSwapRoute
+            details.selectedTokenOut as NetworkTokenWithSwapRoute
           }
           hash={hash}
         />
       )
 
-    case HistoryStatus.WITHDRAW:
+    case HistoryStatus.WITHDRAW: {
       if (!details?.transaction || !hash || iTokenDetailMissing) {
         return <WidgetCardLoading />
       }
       const recoverAmount = (
-        Number(details!.recoverDetails?.amount ?? "0") /
+        Number(details.recoverDetails?.amount ?? "0") /
         10 ** 24
       ).toString()
       return (
         <WidgetCardWithdraw
-          accountId={details?.transaction.signer_id as string}
+          accountId={details.transaction.signer_id as string}
           tokenOut={recoverAmount ?? tokenOutValue}
           selectedTokenOut={
-            details!.selectedTokenOut as NetworkTokenWithSwapRoute
+            details.selectedTokenOut as NetworkTokenWithSwapRoute
           }
           hash={hash}
         />
       )
+    }
 
     case HistoryStatus.DEPOSIT:
       if (!details?.transaction || !hash || iTokenDetailMissing) {
@@ -139,20 +134,18 @@ const WidgetCardTransaction = ({
       }
       return (
         <WidgetCardDeposit
-          accountId={details?.transaction.signer_id as string}
+          accountId={details.transaction.signer_id as string}
           tokenIn={tokenInValue}
-          selectedTokenIn={
-            details!.selectedTokenIn as NetworkTokenWithSwapRoute
-          }
+          selectedTokenIn={details.selectedTokenIn as NetworkTokenWithSwapRoute}
           hash={hash}
         />
       )
 
-    case HistoryStatus.STORAGE_DEPOSIT:
+    case HistoryStatus.STORAGE_DEPOSIT: {
       if (
         !details?.recoverDetails?.receiverId ||
         !hash ||
-        !details?.recoverDetails?.amount
+        !details.recoverDetails?.amount
       ) {
         return <WidgetCardLoading />
       }
@@ -167,6 +160,7 @@ const WidgetCardTransaction = ({
           hash={hash}
         />
       )
+    }
   }
 
   return <WidgetCardLoading />

@@ -1,11 +1,11 @@
 import axios, { AxiosResponse } from "axios"
 
-import {
+import type { SolverTokenList } from "@src/libs/de-sdk/providers/solver0Provider"
+import type {
   BitcoinBalanceEntity,
   BitcoinPriceInUsdEntity,
   Result,
 } from "@src/types/interfaces"
-import { SolverTokenList } from "@src/libs/de-sdk/providers/solver0Provider"
 
 const SOLVER_RELAY_0_URL = process.env.SOLVER_RELAY_0_URL ?? ""
 const BITCOIN_INFO_URL = process.env.BITCOIN_INFO_URL ?? ""
@@ -26,9 +26,9 @@ export const getDiscoverDefuseAssets = (
 export const getBitcoinBalance = (
   address: string
 ): Promise<BitcoinBalanceEntity> =>
-  axios.get(BITCOIN_INFO_URL + "/" + address).then((resp) => resp.data)
+  axios.get(`${BITCOIN_INFO_URL}/${address}`).then((resp) => resp.data)
 
 export const getBitcoinPriceInUsd = (): Promise<BitcoinPriceInUsdEntity> =>
   axios
-    .get(COINGECKO_API_URL + "/simple/price?ids=bitcoin&vs_currencies=usd")
+    .get(`${COINGECKO_API_URL}/simple/price?ids=bitcoin&vs_currencies=usd`)
     .then((resp) => resp.data)

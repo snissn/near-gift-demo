@@ -31,9 +31,9 @@ export function middleware(request: NextRequest) {
     response.headers.set("Access-Control-Allow-Origin", origin)
   }
 
-  Object.entries(corsOptions).forEach(([key, value]) => {
+  for (const [key, value] of Object.entries(corsOptions)) {
     response.headers.set(key, value)
-  })
+  }
 
   return response
 }

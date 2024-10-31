@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-import { NetworkToken } from "@src/types/interfaces"
+import type { NetworkToken } from "@src/types/interfaces"
 
 export const useCalculateTokenToUsd = () => {
   const [priceToUsd, setPriceToUsd] = useState("0")
@@ -9,7 +9,7 @@ export const useCalculateTokenToUsd = () => {
     amount: string,
     selectToken: NetworkToken | undefined
   ) => {
-    if (!selectToken || !parseFloat(amount)) {
+    if (!selectToken || !Number.parseFloat(amount)) {
       setPriceToUsd("0")
       return
     }

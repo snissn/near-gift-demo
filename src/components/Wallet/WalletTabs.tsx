@@ -1,13 +1,13 @@
 "use client"
 
-import { Box, Text, Tabs, Spinner } from "@radix-ui/themes"
-import { PropsWithChildren, useEffect, useState } from "react"
+import { Box, Spinner, Tabs, Text } from "@radix-ui/themes"
 import { formatUnits } from "ethers"
+import { type PropsWithChildren, useEffect, useState } from "react"
 
 import LabelComingSoon from "@src/components/LabelComingSoon"
-import { useTokensStore } from "@src/providers/TokensStoreProvider"
-import { useAccountBalance } from "@src/hooks/useAccountBalance"
 import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
+import { useAccountBalance } from "@src/hooks/useAccountBalance"
+import { useTokensStore } from "@src/providers/TokensStoreProvider"
 
 const IS_DISABLED_ALL_TABS = true
 
@@ -58,24 +58,25 @@ const WalletTabs = () => {
     const temp = []
     let wNearConvertedLastUsd = 0
 
-    data.forEach((token) => {
+    for (const token of data.values()) {
       temp.push(token)
       if (token?.balanceUsd && token?.balanceUsd > 0) {
-        balanceInUsd = Number(balanceInUsd) + Number(token!.balanceUsd)
+        balanceInUsd = Number(balanceInUsd) + Number(token.balanceUsd)
         if (token.defuse_asset_id === "near:mainnet:wrap.near") {
-          wNearConvertedLastUsd = token.convertedLast!.usd
+          assert(token.convertedLast, "Token convertedLast not found")
+          wNearConvertedLastUsd = token.convertedLast.usd
         }
       }
-    })
+    }
 
     const tokenNearNative = LIST_NATIVE_TOKENS.find(
       (token) => token.defuse_asset_id === "near:mainnet:native"
     )
-
+    assert(tokenNearNative, "Token near native not found")
     const { balance } = await getAccountBalance()
     const nativeBalanceInUsd = formatUnits(
       BigInt(balance),
-      tokenNearNative!.decimals as number
+      tokenNearNative.decimals
     )
 
     balanceInUsd += Number(nativeBalanceInUsd) * wNearConvertedLastUsd
@@ -84,6 +85,7 @@ const WalletTabs = () => {
     setIsLoading(false)
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     if (data.size) {
       void getBalanceToUsd()
@@ -126,3 +128,9 @@ const WalletTabs = () => {
 }
 
 export default WalletTabs
+
+function assert(condition: unknown, msg?: string): asserts condition {
+  if (!condition) {
+    throw new Error(msg)
+  }
+}

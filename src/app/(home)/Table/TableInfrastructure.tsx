@@ -1,7 +1,7 @@
-import Image from "next/image"
-import React, { PropsWithChildren } from "react"
 import { Text } from "@radix-ui/themes"
 import clsx from "clsx"
+import Image from "next/image"
+import React, { type PropsWithChildren } from "react"
 
 export enum ColumnGroupType {
   MAIN = "main",
@@ -86,7 +86,7 @@ const TableInfrastructure = ({ data, maxWidth }: Props) => {
   return (
     <div
       className={clsx("mx-auto min-w-0 -m-5 xl:m-0")}
-      style={{ maxWidth: maxWidth + "px" }}
+      style={{ maxWidth: `${maxWidth}px` }}
     >
       <div className="block overflow-auto max-h-screen">
         <table className="table-fixed w-full" border={0} cellPadding="0">
@@ -102,6 +102,7 @@ const TableInfrastructure = ({ data, maxWidth }: Props) => {
           </thead>
           <tbody>
             {data.map((dataElement, index, array) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: <reason>
               <tr key={index}>
                 <ComponentBody
                   icon={dataElement.featureIcon}

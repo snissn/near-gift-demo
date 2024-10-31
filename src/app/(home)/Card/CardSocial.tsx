@@ -11,6 +11,7 @@ type Props = {
 }
 const CardSocial = ({ name, icon, link }: Props) => {
   return (
+    // biome-ignore lint/a11y/useKeyWithClickEvents: <reason>
     <div
       onClick={() => {
         window.open(link)

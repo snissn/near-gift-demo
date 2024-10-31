@@ -8,6 +8,7 @@ export enum ModalType {
   MODAL_CONFIRM_SWAP = "modalConfirmSwap",
   MODAL_CONNECT_NETWORKS = "modalConnectNetworks",
   MODAL_STORE_NETWORK = "modalStoreNetwork",
+  MODAL_SELECT_WALLET = "modalSelectWallet",
 }
 
 export type ModalState = {

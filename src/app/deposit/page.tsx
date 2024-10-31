@@ -1,74 +1,49 @@
 "use client"
 
 import React from "react"
-import { FieldValues, useForm } from "react-hook-form"
-import Image from "next/image"
 
+import { DepositWidget } from "@defuse-protocol/defuse-sdk"
 import Paper from "@src/components/Paper"
-import Form from "@src/components/Form"
-import FieldComboInput from "@src/components/Form/FieldComboInput"
-import ButtonSwitch from "@src/components/Button/ButtonSwitch"
-import Accordion from "@src/components/Accordion"
-import Button from "@src/components/Button/Button"
-import { NetworkToken } from "@src/types/interfaces"
-
-type FormValues = {
-  tokenIn: string
-  tokenOut: string
-}
+import { LIST_TOKENS } from "@src/constants/tokens"
+import { SignInType, useConnectWallet } from "@src/hooks/useConnectWallet"
+import { useNotificationStore } from "@src/providers/NotificationProvider"
+import { NotificationType } from "@src/stores/notificationStore"
 
 export default function Deposit() {
-  const { handleSubmit, register } = useForm<FormValues>()
+  const { state, sendTransaction } = useConnectWallet()
+  const setNotification = useNotificationStore((state) => state.setNotification)
 
-  const onSubmit = (values: FieldValues) => {
-    console.log(values, "form submit")
-  }
-  const handleSwitch = () => {
-    console.log("form switch")
-  }
-  const handleSetMax = () => {
-    console.log("form set max")
-  }
   return (
     <Paper title="Deposit">
-      <Form<FormValues>
-        handleSubmit={handleSubmit(onSubmit)}
-        register={register}
-      >
-        <FieldComboInput<FormValues>
-          fieldName="tokenIn"
-          label="You pay"
-          selected={{ name: "USD" } as NetworkToken}
-        />
-        <ButtonSwitch onClick={handleSwitch} />
-        <FieldComboInput<FormValues>
-          fieldName="tokenOut"
-          label="You receive"
-          selected={{ name: "AURORA" } as NetworkToken}
-        />
-        <Accordion
-          leftHeaderElement={
-            <>
-              <span className="text-sm font-medium">0.184 ETH = €2,681.60</span>
-              <span className="text-sm text-gray-700">($0.361)</span>
-            </>
+      <DepositWidget
+        tokenList={LIST_TOKENS}
+        userAddress={state.address ?? null}
+        sendTransactionNear={async (transactions) => {
+          const result = await sendTransaction({
+            id: SignInType.NearWalletSelector,
+            transactions,
+          })
+
+          // For batch transactions, the result is an array with the transaction hash as the second element
+          return Array.isArray(result) ? result[1].transaction.hash : result
+        }}
+        onEmit={(event) => {
+          if (event.type === "SUCCESSFUL_DEPOSIT") {
+            setNotification({
+              id: crypto.randomUUID(),
+              message: "Deposit successful",
+              type: NotificationType.SUCCESS,
+            })
           }
-          rightHeaderElement={
-            <>
-              <Image
-                src="/static/icons/fire.svg"
-                width={12}
-                height={16}
-                alt="caret-down"
-              />
-              <span className="text-sm font-medium text-gray-700">$5.56</span>
-            </>
+          if (event.type === "FAILED_DEPOSIT") {
+            setNotification({
+              id: crypto.randomUUID(),
+              message: "Deposit failed",
+              type: NotificationType.ERROR,
+            })
           }
-        />
-        <Button type="submit" size="lg" fullWidth disabled>
-          Coming soon
-        </Button>
-      </Form>
+        }}
+      />
     </Paper>
   )
 }

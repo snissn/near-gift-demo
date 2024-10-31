@@ -1,49 +1,158 @@
 "use client"
 
+import type { FinalExecutionOutcome } from "@near-wallet-selector/core"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import type { SignAndSendTransactionsParams } from "@src/types/interfaces"
+import { useEffect, useState } from "react"
+import { type Connector, useAccount, useConnect, useDisconnect } from "wagmi"
+import { useNearWalletActions } from "./useNearWalletActions"
+
+export enum SignInType {
+  NearWalletSelector = "near-wallet-selector",
+  Wagmi = "wagmi",
+}
+
+export enum SendTransactionType {
+  SignAndSendTransactions = "signAndSendTransactions",
+}
+
+type State = {
+  signInType?: SignInType | undefined
+  network?: string | undefined
+  address?: string | undefined
+}
 
 interface ConnectWalletAction {
-  handleSignIn: () => void
-  handleSignOut: () => Promise<void>
-  handleSwitchWallet: () => void
-  handleSwitchAccount: () => void
+  signIn: (params: {
+    id: SignInType
+    connector?: Connector
+  }) => Promise<void>
+  signOut: (params: { id: SignInType }) => Promise<void>
+  signMessage: (params: { id: SignInType; message: string }) => Promise<void>
+  sendTransaction: (params: {
+    id: SignInType
+    transactions: SignAndSendTransactionsParams["transactions"]
+  }) => Promise<string | FinalExecutionOutcome[]>
+  connectors: Connector[]
+  state: State
 }
-export const useConnectWallet = (): ConnectWalletAction => {
-  const { selector, modal, accounts, accountId } = useWalletSelector()
 
-  const handleSignIn = () => {
+const defaultState: State = {
+  signInType: undefined,
+  network: undefined,
+  address: undefined,
+}
+
+export const useConnectWallet = (): ConnectWalletAction => {
+  const [state, setState] = useState<State>(defaultState)
+  const { selector, modal, accountId } = useWalletSelector()
+  const { signAndSendTransactions } = useNearWalletActions()
+  const { connectors, connect } = useConnect()
+  const { disconnect } = useDisconnect()
+  const { address, chain } = useAccount()
+
+  const handleSignInViaNearWalletSelector = async (): Promise<void> => {
     modal.show()
   }
 
-  const handleSignOut = async () => {
+  const handleSignOutViaNearWalletSelector = async () => {
     try {
       const wallet = await selector.wallet()
       await wallet.signOut()
     } catch (e) {
-      console.log("Failed to sign out")
-      console.error(e)
+      console.log("Failed to sign out", e)
     }
   }
 
-  const handleSwitchWallet = () => {
-    modal.show()
+  const handleSignInViaWalletConnect = async ({
+    connector,
+  }: {
+    connector: Connector
+  }): Promise<void> => {
+    if (!connector) {
+      throw new Error("Invalid connector")
+    }
+    connect({ connector })
   }
 
-  const handleSwitchAccount = () => {
-    const currentIndex = accounts.findIndex((x) => x.accountId === accountId)
-    const nextIndex = currentIndex < accounts.length - 1 ? currentIndex + 1 : 0
-
-    const nextAccountId = accounts[nextIndex].accountId
-
-    selector.setActiveAccount(nextAccountId)
-
-    alert("Switched account to " + nextAccountId)
+  const handleSignOutViaWalletConnect = async () => {
+    await disconnect()
   }
+
+  useEffect(() => {
+    if (!accountId && !address) {
+      setState(defaultState)
+    }
+    if (accountId) {
+      setState({
+        address: accountId,
+        network: "near:mainet",
+        signInType: SignInType.NearWalletSelector,
+      })
+    }
+    if (address) {
+      setState({
+        address,
+        network: chain?.id ? `eth:${chain.name}` : "unknown",
+        signInType: SignInType.Wagmi,
+      })
+    }
+  }, [accountId, address, chain])
 
   return {
-    handleSignIn,
-    handleSignOut,
-    handleSwitchWallet,
-    handleSwitchAccount,
+    async signIn(params: {
+      id: SignInType
+      connector?: Connector
+    }): Promise<void> {
+      const strategies = {
+        [SignInType.NearWalletSelector]: () =>
+          handleSignInViaNearWalletSelector(),
+        [SignInType.Wagmi]: () =>
+          params.connector
+            ? handleSignInViaWalletConnect({ connector: params.connector })
+            : undefined,
+      }
+      return strategies[params.id]()
+    },
+
+    async signOut(params: {
+      id: SignInType
+    }): Promise<void> {
+      const strategies = {
+        [SignInType.NearWalletSelector]: () =>
+          handleSignOutViaNearWalletSelector(),
+        [SignInType.Wagmi]: () => handleSignOutViaWalletConnect(),
+      }
+      return strategies[params.id]()
+    },
+
+    // TODO: Implement this
+    signMessage: async ({
+      id,
+      message,
+    }: { id: SignInType; message: string }) => {},
+
+    sendTransaction: async (
+      params
+    ): Promise<string | FinalExecutionOutcome[]> => {
+      const strategies = {
+        [SignInType.NearWalletSelector]: async () =>
+          await signAndSendTransactions({
+            transactions: params.transactions,
+          }),
+        [SignInType.Wagmi]: async () => {
+          throw new Error("Wagmi sendTransaction not implemented")
+        },
+      }
+
+      const result = await strategies[params.id]()
+      if (result === undefined) {
+        throw new Error(`Transaction failed for ${params.id}`)
+      }
+      return result
+    },
+
+    connectors: connectors as Connector[],
+    state,
   }
 }

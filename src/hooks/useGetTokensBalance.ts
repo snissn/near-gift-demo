@@ -2,30 +2,30 @@
 
 import { useEffect, useState } from "react"
 
-import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import { nep141Balance } from "@src/utils/near"
-import {
-  NetworkTokenWithSwapRoute,
-  TokenBalance,
-  NetworkEnum,
-  BlockchainEnum,
-} from "@src/types/interfaces"
-import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 import { useGetCoingeckoExchangeList } from "@src/api/hooks/exchange/useGetCoingeckoExchangeList"
-import { CoingeckoExchanges } from "@src/types/coingecko"
-import { useAccountBalance } from "@src/hooks/useAccountBalance"
-import parseDefuseAsset from "@src/utils/parseDefuseAsset"
-import { useMinimumNearBalance } from "@src/hooks/useMinimumNearBalance"
-import { W_BASE_TOKEN_META, W_NEAR_TOKEN_META } from "@src/constants/tokens"
+import { getBitcoinPriceInUsd } from "@src/api/token"
 import { balanceToDecimal } from "@src/app/swap/SwapForm/service/balanceTo"
 import { getBalanceNearAllowedToSwap } from "@src/app/swap/SwapForm/service/getBalanceNearAllowedToSwap"
+import { W_BASE_TOKEN_META, W_NEAR_TOKEN_META } from "@src/constants/tokens"
+import { useAccountBalance } from "@src/hooks/useAccountBalance"
+import { useMinimumNearBalance } from "@src/hooks/useMinimumNearBalance"
+import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
+import { useTokensStore } from "@src/providers/TokensStoreProvider"
+import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import type { CoingeckoExchanges } from "@src/types/coingecko"
+import {
+  BlockchainEnum,
+  NetworkEnum,
+  type NetworkTokenWithSwapRoute,
+  type TokenBalance,
+} from "@src/types/interfaces"
+import { bitcoinNativeBalance } from "@src/utils/bitcoin"
 import {
   ethereumERC20Balance,
   ethereumNativeBalance,
 } from "@src/utils/ethereum"
-import { bitcoinNativeBalance } from "@src/utils/bitcoin"
-import { getBitcoinPriceInUsd } from "@src/api/token"
-import { useTokensStore } from "@src/providers/TokensStoreProvider"
+import { nep141Balance } from "@src/utils/near"
+import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 
 import { useGetAccount } from "./useGetAccount"
 
@@ -275,6 +275,7 @@ export const useGetTokensBalance = (
     setData(dataCleanBalances)
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     if (accountId && tokensList && isFetchedListNear && isFetchedListBase) {
       void getTokensBalance()
@@ -289,6 +290,7 @@ export const useGetTokensBalance = (
     isLoading,
   ])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <reason>
   useEffect(() => {
     if (!accountId && !isFetching) {
       clearTokensBalance()

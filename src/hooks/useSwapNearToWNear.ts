@@ -1,4 +1,4 @@
-import { WalletSelector } from "@near-wallet-selector/core"
+import type { WalletSelector } from "@near-wallet-selector/core"
 
 import {
   FT_STORAGE_DEPOSIT_GAS,
@@ -16,7 +16,8 @@ const useSwapNearToWNear = ({ selector }: Props) => {
     contractAddress: string,
     deposit: string
   ) => {
-    const wallet = await selector!.wallet()
+    assert(selector, "Wallet selector is not initialized")
+    const wallet = await selector.wallet()
     return await wallet.signAndSendTransactions({
       transactions: [
         {
@@ -41,7 +42,8 @@ const useSwapNearToWNear = ({ selector }: Props) => {
     contractAddress: string,
     amount: string
   ) => {
-    const wallet = await selector!.wallet()
+    assert(selector, "Wallet selector is not initialized")
+    const wallet = await selector.wallet()
     return await wallet.signAndSendTransactions({
       transactions: [
         {
@@ -71,3 +73,9 @@ const useSwapNearToWNear = ({ selector }: Props) => {
 }
 
 export default useSwapNearToWNear
+
+function assert(condition: unknown, msg?: string): asserts condition {
+  if (!condition) {
+    throw new Error(msg)
+  }
+}

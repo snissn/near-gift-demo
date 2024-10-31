@@ -1,5 +1,5 @@
 import { getNearFinalBlock } from "@src/api/transaction"
-import { NearBlock, NearHeader } from "@src/types/interfaces"
+import type { NearBlock, NearHeader } from "@src/types/interfaces"
 
 export const useNearBlock = () => {
   const getNearBlock = async (): Promise<NearHeader> => {

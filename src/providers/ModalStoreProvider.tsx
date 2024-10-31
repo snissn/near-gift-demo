@@ -1,6 +1,6 @@
 "use client"
 
-import { type ReactNode, createContext, useRef, useContext } from "react"
+import { type ReactNode, createContext, useContext, useRef } from "react"
 import { type StoreApi, useStore } from "zustand"
 
 import {
@@ -34,7 +34,7 @@ export const useModalStore = <T,>(selector: (store: ModalStore) => T): T => {
   const modalStoreContext = useContext(ModalStoreContext)
 
   if (!modalStoreContext) {
-    throw new Error(`useModalStore must be use within ModalStoreProvider`)
+    throw new Error("useModalStore must be use within ModalStoreProvider")
   }
 
   return useStore(modalStoreContext, selector)

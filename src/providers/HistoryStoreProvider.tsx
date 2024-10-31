@@ -1,6 +1,6 @@
 "use client"
 
-import { type ReactNode, createContext, useRef, useContext } from "react"
+import { type ReactNode, createContext, useContext, useRef } from "react"
 import { type StoreApi, useStore } from "zustand"
 
 import {
@@ -38,7 +38,7 @@ export const useHistoryStore = <T,>(
   const historyStoreContext = useContext(HistoryStoreContext)
 
   if (!historyStoreContext) {
-    throw new Error(`useHistoryStore must be use within HistoryStoreProvider`)
+    throw new Error("useHistoryStore must be use within HistoryStoreProvider")
   }
 
   return useStore(historyStoreContext, selector)

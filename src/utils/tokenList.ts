@@ -1,5 +1,5 @@
-import { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 import { NEAR_TOKEN_META, W_NEAR_TOKEN_META } from "@src/constants/tokens"
+import type { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 
 /**
  * Wrap Near has to be applied to Native Near and goes in conjunction on Swap.

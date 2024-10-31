@@ -1,29 +1,29 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
-import Image from "next/image"
-import { Text, Tooltip } from "@radix-ui/themes"
 import { InfoCircledIcon } from "@radix-ui/react-icons"
-import { isAddress } from "ethers"
+import { Text, Tooltip } from "@radix-ui/themes"
 import * as bitcoin from "bitcoinjs-lib"
+import { isAddress } from "ethers"
+import Image from "next/image"
+import React, { useEffect, useState } from "react"
 
-import { BlockchainEnum, NetworkToken } from "@src/types/interfaces"
-import { useModalStore } from "@src/providers/ModalStoreProvider"
 import Button from "@src/components/Button/Button"
 import ModalDialog from "@src/components/Modal/ModalDialog"
-import { ModalType } from "@src/stores/modalStore"
-import NetworkNear from "@src/components/Network/NetworkNear"
-import { useConnectWallet } from "@src/hooks/useConnectWallet"
-import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import Network from "@src/components/Network/Network"
-import { networkLabelAdapter } from "@src/utils/network"
-import parseDefuseAsset from "@src/utils/parseDefuseAsset"
-import { useTokensStore } from "@src/providers/TokensStoreProvider"
-import { MapsEnum } from "@src/libs/de-sdk/utils/maps"
+import NetworkNear from "@src/components/Network/NetworkNear"
 import {
   CONNECTOR_BTC_MAINNET,
   CONNECTOR_ETH_BASE,
 } from "@src/constants/contracts"
+import { SignInType, useConnectWallet } from "@src/hooks/useConnectWallet"
+import { MapsEnum } from "@src/libs/de-sdk/utils/maps"
+import { useModalStore } from "@src/providers/ModalStoreProvider"
+import { useTokensStore } from "@src/providers/TokensStoreProvider"
+import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
+import { ModalType } from "@src/stores/modalStore"
+import { BlockchainEnum, type NetworkToken } from "@src/types/interfaces"
+import { networkLabelAdapter } from "@src/utils/network"
+import parseDefuseAsset from "@src/utils/parseDefuseAsset"
 
 export type ModalConnectNetworksPayload = {
   tokenIn: string
@@ -46,10 +46,10 @@ export const handleValidateAccount = (
       if (!isAddress(account)) {
         setErrorAccount("Invalid wallet address.")
         return false
-      } else {
-        setErrorAccount("")
-        return true
       }
+      setErrorAccount("")
+      return true
+
     case BlockchainEnum.Btc:
       try {
         bitcoin.address.toOutputScript(account)
@@ -68,7 +68,7 @@ const handleGetStoreKey = (defuse_asset_id: string) => {
   const result = parseDefuseAsset(defuse_asset_id)
   if (!result) return ""
   switch (`${result.blockchain}:${result.network}`) {
-    case MapsEnum.ETH_BASE:
+    case MapsEnum.EVM_BASE:
       return CONNECTOR_ETH_BASE
     case MapsEnum.BTC_MAINNET:
       return CONNECTOR_BTC_MAINNET
@@ -86,7 +86,7 @@ const ModalConnectNetworks = () => {
   const { accountId } = useWalletSelector()
   const { triggerTokenUpdate } = useTokensStore((state) => state)
 
-  const { handleSignIn, handleSignOut } = useConnectWallet()
+  const { signIn, signOut } = useConnectWallet()
   const [convertPayload] = useState<ModalConnectNetworksPayload>(
     payload as ModalConnectNetworksPayload
   )
@@ -140,7 +140,7 @@ const ModalConnectNetworks = () => {
               </Tooltip>
             </div>
           </div>
-          <button className="shrink-0" onClick={onCloseModal}>
+          <button type={"button"} className="shrink-0" onClick={onCloseModal}>
             <Image
               src="/static/icons/close.svg"
               alt="Close Icon"
@@ -158,9 +158,13 @@ const ModalConnectNetworks = () => {
                 account={accountFrom}
                 onConnect={() => {
                   onCloseModal()
-                  handleSignIn()
+                  signIn({
+                    id: SignInType.NearWalletSelector,
+                  })
                 }}
-                onDisconnect={handleSignOut}
+                onDisconnect={() =>
+                  signOut({ id: SignInType.NearWalletSelector })
+                }
               />
             ) : (
               <Network
@@ -197,9 +201,13 @@ const ModalConnectNetworks = () => {
                 account={accountTo}
                 onConnect={() => {
                   onCloseModal()
-                  handleSignIn()
+                  signIn({
+                    id: SignInType.NearWalletSelector,
+                  })
                 }}
-                onDisconnect={handleSignOut}
+                onDisconnect={() =>
+                  signOut({ id: SignInType.NearWalletSelector })
+                }
               />
             ) : (
               <Network
