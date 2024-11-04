@@ -4,10 +4,10 @@ import { Box, Spinner, Tabs, Text } from "@radix-ui/themes"
 import { formatUnits } from "ethers"
 import { type PropsWithChildren, useEffect, useState } from "react"
 
-import LabelComingSoon from "@src/components/LabelComingSoon"
 import { LIST_NATIVE_TOKENS } from "@src/constants/tokens"
 import { useAccountBalance } from "@src/hooks/useAccountBalance"
 import { useTokensStore } from "@src/providers/TokensStoreProvider"
+import { LabelComingSoon } from "../ComingSoon"
 
 const IS_DISABLED_ALL_TABS = true
 

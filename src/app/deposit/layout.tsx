@@ -5,8 +5,9 @@ import type { PropsWithChildren } from "react"
 import Layout from "@src/components/Layout"
 
 export const metadata: Metadata = {
-  title: "Deposit",
-  description: "Deposit",
+  title: "Deposit | Your Multichain DeFi Hub",
+  description:
+    "Seamlessly manage your cross-chain deposits with our efficient DeFi hub. Join us to experience unparalleled ease and security.",
 }
 
 const DepositLayout: React.FC<PropsWithChildren> = ({ children }) => {
