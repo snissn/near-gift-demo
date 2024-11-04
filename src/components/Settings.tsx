@@ -7,6 +7,7 @@ import React, { useState, useEffect } from "react"
 
 import { THEME_MODE_KEY } from "@src/constants/contracts"
 import Themes from "@src/types/themes"
+import ComingSoon from "./ComingSoon"
 
 const NEXT_PUBLIC_LINK_DOCS = process.env.NEXT_PUBLIC_LINK_DOCS ?? ""
 const NEXT_PUBLIC_PUBLIC_MAIL = process?.env?.NEXT_PUBLIC_PUBLIC_MAIL ?? ""
@@ -47,18 +48,20 @@ const Settings = () => {
         </Popover.Trigger>
         <Popover.Content className="min-w-[180px] mt-1 dark:bg-black-800 rounded-2xl">
           <div className="flex flex-col gap-4">
-            <div className="flex justify-between items-center gap-4">
-              <Text size="2" weight="medium">
-                Dark Mode
-              </Text>
-              <Switch
-                className="cursor-pointer"
-                size="1"
-                onClick={onChangeTheme}
-                color="orange"
-                defaultChecked={theme === Themes.DARK}
-              />
-            </div>
+            <ComingSoon>
+              <div className="flex justify-between items-center gap-4">
+                <Text size="2" weight="medium">
+                  Dark Mode
+                </Text>
+                <Switch
+                  className="cursor-pointer"
+                  size="1"
+                  onClick={onChangeTheme}
+                  color="orange"
+                  defaultChecked={theme === Themes.DARK}
+                />
+              </div>
+            </ComingSoon>
             <Separator orientation="horizontal" size="4" />
             <div className="flex flex-col justify-between items-center gap-1.5">
               <button
