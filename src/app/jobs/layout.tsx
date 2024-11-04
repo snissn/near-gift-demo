@@ -5,9 +5,9 @@ import type { PropsWithChildren } from "react"
 import Layout from "@src/components/Layout"
 
 export const metadata: Metadata = {
-  title: "Careers at Defuse - Join Our Team",
+  title: "Careers - Join Our Team",
   description:
-    "Join Defuse for exciting careers in blockchain and cross-chain technology. Apply today and start shaping the future of decentralized finance!",
+    "Join for exciting careers in blockchain and cross-chain technology. Apply today and start shaping the future of decentralized finance!",
 }
 
 const JobsLayout: React.FC<PropsWithChildren> = ({ children }) => {
