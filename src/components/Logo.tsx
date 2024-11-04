@@ -7,14 +7,14 @@ const Logo = () => {
   return (
     <Link href={Navigation.HOME}>
       <Image
-        src="/static/icons/Logo_Near_Intent.svg"
+        src="/static/icons/NearIntentsLOGO.svg"
         alt="Near Intent Logo"
         width={175}
         height={32}
         className="hidden dark:block"
       />
       <Image
-        src="/static/icons/Logo_Near_Intent_dark.svg"
+        src="/static/icons/NearIntentsLOGO.svg"
         alt="Near Intent Logo"
         width={175}
         height={32}
