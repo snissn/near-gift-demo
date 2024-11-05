@@ -257,10 +257,10 @@
     preact "^10.16.0"
     sha.js "^2.4.11"
 
-"@defuse-protocol/defuse-sdk@^2.0.0":
-  version "2.0.0"
-  resolved "https://npm.pkg.github.com/download/@defuse-protocol/defuse-sdk/2.0.0/e2241545115232a67400a0beaf434c43a587df90#e2241545115232a67400a0beaf434c43a587df90"
-  integrity sha512-adhFutsFtVsyVWtuTZjG/V38Opn1KuokIlqyHBcJW388dKyLKEJU2lzccrnPHgjBR1/hUSeeHIqTCWyV9eViKA==
+"@defuse-protocol/defuse-sdk@^2.1.0":
+  version "2.1.0"
+  resolved "https://npm.pkg.github.com/download/@defuse-protocol/defuse-sdk/2.1.0/c133ce1e06a5402b3d68d8d5ab7ddeaa0a536c7b#c133ce1e06a5402b3d68d8d5ab7ddeaa0a536c7b"
+  integrity sha512-prUBG6qW4sYVXE7QAn8Kh++GeCgfIU8f4YJvfwYz70yfXxIT2Hv4H6RIIwEbSHF8cNhOoMN0R6Nv06oKCjQqqA==
   dependencies:
     "@defuse-protocol/swap-facade" "^1.0.3"
     "@radix-ui/react-checkbox" "^1.1.1"
