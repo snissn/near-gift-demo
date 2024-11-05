@@ -5,6 +5,7 @@ import Paper from "@src/components/Paper"
 import { LIST_TOKENS } from "@src/constants/tokens"
 import { useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useNearWalletActions } from "@src/hooks/useNearWalletActions"
+import type { NearTX } from "@src/types/interfaces"
 
 export default function Withdraw() {
   const { state } = useConnectWallet()
@@ -14,7 +15,9 @@ export default function Withdraw() {
     <Paper title="Withdraw">
       <WithdrawWidget
         tokenList={LIST_TOKENS}
+        // @ts-ignore
         accountId={state.address}
+        // @ts-ignore
         sendNearTransaction={async (tx) => {
           const result = await signAndSendTransactions({ transactions: [tx] })
 
