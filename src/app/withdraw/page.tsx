@@ -5,7 +5,6 @@ import Paper from "@src/components/Paper"
 import { LIST_TOKENS } from "@src/constants/tokens"
 import { useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useNearWalletActions } from "@src/hooks/useNearWalletActions"
-import type { NearTX } from "@src/types/interfaces"
 
 export default function Withdraw() {
   const { state } = useConnectWallet()
