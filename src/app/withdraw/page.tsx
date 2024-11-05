@@ -14,9 +14,7 @@ export default function Withdraw() {
     <Paper title="Withdraw">
       <WithdrawWidget
         tokenList={LIST_TOKENS}
-        // @ts-ignore
         accountId={state.address}
-        // @ts-ignore
         sendNearTransaction={async (tx) => {
           const result = await signAndSendTransactions({ transactions: [tx] })
 
