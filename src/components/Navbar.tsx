@@ -4,8 +4,8 @@ import { Button } from "@radix-ui/themes"
 import clsx from "clsx"
 import { usePathname, useRouter } from "next/navigation"
 
-import LabelComingSoon from "@src/components/LabelComingSoon"
 import { LINKS_HEADER, type NavigationLinks } from "@src/constants/routes"
+import { LabelComingSoon } from "./ComingSoon"
 
 const TURN_OFF_APPS = process?.env?.turnOffApps === "true" ?? true
 

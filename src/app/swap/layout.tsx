@@ -5,9 +5,9 @@ import type { PropsWithChildren } from "react"
 import Layout from "@src/components/Layout"
 
 export const metadata: Metadata = {
-  title: "Defuse Swap - Efficient Cross-Chain Asset Swapping",
+  title: "Swap - Efficient Cross-Chain Asset Swapping",
   description:
-    "Defuse Swap ensures fast transactions and the best rates across multiple blockchains. Start swapping with Defuse today for a superior trading experience.",
+    "Swap ensures fast transactions and the best rates across multiple blockchains. Start swapping today for a superior trading experience.",
 }
 
 const SwapLayout: React.FC<PropsWithChildren> = ({ children }) => {

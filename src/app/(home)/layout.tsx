@@ -5,9 +5,9 @@ import type { PropsWithChildren } from "react"
 import Layout from "@src/components/Layout"
 
 export const metadata: Metadata = {
-  title: "Defuse - Your Multichain DeFi Hub",
+  title: "Your Multichain DeFi Hub",
   description:
-    "Defuse: the premier platform for cross-chain liquidity and trading. Experience efficient, secure, and transparent swaps across multiple blockchains.",
+    "The premier platform for cross-chain liquidity and trading. Experience efficient, secure, and transparent swaps across multiple blockchains.",
 }
 
 const HomeLayout: React.FC<PropsWithChildren> = ({ children }) => {
