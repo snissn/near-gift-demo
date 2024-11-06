@@ -11,7 +11,7 @@ import {
   CONNECTOR_BTC_MAINNET,
   CONNECTOR_ETH_BASE,
 } from "@src/constants/contracts"
-import { SignInType, useConnectWallet } from "@src/hooks/useConnectWallet"
+import { ChainType, useConnectWallet } from "@src/hooks/useConnectWallet"
 import useShortAccountId from "@src/hooks/useShortAccountId"
 import { getChainIconFromId } from "@src/hooks/useTokensListAdapter"
 import { MapsEnum } from "@src/libs/de-sdk/utils/maps"
@@ -155,7 +155,7 @@ const WalletConnections = () => {
         const storeKey = ""
         switch (connector) {
           case MapsEnum.NEAR_MAINNET:
-            if (state.signInType !== SignInType.NearWalletSelector) {
+            if (state.chainType !== ChainType.Near) {
               return null
             }
             return (
@@ -167,7 +167,7 @@ const WalletConnections = () => {
                 onCopy={() => setCopyWalletAddress(MapsEnum.NEAR_MAINNET)}
                 isCopied={copyWalletAddress === MapsEnum.NEAR_MAINNET}
                 onDisconnect={() => {
-                  signOut({ id: SignInType.NearWalletSelector })
+                  signOut({ id: ChainType.Near })
                   triggerTokenUpdate()
                 }}
                 key={connector}
@@ -175,7 +175,7 @@ const WalletConnections = () => {
               />
             )
           case MapsEnum.EVM_ETHEREUM:
-            if (state.signInType !== SignInType.Wagmi) {
+            if (state.chainType !== ChainType.EMV) {
               return null
             }
             chainIcon = getChainIconFromId("eth")
@@ -187,7 +187,7 @@ const WalletConnections = () => {
                 chainIcon={chainIcon}
                 onCopy={() => setCopyWalletAddress(MapsEnum.EVM_ETHEREUM)}
                 isCopied={copyWalletAddress === MapsEnum.EVM_ETHEREUM}
-                onDisconnect={() => signOut({ id: SignInType.Wagmi })}
+                onDisconnect={() => signOut({ id: ChainType.EMV })}
                 onConnect={() => {}}
                 key={connector}
                 index={i}

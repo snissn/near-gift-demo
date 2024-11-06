@@ -5,7 +5,7 @@ import React from "react"
 import { DepositWidget } from "@defuse-protocol/defuse-sdk"
 import Paper from "@src/components/Paper"
 import { LIST_TOKENS } from "@src/constants/tokens"
-import { SignInType, useConnectWallet } from "@src/hooks/useConnectWallet"
+import { ChainType, useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useNotificationStore } from "@src/providers/NotificationProvider"
 import { NotificationType } from "@src/stores/notificationStore"
 
@@ -17,11 +17,12 @@ export default function Deposit() {
     <Paper title="Deposit">
       <DepositWidget
         tokenList={LIST_TOKENS}
-        userAddress={state.address ?? null}
-        userNetwork={state.network ?? null}
+        userAddress={state.address}
+        // @ts-expect-error
+        chainType={state.chainType}
         sendTransactionNear={async (transactions) => {
           const result = await sendTransaction({
-            id: SignInType.NearWalletSelector,
+            id: ChainType.Near,
             transactions,
           })
 

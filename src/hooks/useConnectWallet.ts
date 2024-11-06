@@ -7,36 +7,30 @@ import { useEffect, useState } from "react"
 import { type Connector, useAccount, useConnect, useDisconnect } from "wagmi"
 import { useNearWalletActions } from "./useNearWalletActions"
 
-export enum SignInType {
-  NearWalletSelector = "near-wallet-selector",
-  Wagmi = "wagmi",
+export enum ChainType {
+  Near = "near",
+  EMV = "evm",
 }
 
 export enum SendTransactionType {
   SignAndSendTransactions = "signAndSendTransactions",
 }
 
-type State =
-  | {
-      signInType: SignInType
-      network: string
-      address: string
-    }
-  | {
-      signInType: undefined
-      network: undefined
-      address: undefined
-    }
+type State = {
+  chainType?: ChainType
+  network?: string
+  address?: string
+}
 
 interface ConnectWalletAction {
   signIn: (params: {
-    id: SignInType
+    id: ChainType
     connector?: Connector
   }) => Promise<void>
-  signOut: (params: { id: SignInType }) => Promise<void>
-  signMessage: (params: { id: SignInType; message: string }) => Promise<void>
+  signOut: (params: { id: ChainType }) => Promise<void>
+  signMessage: (params: { id: ChainType; message: string }) => Promise<void>
   sendTransaction: (params: {
-    id: SignInType
+    id: ChainType
     transactions: SignAndSendTransactionsParams["transactions"]
   }) => Promise<string | FinalExecutionOutcome[]>
   connectors: Connector[]
@@ -44,7 +38,7 @@ interface ConnectWalletAction {
 }
 
 const defaultState: State = {
-  signInType: undefined,
+  chainType: undefined,
   network: undefined,
   address: undefined,
 }
@@ -90,13 +84,13 @@ export const useConnectWallet = (): ConnectWalletAction => {
       setState({
         address: accountId,
         network: "near:mainnet",
-        signInType: SignInType.NearWalletSelector,
+        chainType: ChainType.Near,
       })
     } else if (address != null) {
       setState({
         address,
         network: chain?.id ? `eth:${chain.name.toLowerCase()}` : "unknown",
-        signInType: SignInType.Wagmi,
+        chainType: ChainType.EMV,
       })
     } else {
       setState(defaultState)
@@ -105,13 +99,12 @@ export const useConnectWallet = (): ConnectWalletAction => {
 
   return {
     async signIn(params: {
-      id: SignInType
+      id: ChainType
       connector?: Connector
     }): Promise<void> {
       const strategies = {
-        [SignInType.NearWalletSelector]: () =>
-          handleSignInViaNearWalletSelector(),
-        [SignInType.Wagmi]: () =>
+        [ChainType.Near]: () => handleSignInViaNearWalletSelector(),
+        [ChainType.EMV]: () =>
           params.connector
             ? handleSignInViaWalletConnect({ connector: params.connector })
             : undefined,
@@ -120,12 +113,11 @@ export const useConnectWallet = (): ConnectWalletAction => {
     },
 
     async signOut(params: {
-      id: SignInType
+      id: ChainType
     }): Promise<void> {
       const strategies = {
-        [SignInType.NearWalletSelector]: () =>
-          handleSignOutViaNearWalletSelector(),
-        [SignInType.Wagmi]: () => handleSignOutViaWalletConnect(),
+        [ChainType.Near]: () => handleSignOutViaNearWalletSelector(),
+        [ChainType.EMV]: () => handleSignOutViaWalletConnect(),
       }
       return strategies[params.id]()
     },
@@ -134,17 +126,17 @@ export const useConnectWallet = (): ConnectWalletAction => {
     signMessage: async ({
       id,
       message,
-    }: { id: SignInType; message: string }) => {},
+    }: { id: ChainType; message: string }) => {},
 
     sendTransaction: async (
       params
     ): Promise<string | FinalExecutionOutcome[]> => {
       const strategies = {
-        [SignInType.NearWalletSelector]: async () =>
+        [ChainType.Near]: async () =>
           await signAndSendTransactions({
             transactions: params.transactions,
           }),
-        [SignInType.Wagmi]: async () => {
+        [ChainType.EMV]: async () => {
           throw new Error("Wagmi sendTransaction not implemented")
         },
       }

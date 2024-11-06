@@ -15,7 +15,7 @@ import {
   CONNECTOR_BTC_MAINNET,
   CONNECTOR_ETH_BASE,
 } from "@src/constants/contracts"
-import { SignInType, useConnectWallet } from "@src/hooks/useConnectWallet"
+import { ChainType, useConnectWallet } from "@src/hooks/useConnectWallet"
 import { MapsEnum } from "@src/libs/de-sdk/utils/maps"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { useTokensStore } from "@src/providers/TokensStoreProvider"
@@ -159,12 +159,10 @@ const ModalConnectNetworks = () => {
                 onConnect={() => {
                   onCloseModal()
                   signIn({
-                    id: SignInType.NearWalletSelector,
+                    id: ChainType.Near,
                   })
                 }}
-                onDisconnect={() =>
-                  signOut({ id: SignInType.NearWalletSelector })
-                }
+                onDisconnect={() => signOut({ id: ChainType.Near })}
               />
             ) : (
               <Network
@@ -202,12 +200,10 @@ const ModalConnectNetworks = () => {
                 onConnect={() => {
                   onCloseModal()
                   signIn({
-                    id: SignInType.NearWalletSelector,
+                    id: ChainType.Near,
                   })
                 }}
-                onDisconnect={() =>
-                  signOut({ id: SignInType.NearWalletSelector })
-                }
+                onDisconnect={() => signOut({ id: ChainType.Near })}
               />
             ) : (
               <Network

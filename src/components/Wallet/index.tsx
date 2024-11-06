@@ -9,7 +9,7 @@ import type { Connector } from "wagmi"
 
 import WalletConnections from "@src/components/Wallet/WalletConnections"
 import WalletTabs from "@src/components/Wallet/WalletTabs"
-import { SignInType, useConnectWallet } from "@src/hooks/useConnectWallet"
+import { ChainType, useConnectWallet } from "@src/hooks/useConnectWallet"
 import useShortAccountId from "@src/hooks/useShortAccountId"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
 
@@ -22,11 +22,11 @@ const ConnectWallet = () => {
   const { signIn, connectors } = useConnectWallet()
 
   const handleNearWalletSelector = () => {
-    signIn({ id: SignInType.NearWalletSelector })
+    signIn({ id: ChainType.Near })
   }
 
   const handleWalletConnect = (connector: Connector) => {
-    signIn({ id: SignInType.Wagmi, connector })
+    signIn({ id: ChainType.EMV, connector })
   }
 
   const handleTradeHistory = () => openWidget()
