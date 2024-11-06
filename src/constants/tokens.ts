@@ -374,6 +374,18 @@ export const LIST_TOKENS: (BaseTokenInfo | UnifiedTokenInfo)[] = [
     symbol: "BRETT",
     name: "Brett",
   },
+  {
+    defuseAssetId: "nep141:token.sweat",
+    address: "token.sweat",
+    decimals: 18,
+    icon: "https://assets.coingecko.com/coins/images/25057/standard/fhD9Xs16_400x400.jpg?1696524208",
+    chainId: "",
+    chainIcon: "/static/icons/network/near.svg",
+    chainName: "near",
+    routes: [],
+    symbol: "SWEAT",
+    name: "Sweat Economy",
+  },
 ]
 
 /** @deprecated */
