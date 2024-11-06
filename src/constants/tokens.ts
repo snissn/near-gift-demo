@@ -2,13 +2,11 @@ import type {
   BaseTokenInfo,
   UnifiedTokenInfo,
 } from "@defuse-protocol/defuse-sdk"
-import type {
-  NetworkToken,
-  NetworkTokenWithSwapRoute,
-} from "@src/types/interfaces"
+import type { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 
 const environment = process.env.environment || "production"
 
+/** @deprecated */
 export const NEAR_TOKEN_META = {
   defuse_asset_id: "near:mainnet:native",
   blockchain: "near",
@@ -23,6 +21,7 @@ export const NEAR_TOKEN_META = {
   routes: ["wrap.near", "near:mainnet:wrap.near"],
 }
 
+/** @deprecated */
 export const W_NEAR_TOKEN_META = {
   defuse_asset_id: "near:mainnet:wrap.near",
   blockchain: "near",
@@ -36,6 +35,7 @@ export const W_NEAR_TOKEN_META = {
   decimals: 24,
 }
 
+/** @deprecated */
 export const W_BASE_TOKEN_META = {
   defuse_asset_id: "eth:8453:native",
   blockchain: "eth",
@@ -49,189 +49,6 @@ export const W_BASE_TOKEN_META = {
   decimals: 18,
 }
 
-const listNetworksTokensTestnet = [
-  {
-    defuse_asset_id: "near:testnet:wrap.testnet",
-    blockchain: "near",
-    chainId: "testnet",
-    address: "wrap.testnet",
-    chainName: "NEAR",
-    name: "Wrapped NEAR fungible token",
-    symbol: "wNEAR",
-    chainIcon: "/static/icons/network/near.svg",
-    icon: "https://assets.coingecko.com/coins/images/18280/standard/EX4mrWMW_400x400.jpg?1696517773",
-    decimals: 24,
-  },
-  {
-    defuse_asset_id: "near:testnet:aurora.fakes.testnet",
-    blockchain: "near",
-    chainId: "testnet",
-    address: "aurora.fakes.testnet",
-    chainName: "NEAR",
-    name: "Aurora",
-    symbol: "AURORA",
-    chainIcon: "/static/icons/network/near.svg",
-    icon: "https://assets.coingecko.com/coins/images/20582/standard/aurora.jpeg?1696519989",
-    decimals: 18,
-  },
-  {
-    defuse_asset_id: "near:testnet:usdt.fakes.testnet",
-    blockchain: "near",
-    chainId: "testnet",
-    address: "usdt.fakes.testnet",
-    chainName: "NEAR",
-    name: "Tether USD",
-    symbol: "USDT.e",
-    chainIcon: "/static/icons/network/near.svg",
-    icon: "https://assets.coingecko.com/coins/images/325/standard/Tether.png?1696501661",
-    decimals: 6,
-  },
-  {
-    defuse_asset_id: "near:testnet:usdc.fakes.testnet",
-    blockchain: "near",
-    chainId: "testnet",
-    address: "usdc.fakes.testnet",
-    chainName: "NEAR",
-    name: "USD Coin",
-    symbol: "USDC",
-    chainIcon: "/static/icons/network/near.svg",
-    icon: "https://assets.coingecko.com/coins/images/6319/standard/usdc.png?1696506694",
-    decimals: 6,
-  },
-  {
-    defuse_asset_id: "near:testnet:wbtc.fakes.testnet",
-    blockchain: "near",
-    chainId: "testnet",
-    address: "wbtc.fakes.testnet",
-    chainName: "NEAR",
-    name: "Wrapped BTC",
-    symbol: "wBTC",
-    chainIcon: "/static/icons/network/near.svg",
-    icon: "https://assets.coingecko.com/coins/images/7598/standard/wrapped_bitcoin_wbtc.png?1696507857",
-    decimals: 8,
-  },
-  {
-    defuse_asset_id:
-      "near:testnet:14b2bc0c-32bc-4ac0-8eab-416c700d7c3d.testnet",
-    blockchain: "near",
-    chainId: "testnet",
-    address: "14b2bc0c-32bc-4ac0-8eab-416c700d7c3d.testnet",
-    chainName: "NEAR",
-    name: "Sweat",
-    symbol: "SWEAT",
-    chainIcon: "/static/icons/network/near.svg",
-    icon: "https://assets.coingecko.com/coins/images/25057/standard/fhD9Xs16_400x400.jpg?1696524208",
-    decimals: 18,
-  },
-  {
-    defuse_asset_id: "near:testnet:ref.fakes.testnet",
-    blockchain: "near",
-    chainId: "testnet",
-    address: "ref.fakes.testnet",
-    chainName: "NEAR",
-    name: "Ref Finance Token",
-    symbol: "REF",
-    chainIcon: "/static/icons/network/near.svg",
-    icon: "https://assets.coingecko.com/coins/images/18279/standard/ref.png?1696517772",
-    decimals: 18,
-  },
-  {
-    defuse_asset_id: "near:testnet:blackdragon.fakes.testnet",
-    blockchain: "near",
-    chainId: "testnet",
-    address: "blackdragon.fakes.testnet",
-    chainName: "NEAR",
-    name: "Black Dragon",
-    symbol: "BLACKDRAGON",
-    chainIcon: "/static/icons/network/near.svg",
-    icon: "https://assets.coingecko.com/coins/images/35502/standard/Untitled-8.png?1709390396",
-    decimals: 16,
-  },
-  {
-    defuse_asset_id: "near:testnet:deltalonk.testnet",
-    blockchain: "near",
-    chainId: "testnet",
-    address: "deltalonk.testnet",
-    chainName: "NEAR",
-    name: "LONK fungible token",
-    symbol: "LONK",
-    chainIcon: "/static/icons/network/near.svg",
-    icon: "https://assets.coingecko.com/coins/images/36497/standard/Logo_Long_square.png?1717541650",
-    decimals: 8,
-  },
-]
-
-const listNetworksTokensMainnet = [
-  W_NEAR_TOKEN_META,
-  {
-    defuse_asset_id:
-      "near:mainnet:aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near",
-    blockchain: "near",
-    chainId: "mainnet",
-    address: "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near",
-    chainName: "NEAR",
-    name: "Aurora",
-    symbol: "AURORA",
-    chainIcon: "/static/icons/network/near.svg",
-    icon: "https://assets.coingecko.com/coins/images/20582/standard/aurora.jpeg?1696519989",
-    decimals: 18,
-  },
-  {
-    defuse_asset_id: "near:mainnet:usm.tkn.near",
-    blockchain: "near",
-    chainId: "mainnet",
-    address: "usm.tkn.near",
-    chainName: "NEAR",
-    name: "USMeme",
-    symbol: "USM",
-    chainIcon: "/static/icons/network/near.svg",
-    icon: "https://assets.coingecko.com/coins/images/38114/standard/usmeme.jpeg?1716536863",
-    decimals: 18,
-  },
-  {
-    defuse_asset_id:
-      "near:mainnet:2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
-    blockchain: "near",
-    chainId: "mainnet",
-    address: "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
-    chainName: "NEAR",
-    name: "Wrapped BTC",
-    symbol: "wBTC",
-    chainIcon: "/static/icons/network/near.svg",
-    icon: "https://assets.coingecko.com/coins/images/7598/standard/wrapped_bitcoin_wbtc.png",
-    decimals: 18,
-  },
-  {
-    defuse_asset_id: "near:mainnet:token.v2.ref-finance.near",
-    blockchain: "near",
-    chainId: "mainnet",
-    address: "token.v2.ref-finance.near",
-    chainName: "NEAR",
-    name: "Ref Finance Token",
-    symbol: "REF",
-    chainIcon: "/static/icons/network/near.svg",
-    icon: "https://assets.coingecko.com/coins/images/18279/standard/ref.png?1696517772",
-    decimals: 18,
-  },
-  {
-    defuse_asset_id: "near:mainnet:aurora",
-    blockchain: "near",
-    chainId: "mainnet",
-    address: "aurora",
-    chainName: "NEAR",
-    name: "ETH",
-    symbol: "ETH",
-    chainIcon: "/static/icons/network/near.svg",
-    icon: "https://assets.coingecko.com/coins/images/279/standard/ethereum.png",
-    decimals: 18,
-  },
-]
-
-export const LIST_NETWORKS_TOKENS: NetworkToken[] =
-  environment === "development"
-    ? listNetworksTokensTestnet
-    : listNetworksTokensMainnet
-
 export const LIST_TOKENS: (BaseTokenInfo | UnifiedTokenInfo)[] = [
   {
     unifiedAssetId: "usdc",
@@ -242,25 +59,11 @@ export const LIST_TOKENS: (BaseTokenInfo | UnifiedTokenInfo)[] = [
     groupedTokens: [
       {
         defuseAssetId:
-          "nep141:17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
-        address:
-          "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
+          "nep141:eth-0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.omft.near",
+        address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         decimals: 6,
         icon: "https://assets.coingecko.com/coins/images/6319/standard/usdc.png",
-        chainId: "mainnet",
-        chainIcon: "/static/icons/network/near.svg",
-        chainName: "near",
-        routes: [],
-        symbol: "USDC",
-        name: "USDC",
-      },
-      {
-        defuseAssetId:
-          "nep141:eth-0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.duse.near",
-        address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        decimals: 6,
-        icon: "https://assets.coingecko.com/coins/images/6319/standard/usdc.png",
-        chainId: "1",
+        chainId: "",
         chainIcon: "/static/icons/network/ethereum.svg",
         chainName: "eth",
         routes: [],
@@ -269,11 +72,25 @@ export const LIST_TOKENS: (BaseTokenInfo | UnifiedTokenInfo)[] = [
       },
       {
         defuseAssetId:
-          "nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.duse.near",
-        address: "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+          "nep141:17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
+        address:
+          "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
         decimals: 6,
         icon: "https://assets.coingecko.com/coins/images/6319/standard/usdc.png",
-        chainId: "8453",
+        chainId: "",
+        chainIcon: "/static/icons/network/near.svg",
+        chainName: "near",
+        routes: [],
+        symbol: "USDC",
+        name: "USDC",
+      },
+      {
+        defuseAssetId:
+          "nep141:base-0x833589fcd6edb6e08f4c7c32d4f71b54bda02913.omft.near",
+        address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        decimals: 6,
+        icon: "https://assets.coingecko.com/coins/images/6319/standard/usdc.png",
+        chainId: "",
         chainIcon: "/static/icons/network/base.svg",
         chainName: "base",
         routes: [],
@@ -282,11 +99,11 @@ export const LIST_TOKENS: (BaseTokenInfo | UnifiedTokenInfo)[] = [
       },
       {
         defuseAssetId:
-          "nep141:arbitrum-0xaf88d065e77c8cc2239327c5edb3a432268e5831.duse.near",
-        address: "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+          "nep141:arb-0xaf88d065e77c8cc2239327c5edb3a432268e5831.omft.near",
+        address: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
         decimals: 6,
         icon: "https://assets.coingecko.com/coins/images/6319/standard/usdc.png",
-        chainId: "8453",
+        chainId: "",
         chainIcon: "/static/icons/network/arbitrum.svg",
         chainName: "arbitrum",
         routes: [],
@@ -303,6 +120,19 @@ export const LIST_TOKENS: (BaseTokenInfo | UnifiedTokenInfo)[] = [
     icon: "https://assets.coingecko.com/coins/images/325/standard/Tether.png",
     groupedTokens: [
       {
+        defuseAssetId:
+          "nep141:eth-0xdac17f958d2ee523a2206206994597c13d831ec7.omft.near",
+        address: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+        decimals: 6,
+        icon: "https://assets.coingecko.com/coins/images/325/standard/Tether.png",
+        chainId: "",
+        chainIcon: "/static/icons/network/ethereum.svg",
+        chainName: "eth",
+        routes: [],
+        symbol: "USDT",
+        name: "Tether USD",
+      },
+      {
         defuseAssetId: "nep141:usdt.tether-token.near",
         address: "usdt.tether-token.near",
         decimals: 6,
@@ -314,6 +144,19 @@ export const LIST_TOKENS: (BaseTokenInfo | UnifiedTokenInfo)[] = [
         symbol: "USDT",
         name: "USDt",
       },
+      {
+        defuseAssetId:
+          "nep141:arb-0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9.omft.near",
+        address: "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+        decimals: 6,
+        icon: "https://assets.coingecko.com/coins/images/325/standard/Tether.png",
+        chainId: "",
+        chainIcon: "/static/icons/network/arbitrum.svg",
+        chainName: "arbitrum",
+        routes: [],
+        symbol: "USDT",
+        name: "Tether USD",
+      },
     ],
   },
   {
@@ -324,20 +167,8 @@ export const LIST_TOKENS: (BaseTokenInfo | UnifiedTokenInfo)[] = [
     icon: "https://assets.coingecko.com/coins/images/279/standard/ethereum.png",
     groupedTokens: [
       {
-        defuseAssetId: "nep141:aurora",
-        address: "aurora",
-        decimals: 18,
-        icon: "https://assets.coingecko.com/coins/images/279/standard/ethereum.png",
-        chainId: "mainnet",
-        chainIcon: "/static/icons/network/near.svg",
-        chainName: "near",
-        routes: ["near:mainnet:aurora"],
-        symbol: "ETH",
-        name: "ETH",
-      },
-      {
-        defuseAssetId: "nep141:eth-native.duse.near",
-        type: "native" as const,
+        defuseAssetId: "nep141:eth.omft.near",
+        type: "native",
         address: "native",
         decimals: 18,
         icon: "https://assets.coingecko.com/coins/images/279/standard/ethereum.png",
@@ -349,8 +180,20 @@ export const LIST_TOKENS: (BaseTokenInfo | UnifiedTokenInfo)[] = [
         name: "ETH",
       },
       {
-        defuseAssetId: "nep141:base-native.duse.near",
-        type: "native" as const,
+        defuseAssetId: "nep141:aurora",
+        address: "aurora",
+        decimals: 18,
+        icon: "https://assets.coingecko.com/coins/images/279/standard/ethereum.png",
+        chainId: "",
+        chainIcon: "/static/icons/network/near.svg",
+        chainName: "near",
+        routes: [],
+        symbol: "ETH",
+        name: "ETH",
+      },
+      {
+        defuseAssetId: "nep141:base.omft.near",
+        type: "native",
         address: "native",
         decimals: 18,
         icon: "https://assets.coingecko.com/coins/images/279/standard/ethereum.png",
@@ -362,8 +205,8 @@ export const LIST_TOKENS: (BaseTokenInfo | UnifiedTokenInfo)[] = [
         name: "ETH",
       },
       {
-        defuseAssetId: "nep141:arbitrum-native.duse.near",
-        type: "native" as const,
+        defuseAssetId: "nep141:arb.omft.near",
+        type: "native",
         address: "native",
         decimals: 18,
         icon: "https://assets.coingecko.com/coins/images/279/standard/ethereum.png",
@@ -402,8 +245,8 @@ export const LIST_TOKENS: (BaseTokenInfo | UnifiedTokenInfo)[] = [
     name: "Near",
   },
   {
-    defuseAssetId: "nep141:btc-native.duse.near",
-    type: "native" as const,
+    defuseAssetId: "nep141:btc.omft.near",
+    type: "native",
     address: "native",
     decimals: 8,
     icon: "https://assets.coingecko.com/coins/images/1/standard/bitcoin.png?1696501400",
@@ -414,8 +257,138 @@ export const LIST_TOKENS: (BaseTokenInfo | UnifiedTokenInfo)[] = [
     symbol: "BTC",
     name: "Bitcoin",
   },
+  {
+    defuseAssetId:
+      "nep141:eth-0x6982508145454ce325ddbe47a25d4ec3d2311933.omft.near",
+    address: "0x6982508145454Ce325dDbE47a25d4ec3d2311933",
+    decimals: 18,
+    icon: "https://assets.coingecko.com/coins/images/29850/standard/pepe-token.jpeg?1696528776",
+    chainId: "",
+    chainIcon: "/static/icons/network/ethereum.svg",
+    chainName: "eth",
+    routes: [],
+    symbol: "PEPE",
+    name: "Pepe",
+  },
+  {
+    defuseAssetId:
+      "nep141:eth-0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce.omft.near",
+    address: "0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE",
+    decimals: 18,
+    icon: "https://assets.coingecko.com/coins/images/11939/standard/shiba.png?1696511800",
+    chainId: "",
+    chainIcon: "/static/icons/network/ethereum.svg",
+    chainName: "eth",
+    routes: [],
+    symbol: "SHIB",
+    name: "Shiba Inu",
+  },
+  {
+    defuseAssetId:
+      "nep141:eth-0x514910771af9ca656af840dff83e8264ecf986ca.omft.near",
+    address: "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+    decimals: 18,
+    icon: "https://assets.coingecko.com/coins/images/877/standard/chainlink-new-logo.png?1696502009",
+    chainId: "",
+    chainIcon: "/static/icons/network/ethereum.svg",
+    chainName: "eth",
+    routes: [],
+    symbol: "LINK",
+    name: "Chainlink",
+  },
+  {
+    defuseAssetId:
+      "nep141:eth-0x1f9840a85d5af5bf1d1762f925bdaddc4201f984.omft.near",
+    address: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+    decimals: 18,
+    icon: "https://assets.coingecko.com/coins/images/12504/standard/uniswap-logo.png?1720676669",
+    chainId: "",
+    chainIcon: "/static/icons/network/ethereum.svg",
+    chainName: "eth",
+    routes: [],
+    symbol: "UNI",
+    name: "Uniswap",
+  },
+  {
+    defuseAssetId:
+      "nep141:arb-0x912ce59144191c1204e64559fe8253a0e49e6548.omft.near",
+    address: "0x912CE59144191C1204E64559FE8253a0e49E6548",
+    decimals: 18,
+    icon: "https://assets.coingecko.com/coins/images/16547/standard/arb.jpg?1721358242",
+    chainId: "",
+    chainIcon: "/static/icons/network/arbitrum.svg",
+    chainName: "arbitrum",
+    routes: [],
+    symbol: "ARB",
+    name: "Arbitrum",
+  },
+  {
+    defuseAssetId:
+      "nep141:eth-0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9.omft.near",
+    address: "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
+    decimals: 18,
+    icon: "https://assets.coingecko.com/coins/images/12645/standard/aave-token-round.png?1720472354",
+    chainId: "",
+    chainIcon: "/static/icons/network/ethereum.svg",
+    chainName: "eth",
+    routes: [],
+    symbol: "AAVE",
+    name: "Aave",
+  },
+  {
+    defuseAssetId:
+      "nep141:arb-0xfc5a1a6eb076a2c7ad06ed22c90d7e710e35ad0a.omft.near",
+    address: "0xfc5A1A6EB076a2C7aD06eD22C90d7E710E35ad0a",
+    decimals: 18,
+    icon: "https://assets.coingecko.com/coins/images/18323/standard/arbit.png?1696517814",
+    chainId: "",
+    chainIcon: "/static/icons/network/arbitrum.svg",
+    chainName: "arbitrum",
+    routes: [],
+    symbol: "GMX",
+    name: "GMX",
+  },
+  {
+    defuseAssetId:
+      "nep141:eth-0xaaee1a9723aadb7afa2810263653a34ba2c21c7a.omft.near",
+    address: "0xaaeE1A9723aaDB7afA2810263653A34bA2C21C7a",
+    decimals: 18,
+    icon: "https://assets.coingecko.com/coins/images/31059/standard/MOG_LOGO_200x200.png?1696529893",
+    chainId: "",
+    chainIcon: "/static/icons/network/ethereum.svg",
+    chainName: "eth",
+    routes: [],
+    symbol: "MOG",
+    name: "Mog Coin",
+  },
+  {
+    defuseAssetId:
+      "nep141:base-0x532f27101965dd16442e59d40670faf5ebb142e4.omft.near",
+    address: "0x532f27101965dd16442E59d40670FaF5eBB142E4",
+    decimals: 18,
+    icon: "https://assets.coingecko.com/coins/images/35529/standard/1000050750.png?1709031995",
+    chainId: "",
+    chainIcon: "/static/icons/network/base.svg",
+    chainName: "base",
+    routes: [],
+    symbol: "BRETT",
+    name: "Brett",
+  },
+  {
+    defuseAssetId: "nep141:token.sweat",
+    address: "token.sweat",
+    decimals: 18,
+    icon: "https://assets.coingecko.com/coins/images/25057/standard/fhD9Xs16_400x400.jpg?1696524208",
+    chainId: "",
+    chainIcon: "/static/icons/network/near.svg",
+    chainName: "near",
+    routes: [],
+    symbol: "SWEAT",
+    name: "Sweat Economy",
+  },
 ]
 
+/** @deprecated */
 const listNativeTokensTestnet = [
   {
     defuse_asset_id: "near:testnet:native",
@@ -431,8 +404,10 @@ const listNativeTokensTestnet = [
     routes: ["wrap.testnet"],
   },
 ]
+/** @deprecated */
 const listNativeTokensMainnet = [NEAR_TOKEN_META]
 
+/** @deprecated */
 export const LIST_NATIVE_TOKENS: NetworkTokenWithSwapRoute[] =
   environment === "development"
     ? listNativeTokensTestnet
