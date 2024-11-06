@@ -1,15 +1,17 @@
 "use client"
 
 import { SwapWidget } from "@defuse-protocol/defuse-sdk"
+import { useSignMessage } from "wagmi"
 
 import Paper from "@src/components/Paper"
 import { LIST_TOKENS } from "@src/constants/tokens"
+import { SignInType, useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useNearWalletActions } from "@src/hooks/useNearWalletActions"
-import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 
 export default function Swap() {
-  const { accountId } = useWalletSelector()
+  const { state } = useConnectWallet()
   const { signMessage, signAndSendTransactions } = useNearWalletActions()
+  const { signMessageAsync: signMessageAsyncWagmi } = useSignMessage()
 
   return (
     <Paper
@@ -18,7 +20,7 @@ export default function Swap() {
     >
       <SwapWidget
         tokenList={LIST_TOKENS}
-        userAddress={accountId}
+        userAddress={state.address ?? null}
         sendNearTransaction={async (tx) => {
           const result = await signAndSendTransactions({ transactions: [tx] })
 
@@ -34,12 +36,32 @@ export default function Swap() {
           return { txHash: outcome.transaction.hash }
         }}
         signMessage={async (params) => {
-          const { signatureData, signedData } = await signMessage({
-            ...params.NEP413,
-            nonce: Buffer.from(params.NEP413.nonce),
-          })
+          const signInType = state.signInType
 
-          return { type: "NEP413", signatureData, signedData }
+          switch (signInType) {
+            case SignInType.Wagmi: {
+              const signatureData = await signMessageAsyncWagmi({
+                message: params.ERC191.message,
+              })
+              return {
+                type: "ERC191",
+                signatureData,
+                signedData: params.ERC191,
+              }
+            }
+            case SignInType.NearWalletSelector: {
+              const { signatureData, signedData } = await signMessage({
+                ...params.NEP413,
+                nonce: Buffer.from(params.NEP413.nonce),
+              })
+              return { type: "NEP413", signatureData, signedData }
+            }
+            case undefined:
+              throw new Error("User not signed in")
+            default:
+              signInType satisfies never
+              throw new Error(`Unsupported sign in type: ${signInType}`)
+          }
         }}
         onSuccessSwap={() => {}}
       />

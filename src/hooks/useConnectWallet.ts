@@ -16,11 +16,17 @@ export enum SendTransactionType {
   SignAndSendTransactions = "signAndSendTransactions",
 }
 
-type State = {
-  signInType?: SignInType | undefined
-  network?: string | undefined
-  address?: string | undefined
-}
+type State =
+  | {
+      signInType: SignInType
+      network: string
+      address: string
+    }
+  | {
+      signInType: undefined
+      network: undefined
+      address: undefined
+    }
 
 interface ConnectWalletAction {
   signIn: (params: {
@@ -80,22 +86,20 @@ export const useConnectWallet = (): ConnectWalletAction => {
   }
 
   useEffect(() => {
-    if (!accountId && !address) {
-      setState(defaultState)
-    }
-    if (accountId) {
+    if (accountId != null) {
       setState({
         address: accountId,
         network: "near:mainet",
         signInType: SignInType.NearWalletSelector,
       })
-    }
-    if (address) {
+    } else if (address != null) {
       setState({
         address,
         network: chain?.id ? `eth:${chain.name}` : "unknown",
         signInType: SignInType.Wagmi,
       })
+    } else {
+      setState(defaultState)
     }
   }, [accountId, address, chain])
 

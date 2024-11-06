@@ -5,18 +5,15 @@ import { Button, Popover, Text } from "@radix-ui/themes"
 import clsx from "clsx"
 import Image from "next/image"
 import React from "react"
+import type { Connector } from "wagmi"
 
 import WalletConnections from "@src/components/Wallet/WalletConnections"
 import WalletTabs from "@src/components/Wallet/WalletTabs"
 import { SignInType, useConnectWallet } from "@src/hooks/useConnectWallet"
 import useShortAccountId from "@src/hooks/useShortAccountId"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
-import { useModalStore } from "@src/providers/ModalStoreProvider"
-import { ModalType } from "@src/stores/modalStore"
-import type { Connector } from "wagmi"
 
 const TURN_OFF_APPS = process?.env?.turnOffApps === "true" ?? true
-const TURN_OFF_EVM_WALLETS = process?.env?.turnOffEvmWallets === "true" ?? true
 
 const ConnectWallet = () => {
   const { state } = useConnectWallet()
@@ -74,26 +71,24 @@ const ConnectWallet = () => {
                 </Text>
               </div>
             </Button>
-            {!TURN_OFF_EVM_WALLETS && (
-              <Button
-                key={connectors[0].id}
-                onClick={() => handleWalletConnect(connectors[0])}
-                size="4"
-                radius="medium"
-                variant="soft"
-                color="gray"
-              >
-                <Image
-                  src="/static/icons/logo-meta-mask.svg"
-                  alt="Wallet Connect"
-                  width={24}
-                  height={24}
-                />
-                <Text size="2" weight="bold">
-                  MetaMask
-                </Text>
-              </Button>
-            )}
+            <Button
+              key={connectors[0].id}
+              onClick={() => handleWalletConnect(connectors[0])}
+              size="4"
+              radius="medium"
+              variant="soft"
+              color="gray"
+            >
+              <Image
+                src="/static/icons/logo-meta-mask.svg"
+                alt="Wallet Connect"
+                width={24}
+                height={24}
+              />
+              <Text size="2" weight="bold">
+                MetaMask
+              </Text>
+            </Button>
           </div>
         </Popover.Content>
       </Popover.Root>
