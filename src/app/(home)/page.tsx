@@ -5,7 +5,7 @@ import { useSignMessage } from "wagmi"
 
 import Paper from "@src/components/Paper"
 import { LIST_TOKENS } from "@src/constants/tokens"
-import { SignInType, useConnectWallet } from "@src/hooks/useConnectWallet"
+import { ChainType, useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useNearWalletActions } from "@src/hooks/useNearWalletActions"
 
 export default function Swap() {
@@ -36,10 +36,10 @@ export default function Swap() {
           return { txHash: outcome.transaction.hash }
         }}
         signMessage={async (params) => {
-          const signInType = state.signInType
+          const chainType = state.chainType
 
-          switch (signInType) {
-            case SignInType.Wagmi: {
+          switch (chainType) {
+            case ChainType.EMV: {
               const signatureData = await signMessageAsyncWagmi({
                 message: params.ERC191.message,
               })
@@ -49,7 +49,7 @@ export default function Swap() {
                 signedData: params.ERC191,
               }
             }
-            case SignInType.NearWalletSelector: {
+            case ChainType.Near: {
               const { signatureData, signedData } = await signMessage({
                 ...params.NEP413,
                 nonce: Buffer.from(params.NEP413.nonce),
@@ -59,8 +59,8 @@ export default function Swap() {
             case undefined:
               throw new Error("User not signed in")
             default:
-              signInType satisfies never
-              throw new Error(`Unsupported sign in type: ${signInType}`)
+              chainType satisfies never
+              throw new Error(`Unsupported sign in type: ${chainType}`)
           }
         }}
         onSuccessSwap={() => {}}
