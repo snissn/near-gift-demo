@@ -1,15 +1,19 @@
 "use client"
 
 import { SwapWidget } from "@defuse-protocol/defuse-sdk"
+import { useSignMessage } from "wagmi"
 
 import Paper from "@src/components/Paper"
 import { LIST_TOKENS } from "@src/constants/tokens"
+import { ChainType, useConnectWallet } from "@src/hooks/useConnectWallet"
+import { useFlatTokenList } from "@src/hooks/useFlatTokenList"
 import { useNearWalletActions } from "@src/hooks/useNearWalletActions"
-import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 
 export default function Swap() {
-  const { accountId } = useWalletSelector()
+  const { state } = useConnectWallet()
   const { signMessage, signAndSendTransactions } = useNearWalletActions()
+  const { signMessageAsync: signMessageAsyncWagmi } = useSignMessage()
+  const tokenList = useFlatTokenList(LIST_TOKENS)
 
   return (
     <Paper
@@ -17,8 +21,8 @@ export default function Swap() {
       description="Cross-chain swap across any network, any token."
     >
       <SwapWidget
-        tokenList={LIST_TOKENS}
-        userAddress={accountId}
+        tokenList={tokenList}
+        userAddress={state.address ?? null}
         sendNearTransaction={async (tx) => {
           const result = await signAndSendTransactions({ transactions: [tx] })
 
@@ -34,12 +38,32 @@ export default function Swap() {
           return { txHash: outcome.transaction.hash }
         }}
         signMessage={async (params) => {
-          const { signatureData, signedData } = await signMessage({
-            ...params.NEP413,
-            nonce: Buffer.from(params.NEP413.nonce),
-          })
+          const chainType = state.chainType
 
-          return { type: "NEP413", signatureData, signedData }
+          switch (chainType) {
+            case ChainType.EMV: {
+              const signatureData = await signMessageAsyncWagmi({
+                message: params.ERC191.message,
+              })
+              return {
+                type: "ERC191",
+                signatureData,
+                signedData: params.ERC191,
+              }
+            }
+            case ChainType.Near: {
+              const { signatureData, signedData } = await signMessage({
+                ...params.NEP413,
+                nonce: Buffer.from(params.NEP413.nonce),
+              })
+              return { type: "NEP413", signatureData, signedData }
+            }
+            case undefined:
+              throw new Error("User not signed in")
+            default:
+              chainType satisfies never
+              throw new Error(`Unsupported sign in type: ${chainType}`)
+          }
         }}
         onSuccessSwap={() => {}}
       />

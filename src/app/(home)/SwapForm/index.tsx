@@ -24,7 +24,7 @@ import type {
 import { CONFIRM_SWAP_LOCAL_KEY } from "@src/constants/contracts"
 import { NEAR_TOKEN_META } from "@src/constants/tokens"
 import { useCalculateTokenToUsd } from "@src/hooks/useCalculateTokenToUsd"
-import { SignInType, useConnectWallet } from "@src/hooks/useConnectWallet"
+import { ChainType, useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useModalSearchParams } from "@src/hooks/useModalSearchParams"
 import useSwapEstimateBot from "@src/hooks/useSwapEstimateBot"
 import { useModalStore } from "@src/providers/ModalStoreProvider"
@@ -119,7 +119,7 @@ export default function Swap() {
       return
     }
     if (!accountId) {
-      return signIn({ id: SignInType.NearWalletSelector })
+      return signIn({ id: ChainType.Near })
     }
     let hasUnsetTokens = false
     if (!selectTokenIn) {

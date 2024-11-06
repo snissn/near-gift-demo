@@ -1,4 +1,8 @@
 import type {
+  BaseTokenInfo,
+  UnifiedTokenInfo,
+} from "@defuse-protocol/defuse-sdk"
+import type {
   NetworkToken,
   NetworkTokenWithSwapRoute,
 } from "@src/types/interfaces"
@@ -228,7 +232,7 @@ export const LIST_NETWORKS_TOKENS: NetworkToken[] =
     ? listNetworksTokensTestnet
     : listNetworksTokensMainnet
 
-export const LIST_TOKENS = [
+export const LIST_TOKENS: (BaseTokenInfo | UnifiedTokenInfo)[] = [
   {
     unifiedAssetId: "usdc",
     decimals: 6,

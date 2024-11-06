@@ -1,20 +1,25 @@
 "use client"
 
+import { useSignMessage } from "wagmi"
+
 import { WithdrawWidget } from "@defuse-protocol/defuse-sdk"
 import Paper from "@src/components/Paper"
 import { LIST_TOKENS } from "@src/constants/tokens"
-import { useConnectWallet } from "@src/hooks/useConnectWallet"
+import { ChainType, useConnectWallet } from "@src/hooks/useConnectWallet"
+import { useFlatTokenList } from "@src/hooks/useFlatTokenList"
 import { useNearWalletActions } from "@src/hooks/useNearWalletActions"
 
 export default function Withdraw() {
   const { state } = useConnectWallet()
   const { signMessage, signAndSendTransactions } = useNearWalletActions()
+  const { signMessageAsync: signMessageAsyncWagmi } = useSignMessage()
+  const tokenList = useFlatTokenList(LIST_TOKENS)
 
   return (
     <Paper title="Withdraw">
       <WithdrawWidget
-        tokenList={LIST_TOKENS}
-        accountId={state.address}
+        tokenList={tokenList}
+        userAddress={state.address}
         sendNearTransaction={async (tx) => {
           const result = await signAndSendTransactions({ transactions: [tx] })
 
@@ -30,12 +35,32 @@ export default function Withdraw() {
           return { txHash: outcome.transaction.hash }
         }}
         signMessage={async (params) => {
-          const { signatureData, signedData } = await signMessage({
-            ...params.NEP413,
-            nonce: Buffer.from(params.NEP413.nonce),
-          })
+          const chainType = state.chainType
 
-          return { type: "NEP413", signatureData, signedData }
+          switch (chainType) {
+            case ChainType.EMV: {
+              const signatureData = await signMessageAsyncWagmi({
+                message: params.ERC191.message,
+              })
+              return {
+                type: "ERC191",
+                signatureData,
+                signedData: params.ERC191,
+              }
+            }
+            case ChainType.Near: {
+              const { signatureData, signedData } = await signMessage({
+                ...params.NEP413,
+                nonce: Buffer.from(params.NEP413.nonce),
+              })
+              return { type: "NEP413", signatureData, signedData }
+            }
+            case undefined:
+              throw new Error("User not signed in")
+            default:
+              chainType satisfies never
+              throw new Error(`Unsupported sign in type: ${chainType}`)
+          }
         }}
       />
     </Paper>
