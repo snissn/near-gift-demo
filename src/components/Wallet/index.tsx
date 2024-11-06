@@ -79,14 +79,8 @@ const ConnectWallet = () => {
               variant="soft"
               color="gray"
             >
-              <Image
-                src="/static/icons/logo-meta-mask.svg"
-                alt="Wallet Connect"
-                width={24}
-                height={24}
-              />
               <Text size="2" weight="bold">
-                MetaMask
+                EVM wallet
               </Text>
             </Button>
           </div>
