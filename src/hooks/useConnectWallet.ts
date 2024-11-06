@@ -89,13 +89,13 @@ export const useConnectWallet = (): ConnectWalletAction => {
     if (accountId != null) {
       setState({
         address: accountId,
-        network: "near:mainet",
+        network: "near:mainnet",
         signInType: SignInType.NearWalletSelector,
       })
     } else if (address != null) {
       setState({
         address,
-        network: chain?.id ? `eth:${chain.name}` : "unknown",
+        network: chain?.id ? `eth:${chain.name.toLowerCase()}` : "unknown",
         signInType: SignInType.Wagmi,
       })
     } else {
