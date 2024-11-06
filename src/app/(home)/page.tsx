@@ -6,12 +6,14 @@ import { useSignMessage } from "wagmi"
 import Paper from "@src/components/Paper"
 import { LIST_TOKENS } from "@src/constants/tokens"
 import { ChainType, useConnectWallet } from "@src/hooks/useConnectWallet"
+import { useFlatTokenList } from "@src/hooks/useFlatTokenList"
 import { useNearWalletActions } from "@src/hooks/useNearWalletActions"
 
 export default function Swap() {
   const { state } = useConnectWallet()
   const { signMessage, signAndSendTransactions } = useNearWalletActions()
   const { signMessageAsync: signMessageAsyncWagmi } = useSignMessage()
+  const tokenList = useFlatTokenList(LIST_TOKENS)
 
   return (
     <Paper
@@ -19,7 +21,7 @@ export default function Swap() {
       description="Cross-chain swap across any network, any token."
     >
       <SwapWidget
-        tokenList={LIST_TOKENS}
+        tokenList={tokenList}
         userAddress={state.address ?? null}
         sendNearTransaction={async (tx) => {
           const result = await signAndSendTransactions({ transactions: [tx] })
