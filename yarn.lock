@@ -255,10 +255,10 @@
     eventemitter3 "^5.0.1"
     preact "^10.16.0"
 
-"@defuse-protocol/defuse-sdk@^2.6.1":
-  version "2.6.1"
-  resolved "https://npm.pkg.github.com/download/@defuse-protocol/defuse-sdk/2.6.1/4bdc9d663a613c2cb5641ec625f2280b3eb1f447#4bdc9d663a613c2cb5641ec625f2280b3eb1f447"
-  integrity sha512-U9vcDt0r+qnlaAIQlSpx21V3/CJlLZWhMBF6F9J2faWXo/sTBQ22Ro6BHEhC2873FUKTrT9Dt5TTok4XlKndzg==
+"@defuse-protocol/defuse-sdk@^2.6.2":
+  version "2.6.2"
+  resolved "https://npm.pkg.github.com/download/@defuse-protocol/defuse-sdk/2.6.2/4685ed448bd2ae326c25920e1ffffeb435af3585#4685ed448bd2ae326c25920e1ffffeb435af3585"
+  integrity sha512-cvEcvnnkuVqSuUIqjbxPPIYObw/U/zl8unsIhaa36mJ9E0QTyA+MfjXZFcJ2VDNJVcjIMIPcoO1GS7Cxkv59ug==
   dependencies:
     "@defuse-protocol/swap-facade" "^1.0.3"
     "@radix-ui/react-checkbox" "^1.1.1"
