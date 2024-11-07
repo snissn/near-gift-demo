@@ -51,6 +51,10 @@ const ConnectWallet = () => {
         <Popover.Content className="min-w-[330px] md:mr-[48px] dark:bg-black-800 rounded-2xl">
           <Text size="1">How do you want to connect?</Text>
           <div className="w-full grid grid-cols-1 gap-4 mt-4">
+            <Text size="1" color="gray">
+              Popular wallets
+            </Text>
+            {/* TODO: Show first 3 connectors */}
             <Button
               onClick={handleNearWalletSelector}
               size="4"
@@ -71,18 +75,45 @@ const ConnectWallet = () => {
                 </Text>
               </div>
             </Button>
-            <Button
-              key={connectors[0].id}
-              onClick={() => handleWalletConnect(connectors[0])}
-              size="4"
-              radius="medium"
-              variant="soft"
-              color="gray"
-            >
-              <Text size="2" weight="bold">
-                EVM wallet
-              </Text>
-            </Button>
+            {connectors.slice(0, 1).map((connector) => (
+              <Button
+                key={connector.uid}
+                onClick={() => handleWalletConnect(connector)}
+                size="4"
+                radius="medium"
+                variant="soft"
+                color="gray"
+                className="px-2.5"
+              >
+                <div className="w-full flex items-center justify-start gap-2">
+                  <WalletIcon connector={connector} />
+                  <Text size="2" weight="bold">
+                    {renderWalletName(connector)}
+                  </Text>
+                </div>
+              </Button>
+            ))}
+            <Text size="1" color="gray">
+              Other wallets
+            </Text>
+            {connectors.slice(1).map((connector) => (
+              <Button
+                key={connector.uid}
+                onClick={() => handleWalletConnect(connector)}
+                size="4"
+                radius="medium"
+                variant="soft"
+                color="gray"
+                className="px-2.5"
+              >
+                <div className="w-full flex items-center justify-start gap-2">
+                  <WalletIcon connector={connector} />
+                  <Text size="2" weight="bold">
+                    {renderWalletName(connector)}
+                  </Text>
+                </div>
+              </Button>
+            ))}
           </div>
         </Popover.Content>
       </Popover.Root>
@@ -123,6 +154,65 @@ const ConnectWallet = () => {
       </Popover.Root>
     </div>
   )
+}
+
+function WalletIcon({ connector }: { connector: Connector }) {
+  switch (connector.id) {
+    case "walletConnect":
+      return (
+        <Image
+          src="/static/icons/wallets/wallet-connect.svg"
+          alt="Wallet Connect"
+          width={36}
+          height={36}
+        />
+      )
+    case "nearWalletSelector":
+      return (
+        <Image
+          src="/static/icons/wallets/near-wallet-selector.svg"
+          alt="Near Wallet Selector"
+          width={36}
+          height={36}
+        />
+      )
+    case "coinbaseWalletSDK":
+      return (
+        <Image
+          src="/static/icons/wallets/coinbase-wallet.svg"
+          alt="Coinbase Wallet"
+          width={36}
+          height={36}
+        />
+      )
+    case "metaMaskSDK":
+      return (
+        <Image
+          src="/static/icons/wallets/meta-mask.svg"
+          alt="MetaMask"
+          width={36}
+          height={36}
+        />
+      )
+    case "injected":
+      return (
+        <Image
+          src="/static/icons/wallets/injected-wallets.svg"
+          alt="Injected"
+          width={36}
+          height={36}
+        />
+      )
+  }
+}
+
+function renderWalletName(connector: Connector) {
+  switch (connector.id) {
+    case "injected":
+      return "Browser Wallet"
+    default:
+      return connector.name
+  }
 }
 
 export default ConnectWallet
