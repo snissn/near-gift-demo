@@ -7,18 +7,12 @@ import React, { useEffect, useState } from "react"
 import { CopyToClipboard } from "react-copy-to-clipboard"
 
 import NetworkIcon from "@src/components/Network/NetworkIcon"
-import {
-  CONNECTOR_BTC_MAINNET,
-  CONNECTOR_ETH_BASE,
-} from "@src/constants/contracts"
 import { ChainType, useConnectWallet } from "@src/hooks/useConnectWallet"
 import useShortAccountId from "@src/hooks/useShortAccountId"
 import { getChainIconFromId } from "@src/hooks/useTokensListAdapter"
 import { MapsEnum } from "@src/libs/de-sdk/utils/maps"
-import { useModalStore } from "@src/providers/ModalStoreProvider"
 import { useTokensStore } from "@src/providers/TokensStoreProvider"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import { ModalType } from "@src/stores/modalStore"
 
 type WalletConnectionState = {
   chainIcon: string
@@ -55,7 +49,6 @@ const WalletConnectionsConnector = ({
   const { shortAccountId } = useShortAccountId(accountId ?? "")
   return (
     <div className="flex flex-col justify-between items-center gap-2.5">
-      {!index ? <Separator orientation="horizontal" size="4" /> : <div />}
       <div className="w-full flex justify-between items-center">
         <div className="flex justify-center items-center gap-4">
           <NetworkIcon
@@ -116,22 +109,8 @@ const WalletConnections = () => {
   const { state, signOut } = useConnectWallet()
   const { accountId } = useWalletSelector()
   const [copyWalletAddress, setCopyWalletAddress] = useState<MapsEnum>()
-  const { setModalType } = useModalStore((state) => state)
   const { triggerTokenUpdate } = useTokensStore((state) => state)
   const [isProcessing, setIsProcessing] = useState(false)
-
-  const handleGetConnector = (connectorKey: string): string => {
-    const getWalletFromLocal = localStorage.getItem(connectorKey)
-    if (!getWalletFromLocal) return ""
-    return getWalletFromLocal
-  }
-
-  const handleDisconnectSideWallet = (connectorKey: string) => {
-    localStorage.removeItem(connectorKey)
-    triggerTokenUpdate()
-    // To force a rerender the component we update the state
-    setIsProcessing(true)
-  }
 
   useEffect(() => {
     // Finalize state update after forced re-render
@@ -145,14 +124,10 @@ const WalletConnections = () => {
         weight="medium"
         className="text-gray-600 dark:text-gray-500 pb-2"
       >
-        Connections
+        Connection
       </Text>
       {connections.map((connector, i) => {
-        const defuse_asset_id = ""
         let chainIcon = ""
-        const chainName = ""
-        const accountIdFromLocal = ""
-        const storeKey = ""
         switch (connector) {
           case MapsEnum.NEAR_MAINNET:
             if (state.chainType !== ChainType.Near) {

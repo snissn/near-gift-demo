@@ -12,7 +12,6 @@ import WalletTabs from "@src/components/Wallet/WalletTabs"
 import { ChainType, useConnectWallet } from "@src/hooks/useConnectWallet"
 import useShortAccountId from "@src/hooks/useShortAccountId"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
-import ComingSoon, { LabelComingSoon } from "../ComingSoon"
 
 const TURN_OFF_APPS = process?.env?.turnOffApps === "true" ?? true
 
@@ -137,23 +136,20 @@ const ConnectWallet = () => {
           <div className="flex flex-col gap-5">
             {/* <WalletTabs /> */}
             <WalletConnections />
-            <div className="relative">
-              <ComingSoon className="-top-[1rem]">
-                <Button
-                  onClick={handleTradeHistory}
-                  size="2"
-                  variant="soft"
-                  radius="full"
-                  color="gray"
-                  className="w-full text-black dark:text-white cursor-pointer"
-                >
-                  <CountdownTimerIcon width={16} height={16} />
-                  <Text size="2" weight="medium">
-                    Transactions
-                  </Text>
-                </Button>
-              </ComingSoon>
-            </div>
+            {/* TODO: Transactions button has to be redesigned or removed */}
+            {/* <Button
+              onClick={handleTradeHistory}
+              size="2"
+              variant="soft"
+              radius="full"
+              color="gray"
+              className="w-full text-black dark:text-white cursor-pointer"
+            >
+              <CountdownTimerIcon width={16} height={16} />
+              <Text size="2" weight="medium">
+                Transactions
+              </Text>
+            </Button> */}
           </div>
         </Popover.Content>
       </Popover.Root>
