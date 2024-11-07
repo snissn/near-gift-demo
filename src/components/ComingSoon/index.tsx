@@ -1,10 +1,13 @@
 import clsx from "clsx"
 import type { PropsWithChildren } from "react"
 
-const WrapperComingSoon = ({ children }: PropsWithChildren) => {
+const WrapperComingSoon = ({
+  children,
+  className,
+}: PropsWithChildren<{ className?: string }>) => {
   return (
     <div className="opacity-80 cursor-not-allowed pointer-events-none">
-      <LabelComingSoon className="top-1 right-5" />
+      <LabelComingSoon className={clsx("top-1 right-5", className)} />
       {children}
     </div>
   )

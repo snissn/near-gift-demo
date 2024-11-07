@@ -48,7 +48,7 @@ const Settings = () => {
         </Popover.Trigger>
         <Popover.Content className="min-w-[180px] mt-1 dark:bg-black-800 rounded-2xl">
           <div className="flex flex-col gap-4">
-            <ComingSoon>
+            <ComingSoon className="top-[0.25rem]">
               <div className="flex justify-between items-center gap-4">
                 <Text size="2" weight="medium">
                   Dark Mode

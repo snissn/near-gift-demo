@@ -12,6 +12,7 @@ import WalletTabs from "@src/components/Wallet/WalletTabs"
 import { ChainType, useConnectWallet } from "@src/hooks/useConnectWallet"
 import useShortAccountId from "@src/hooks/useShortAccountId"
 import { useHistoryStore } from "@src/providers/HistoryStoreProvider"
+import ComingSoon, { LabelComingSoon } from "../ComingSoon"
 
 const TURN_OFF_APPS = process?.env?.turnOffApps === "true" ?? true
 
@@ -134,21 +135,25 @@ const ConnectWallet = () => {
         </Popover.Trigger>
         <Popover.Content className="min-w-[330px] mt-1 md:mr-[48px] dark:bg-black-800 rounded-2xl">
           <div className="flex flex-col gap-5">
-            <WalletTabs />
+            {/* <WalletTabs /> */}
             <WalletConnections />
-            <Button
-              onClick={handleTradeHistory}
-              size="2"
-              variant="soft"
-              radius="full"
-              color="gray"
-              className="w-full text-black dark:text-white cursor-pointer"
-            >
-              <CountdownTimerIcon width={16} height={16} />
-              <Text size="2" weight="medium">
-                Transactions
-              </Text>
-            </Button>
+            <div className="relative">
+              <ComingSoon className="-top-[1rem]">
+                <Button
+                  onClick={handleTradeHistory}
+                  size="2"
+                  variant="soft"
+                  radius="full"
+                  color="gray"
+                  className="w-full text-black dark:text-white cursor-pointer"
+                >
+                  <CountdownTimerIcon width={16} height={16} />
+                  <Text size="2" weight="medium">
+                    Transactions
+                  </Text>
+                </Button>
+              </ComingSoon>
+            </div>
           </div>
         </Popover.Content>
       </Popover.Root>
