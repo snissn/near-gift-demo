@@ -1,6 +1,7 @@
 import { withSentryConfig } from "@sentry/nextjs"
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  productionBrowserSourceMaps: true,
   eslint: {
     // We check the code quality in the CI pipeline
     ignoreDuringBuilds: true,
