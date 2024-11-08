@@ -8,9 +8,11 @@ import React, { useState, useEffect } from "react"
 import { THEME_MODE_KEY } from "@src/constants/contracts"
 import Themes from "@src/types/themes"
 import ComingSoon from "./ComingSoon"
+import LabelNew from "./LabelNew"
 
 const NEXT_PUBLIC_LINK_DOCS = process.env.NEXT_PUBLIC_LINK_DOCS ?? ""
 const NEXT_PUBLIC_PUBLIC_MAIL = process?.env?.NEXT_PUBLIC_PUBLIC_MAIL ?? ""
+const NEXT_PUBLIC_PUBLIC_TG = process?.env?.NEXT_PUBLIC_PUBLIC_TG ?? ""
 
 const Settings = () => {
   const { theme, setTheme } = useTheme()
@@ -84,6 +86,18 @@ const Settings = () => {
                 </Text>
                 <ExternalLinkIcon width={16} height={16} />
               </button>
+              <LabelNew className="right-1/2">
+                <button
+                  type={"button"}
+                  onClick={() => window.open(NEXT_PUBLIC_PUBLIC_TG)}
+                  className="w-full flex justify-between items-center gap-2"
+                >
+                  <Text size="2" weight="medium">
+                    Telegram
+                  </Text>
+                  <ExternalLinkIcon width={16} height={16} />
+                </button>
+              </LabelNew>
             </div>
           </div>
         </Popover.Content>
