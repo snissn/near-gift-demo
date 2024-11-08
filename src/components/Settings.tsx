@@ -37,37 +37,38 @@ const Settings = () => {
             <DarkMode />
             <Separator orientation="horizontal" size="4" />
             <div className="flex flex-col justify-between items-center gap-1.5">
-              <button
-                type={"button"}
-                onClick={() => window.open(NEXT_PUBLIC_LINK_DOCS)}
+              <a
+                href={NEXT_PUBLIC_LINK_DOCS}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full flex justify-between items-center gap-2"
               >
                 <Text size="2" weight="medium">
                   Help center
                 </Text>
                 <ExternalLinkIcon width={16} height={16} />
-              </button>
-              <button
-                type={"button"}
-                onClick={() => window.open(`mailto:${NEXT_PUBLIC_PUBLIC_MAIL}`)}
+              </a>
+              <a
+                href={`mailto:${NEXT_PUBLIC_PUBLIC_MAIL}`}
                 className="w-full flex justify-between items-center gap-2"
               >
                 <Text size="2" weight="medium">
                   Request feature
                 </Text>
                 <ExternalLinkIcon width={16} height={16} />
-              </button>
+              </a>
               <LabelNew className="right-1/2">
-                <button
-                  type={"button"}
-                  onClick={() => window.open(NEXT_PUBLIC_PUBLIC_TG)}
+                <a
+                  href={NEXT_PUBLIC_PUBLIC_TG}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-full flex justify-between items-center gap-2"
                 >
                   <Text size="2" weight="medium">
                     Telegram
                   </Text>
                   <ExternalLinkIcon width={16} height={16} />
-                </button>
+                </a>
               </LabelNew>
             </div>
           </div>
