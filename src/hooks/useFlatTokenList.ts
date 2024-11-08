@@ -14,9 +14,14 @@ export function useFlatTokenList(
 
   return useMemo(() => {
     if (flatListIsEnabled) {
-      return tokenList.flatMap((token) =>
-        isBaseToken(token) ? [token] : token.groupedTokens
-      )
+      return tokenList
+        .flatMap((token) =>
+          isBaseToken(token) ? [token] : token.groupedTokens
+        )
+        .map((token) => ({
+          ...token,
+          symbol: `${token.symbol} (${token.chainName})`,
+        }))
     }
     return tokenList
   }, [flatListIsEnabled, tokenList])
