@@ -6,6 +6,7 @@ import { Theme } from "@radix-ui/themes"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { ThemeProvider } from "next-themes"
+import { useEffect } from "react"
 
 import Modal from "@src/components/Modal"
 import queryClient from "@src/constants/queryClient"
@@ -23,6 +24,8 @@ import "../styles/global.scss"
 import { config } from "@src/config/wagmi"
 
 const DEV_MODE = process?.env?.NEXT_PUBLIC_DEV_MODE === "true" ?? false
+const DARK_MODE_ENABLED =
+  process?.env?.NEXT_PUBLIC_DARK_MODE === "true" ?? false
 
 const RootLayout = ({
   children,
@@ -31,6 +34,10 @@ const RootLayout = ({
 }>) => {
   // CONTEXT: Could be used to share global concerns, theme
   //          like the current theme etc.
+  useEffect(() => {
+    localStorage.setItem("theme", DARK_MODE_ENABLED ? "dark" : "light")
+  }, [])
+
   return (
     <html lang="en">
       <body>
