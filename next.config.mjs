@@ -72,7 +72,7 @@ const sentryConfig = {
   project: "defuse",
   silent: true,
   widenClientFileUpload: true,
-  hideSourceMaps: true,
+  hideSourceMaps: false,
   disableLogger: true,
 }
 
