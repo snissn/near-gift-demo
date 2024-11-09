@@ -8,6 +8,7 @@ import Image from "next/image"
 import { type PropsWithChildren, useState } from "react"
 
 import Section from "@src/app/landing/Section"
+import { settings } from "@src/config/settings"
 
 const ButtonFAQ = ({
   children,
@@ -72,31 +73,31 @@ const FAQ = () => {
           <Accordion.Item className="AccordionItem" value="1">
             <AccordionTrigger className="w-full">
               <ButtonFAQ isActive={expandedSection === "1"}>
-                What is Defuse?
+                What is {settings.appName}?
               </ButtonFAQ>
             </AccordionTrigger>
             <AccordionContent>
               <SectionFAQ>
-                Defuse is a scalable, multi-chain DeFi infrastructure that
-                facilitates the creation and trading of financial instruments
-                with minimized centralization risks, while unifying liquidity
-                across crypto ecosystems.
+                {settings.appName} is a scalable, multi-chain DeFi
+                infrastructure that facilitates the creation and trading of
+                financial instruments with minimized centralization risks, while
+                unifying liquidity across crypto ecosystems.
               </SectionFAQ>
             </AccordionContent>
           </Accordion.Item>
           <Accordion.Item className="AccordionItem mt-4" value="2">
             <AccordionTrigger className="w-full">
               <ButtonFAQ isActive={expandedSection === "2"}>
-                How does Defuse work?
+                How does {settings.appName} work?
               </ButtonFAQ>
             </AccordionTrigger>
             <AccordionContent>
               <SectionFAQ>
-                Defuse is based on Intent-Based Architecture and AccountFi.
-                Utilizing a chain of abstraction, Defuse allows the trading of
-                assets across different chains. This trading is conducted on an
-                intent-based model, where users interact with active market
-                participants.
+                {settings.appName} is based on Intent-Based Architecture and
+                AccountFi. Utilizing a chain of abstraction, {settings.appName}{" "}
+                allows the trading of assets across different chains. This
+                trading is conducted on an intent-based model, where users
+                interact with active market participants.
               </SectionFAQ>
             </AccordionContent>
           </Accordion.Item>
@@ -119,14 +120,14 @@ const FAQ = () => {
           <Accordion.Item className="AccordionItem mt-4" value="4">
             <AccordionTrigger className="w-full">
               <ButtonFAQ isActive={expandedSection === "4"}>
-                Is Defuse scalable?
+                Is {settings.appName} scalable?
               </ButtonFAQ>
             </AccordionTrigger>
             <AccordionContent>
               <SectionFAQ>
-                Defuse utilizes a sharded contract approach, which scales the
-                protocol depending on its’ use. Defuse is powered by the most
-                scalable blockchain to date – NEAR Protocol.
+                {settings.appName} utilizes a sharded contract approach, which
+                scales the protocol depending on its’ use. {settings.appName} is
+                powered by the most scalable blockchain to date – NEAR Protocol.
               </SectionFAQ>
             </AccordionContent>
           </Accordion.Item>

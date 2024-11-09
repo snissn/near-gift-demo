@@ -103,11 +103,11 @@ export const WalletSelectorProvider: React.FC<{
         // setupWalletConnect({
         //   projectId: WALLET_CONNECT_PROJECT_ID,
         //   metadata: {
-        //     name: "Defuse Protocol",
+        //     name: "NEAR Intents Protocol",
         //     description:
-        //       "Defuse: the premier platform for cross-chain liquidity and trading. Experience efficient, secure, and transparent swaps across multiple blockchains.",
+        //       "NEAR Intents: the premier platform for cross-chain liquidity and trading. Experience efficient, secure, and transparent swaps across multiple blockchains.",
         //     url: "https://github.com/defuse-protocol",
-        //     icons: ["https://defuse.org/static/icons/Logo.svg"],
+        //     icons: ["https://app.near-intents.org/static/icons/Logo.svg"],
         //   },
         // }),
         // setupNearMobileWallet(),

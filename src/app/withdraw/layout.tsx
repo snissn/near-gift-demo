@@ -3,12 +3,9 @@ import type React from "react"
 import type { PropsWithChildren } from "react"
 
 import Layout from "@src/components/Layout"
+import { settings } from "@src/config/settings"
 
-export const metadata: Metadata = {
-  title: "Withdraw - Your Trusted Financial Partner",
-  description:
-    "Easily manage your withdrawals with our secure and user-friendly platform. Experience seamless transactions and exceptional support.",
-}
+export const metadata: Metadata = settings.metadata.withdraw
 
 const WithdrawLayout: React.FC<PropsWithChildren> = ({ children }) => {
   return <Layout>{children}</Layout>
