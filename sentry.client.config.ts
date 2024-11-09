@@ -17,7 +17,7 @@ Sentry.init({
     // eslint-disable-next-line import/namespace
     Sentry.replayIntegration({
       maskAllText: false,
-      blockAllMedia: true,
+      blockAllMedia: false,
     }),
   ],
 })

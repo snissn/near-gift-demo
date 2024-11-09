@@ -75,6 +75,11 @@ const sentryConfig = {
   widenClientFileUpload: true,
   hideSourceMaps: false,
   disableLogger: true,
+  reactComponentAnnotation: {
+    enabled: true,
+  },
+  tunnelRoute: "/monitoring",
+  automaticVercelMonitors: true,
 }
 
 export default withSentryConfig(nextConfig, sentryConfig)

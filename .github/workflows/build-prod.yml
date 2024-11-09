@@ -24,6 +24,7 @@ jobs:
           near_node_url: ${{ secrets.NEAR_NODE_URL }}
           wallet_connect_project_id: ${{ secrets.WALLET_CONNECT_PROJECT_ID }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          sentry_auth_token: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Test
         uses: ./.github/actions/test
