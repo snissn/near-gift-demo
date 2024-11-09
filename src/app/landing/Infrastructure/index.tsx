@@ -5,6 +5,7 @@ import Image from "next/image"
 import { type PropsWithChildren, useEffect, useRef, useState } from "react"
 
 import Section from "@src/app/landing/Section"
+import { settings } from "@src/config/settings"
 import useResize from "@src/hooks/useResize"
 
 const CardTopic = ({ children, id }: { id: number } & PropsWithChildren) => {
@@ -30,7 +31,7 @@ const Infrastructure = () => {
   }, [])
 
   return (
-    <Section title="Defuse Infrastructure">
+    <Section title={`${settings.appName} Infrastructure`}>
       <div className="flex flex-col justify-center">
         <p className="text-center text-[20px] md:text-[32px] font-black text-gray-600 mb-4 md:mb-5">
           <Text as="span">
@@ -49,7 +50,7 @@ const Infrastructure = () => {
                   ? "/static/images/Infrastructure--mobile.svg"
                   : "/static/images/Infrastructure.svg"
               }
-              alt="Defuse Infrastructure"
+              alt={`${settings.appName} Infrastructure`}
               layout="fill"
               objectFit="contain"
             />

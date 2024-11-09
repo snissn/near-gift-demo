@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@radix-ui/themes"
+import { settings } from "@src/config/settings"
 
 const APP_URL = process?.env?.appUrl ?? "/"
 
@@ -8,7 +9,7 @@ const TryDefuse = () => {
   return (
     <div className="w-full mx-auto flex flex-col items-center gap-6 pt-10 md:pt-0 z-10 my-[72px] md:mt-[148px] md:mb-[156px]">
       <h1 className="text-3xl md:text-6xl text-center font-bold md:text-nowrap">
-        Welcome to Defuse
+        Welcome to {settings.appName}
       </h1>
       <p className="max-w-[561px] text-center text-xl md:text-[40px] font-black md:leading-[48px] tracking-[-0.4px] text-gray-600">
         Multichain DeFi Hub

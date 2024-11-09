@@ -1,4 +1,5 @@
 import { Text } from "@radix-ui/themes"
+import { settings } from "@src/config/settings"
 import clsx from "clsx"
 import Image from "next/image"
 import React, { type PropsWithChildren } from "react"
@@ -96,7 +97,7 @@ const TableInfrastructure = ({ data, maxWidth }: Props) => {
               <ComponentHead>CEX</ComponentHead>
               <ComponentHead>DEX</ComponentHead>
               <ComponentHead group={ColumnGroupType.PRIMARY}>
-                Defuse
+                {settings.appName}
               </ComponentHead>
             </tr>
           </thead>

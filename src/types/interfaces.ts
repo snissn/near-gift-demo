@@ -279,3 +279,13 @@ export interface SignAndSendTransactionsParams {
    */
   transactions: Array<Optional<Transaction, "signerId">>
 }
+
+export type Settings = {
+  appName: string
+  metadata: {
+    [key: string]: {
+      title: string
+      description: string
+    }
+  }
+}
