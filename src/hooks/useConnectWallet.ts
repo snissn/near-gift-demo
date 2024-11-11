@@ -1,19 +1,11 @@
 "use client"
 
 import type { FinalExecutionOutcome } from "@near-wallet-selector/core"
-import * as Sentry from "@sentry/nextjs"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import type { SignAndSendTransactionsParams } from "@src/types/interfaces"
 import { useEffect, useState } from "react"
-import {
-  type Connector,
-  useAccount,
-  useConnect,
-  useConnectorClient,
-  useDisconnect,
-} from "wagmi"
+import { type Connector, useAccount, useConnect, useDisconnect } from "wagmi"
 import { useNearWalletActions } from "./useNearWalletActions"
-import { useSentrySetContextWallet, useSentrySetUser } from "./useSetSentry"
 
 export enum ChainType {
   Near = "near",
@@ -58,9 +50,6 @@ export const useConnectWallet = (): ConnectWalletAction => {
   const { connectors, connect } = useConnect()
   const { disconnect } = useDisconnect()
   const { address, chain } = useAccount()
-
-  useSentrySetUser({ userAddress: state.address })
-  useSentrySetContextWallet({ userAddress: state.address })
 
   const handleSignInViaNearWalletSelector = async (): Promise<void> => {
     modal.show()

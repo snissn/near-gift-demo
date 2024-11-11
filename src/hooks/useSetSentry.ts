@@ -1,4 +1,4 @@
-import * as Sentry from "@sentry/nextjs"
+import { setContext, setUser } from "@sentry/nextjs"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import { useCallback, useEffect } from "react"
 import { useConnect, useConnectorClient } from "wagmi"
@@ -9,7 +9,7 @@ type QueryKey = [string, { chainId: number; connectorUid: string }]
 export const useSentrySetUser = ({ userAddress }: { userAddress?: string }) => {
   useEffect(() => {
     if (userAddress) {
-      Sentry.setUser({ id: userAddress })
+      setUser({ id: userAddress })
     }
   }, [userAddress])
 }
@@ -44,7 +44,7 @@ export const useSentrySetContextWallet = ({
         wallet = nearWalletSelector
       }
       if (wallet) {
-        Sentry.setContext("wallet", { wallet })
+        setContext("wallet", { wallet })
       }
     }
   }, [userAddress, nearWalletSelector, getWagmiConnectorName])

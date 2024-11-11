@@ -21,6 +21,7 @@ import "@near-wallet-selector/modal-ui/styles.css"
 import "@near-wallet-selector/account-export/styles.css"
 import "@defuse-protocol/defuse-sdk/styles"
 import "../styles/global.scss"
+import { SentryTracer } from "@src/components/SentryTracer"
 import { config } from "@src/config/wagmi"
 
 const DEV_MODE = process?.env?.NEXT_PUBLIC_DEV_MODE === "true" ?? false
@@ -58,6 +59,7 @@ const RootLayout = ({
                       </HistoryStoreProvider>
                     </Theme>
                   </ThemeProvider>
+                  <SentryTracer />
                 </WalletSelectorProvider>
                 {DEV_MODE && <ReactQueryDevtools initialIsOpen={false} />}
               </QueryClientProvider>
