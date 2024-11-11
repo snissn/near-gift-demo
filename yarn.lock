@@ -255,10 +255,10 @@
     eventemitter3 "^5.0.1"
     preact "^10.16.0"
 
-"@defuse-protocol/defuse-sdk@^2.7.0":
-  version "2.7.0"
-  resolved "https://npm.pkg.github.com/download/@defuse-protocol/defuse-sdk/2.7.0/2f3c8105ff068979edc20767c2bcc9e2fc4eb326#2f3c8105ff068979edc20767c2bcc9e2fc4eb326"
-  integrity sha512-eXD4HGDQccrmCsFNs8vPA/3sz1v77A2D/ByHLJ7Nl4+znNSzlSDhmsIgbvEc1JhIY3pt+HtsYmA180Kep87zOQ==
+"@defuse-protocol/defuse-sdk@^2.7.1":
+  version "2.7.1"
+  resolved "https://npm.pkg.github.com/download/@defuse-protocol/defuse-sdk/2.7.1/412a48fe5f0a9b2e90a29555f53f58f47bab1204#412a48fe5f0a9b2e90a29555f53f58f47bab1204"
+  integrity sha512-PnuuYSm4bYW+NN8akiCYrEHbCDZJXlvpxEXIdcGHPkMcdQQq3IrJcG33sr3xXF3d8EfysCNabYWABYozIrZb7g==
   dependencies:
     "@defuse-protocol/swap-facade" "^1.0.3"
     "@noble/curves" "1.4.0"
