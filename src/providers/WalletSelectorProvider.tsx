@@ -52,6 +52,7 @@ interface WalletSelectorContextValue {
   modal: WalletSelectorModal
   accounts: Array<AccountState>
   accountId: string | null
+  selectedWalletId: string | null
 }
 
 const NEAR_ENV = process.env.NEAR_ENV ?? "testnet"
@@ -175,6 +176,7 @@ export const WalletSelectorProvider: React.FC<{
       modal: modal!,
       accounts,
       accountId: accounts.find((account) => account.active)?.accountId || null,
+      selectedWalletId: selector?.store.getState().selectedWalletId || null,
     }),
     [selector, modal, accounts]
   )
