@@ -8,6 +8,9 @@ export const useSentrySetUser = ({ userAddress }: { userAddress?: string }) => {
     if (userAddress) {
       setUser({ id: userAddress })
     }
+    return () => {
+      setUser(null)
+    }
   }, [userAddress])
 }
 
@@ -29,6 +32,9 @@ export const useSentrySetContextWallet = ({
       if (wallet) {
         setContext("wallet", { wallet })
       }
+    }
+    return () => {
+      setContext("wallet", null)
     }
   }, [userAddress, nearWalletSelector, connector])
 }
