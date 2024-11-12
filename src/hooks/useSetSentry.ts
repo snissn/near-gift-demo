@@ -7,8 +7,7 @@ export const useSentrySetUser = ({ userAddress }: { userAddress?: string }) => {
   useEffect(() => {
     if (userAddress) {
       setUser({ id: userAddress })
-    }
-    return () => {
+    } else {
       setUser(null)
     }
   }, [userAddress])
@@ -32,8 +31,7 @@ export const useSentrySetContextWallet = ({
       if (wallet) {
         setContext("wallet", { wallet })
       }
-    }
-    return () => {
+    } else {
       setContext("wallet", null)
     }
   }, [userAddress, nearWalletSelector, connector])
