@@ -1,10 +1,7 @@
 import { setContext, setUser } from "@sentry/nextjs"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import { useCallback, useEffect } from "react"
-import { useConnect, useConnectorClient } from "wagmi"
-
-// We should use custom types as QueryKey from wagmi Array type unknown
-type QueryKey = [string, { chainId: number; connectorUid: string }]
+import { useEffect } from "react"
+import { useAccount } from "wagmi"
 
 export const useSentrySetUser = ({ userAddress }: { userAddress?: string }) => {
   useEffect(() => {
@@ -18,27 +15,13 @@ export const useSentrySetContextWallet = ({
   userAddress,
 }: { userAddress?: string }) => {
   const { selectedWalletId: nearWalletSelector } = useWalletSelector()
-  const { connectors: wagmiConnectors } = useConnect()
-  const wagmiConnectorClient = useConnectorClient()
-
-  const getWagmiConnectorName = useCallback(() => {
-    const queryKey = wagmiConnectorClient.queryKey as QueryKey
-    if (!queryKey || !queryKey[1]) {
-      return null
-    }
-    const connectorUid = queryKey[1].connectorUid
-    const wagmiConnector = wagmiConnectors.find(
-      (connector) => connector.uid === connectorUid
-    )
-    return wagmiConnector?.name
-  }, [wagmiConnectorClient, wagmiConnectors])
+  const { connector } = useAccount()
 
   useEffect(() => {
     if (userAddress) {
       let wallet = null
-      const wagmiConnectorName = getWagmiConnectorName()
-      if (wagmiConnectorName) {
-        wallet = wagmiConnectorName
+      if (connector) {
+        wallet = connector.name
       }
       if (nearWalletSelector) {
         wallet = nearWalletSelector
@@ -47,5 +30,5 @@ export const useSentrySetContextWallet = ({
         setContext("wallet", { wallet })
       }
     }
-  }, [userAddress, nearWalletSelector, getWagmiConnectorName])
+  }, [userAddress, nearWalletSelector, connector])
 }
