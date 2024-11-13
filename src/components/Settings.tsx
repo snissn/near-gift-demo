@@ -70,6 +70,17 @@ const Settings = () => {
                   <ExternalLinkIcon width={16} height={16} />
                 </a>
               </LabelNew>
+              <a
+                href="/jobs"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex justify-between items-center gap-2"
+              >
+                <Text size="2" weight="medium">
+                  Jobs
+                </Text>
+                <ExternalLinkIcon width={16} height={16} />
+              </a>
             </div>
           </div>
         </Popover.Content>

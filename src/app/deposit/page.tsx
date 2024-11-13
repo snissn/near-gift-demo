@@ -21,7 +21,6 @@ export default function Deposit() {
       <DepositWidget
         tokenList={LIST_TOKENS}
         userAddress={state.address}
-        // @ts-expect-error
         chainType={state.chainType}
         rpcUrl={getRPCUrl(chain)}
         sendTransactionNear={async (transactions) => {
