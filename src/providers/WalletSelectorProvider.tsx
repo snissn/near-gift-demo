@@ -84,7 +84,7 @@ export const WalletSelectorProvider: React.FC<{
       modules: [
         setupMyNearWallet(),
         setupMeteorWallet(),
-        setupHereWallet(),
+        // setupHereWallet(),
         // setupSender(),
         // setupNearSnap(),
         // setupNearFi(),
