@@ -150,7 +150,7 @@ const WalletConnections = () => {
               />
             )
           case MapsEnum.EVM_ETHEREUM:
-            if (state.chainType !== ChainType.EMV) {
+            if (state.chainType !== ChainType.EVM) {
               return null
             }
             chainIcon = getChainIconFromId("eth")
@@ -162,7 +162,7 @@ const WalletConnections = () => {
                 chainIcon={chainIcon}
                 onCopy={() => setCopyWalletAddress(MapsEnum.EVM_ETHEREUM)}
                 isCopied={copyWalletAddress === MapsEnum.EVM_ETHEREUM}
-                onDisconnect={() => signOut({ id: ChainType.EMV })}
+                onDisconnect={() => signOut({ id: ChainType.EVM })}
                 onConnect={() => {}}
                 key={connector}
                 index={i}

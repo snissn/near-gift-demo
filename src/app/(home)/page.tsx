@@ -43,7 +43,7 @@ export default function Swap() {
           const chainType = state.chainType
 
           switch (chainType) {
-            case ChainType.EMV: {
+            case ChainType.EVM: {
               const signatureData = await signMessageAsyncWagmi({
                 message: params.ERC191.message,
               })

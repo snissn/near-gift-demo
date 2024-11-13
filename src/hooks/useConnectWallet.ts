@@ -3,17 +3,16 @@
 import type { FinalExecutionOutcome } from "@near-wallet-selector/core"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import type { SignAndSendTransactionsParams } from "@src/types/interfaces"
+import type { SendTransactionParameters } from "@wagmi/core"
 import { useEffect, useState } from "react"
+import type { Abi } from "viem"
 import { type Connector, useAccount, useConnect, useDisconnect } from "wagmi"
+import { useEVMWalletActions } from "./useEVMWalletActions"
 import { useNearWalletActions } from "./useNearWalletActions"
 
 export enum ChainType {
   Near = "near",
-  EMV = "evm",
-}
-
-export enum SendTransactionType {
-  SignAndSendTransactions = "signAndSendTransactions",
+  EVM = "evm",
 }
 
 type State = {
@@ -31,7 +30,14 @@ interface ConnectWalletAction {
   signMessage: (params: { id: ChainType; message: string }) => Promise<void>
   sendTransaction: (params: {
     id: ChainType
-    transactions: SignAndSendTransactionsParams["transactions"]
+    transactions?:
+      | SignAndSendTransactionsParams["transactions"]
+      | SendTransactionParameters[]
+    calldata?: {
+      to?: string
+      value?: bigint
+      data?: string
+    }
   }) => Promise<string | FinalExecutionOutcome[]>
   connectors: Connector[]
   state: State
@@ -50,7 +56,7 @@ export const useConnectWallet = (): ConnectWalletAction => {
   const { connectors, connect } = useConnect()
   const { disconnect } = useDisconnect()
   const { address, chain } = useAccount()
-
+  const { sendTransactions } = useEVMWalletActions()
   const handleSignInViaNearWalletSelector = async (): Promise<void> => {
     modal.show()
   }
@@ -90,7 +96,7 @@ export const useConnectWallet = (): ConnectWalletAction => {
       setState({
         address,
         network: chain?.id ? `eth:${chain.id}` : "unknown",
-        chainType: ChainType.EMV,
+        chainType: ChainType.EVM,
       })
     } else {
       setState(defaultState)
@@ -104,7 +110,7 @@ export const useConnectWallet = (): ConnectWalletAction => {
     }): Promise<void> {
       const strategies = {
         [ChainType.Near]: () => handleSignInViaNearWalletSelector(),
-        [ChainType.EMV]: () =>
+        [ChainType.EVM]: () =>
           params.connector
             ? handleSignInViaWalletConnect({ connector: params.connector })
             : undefined,
@@ -117,7 +123,7 @@ export const useConnectWallet = (): ConnectWalletAction => {
     }): Promise<void> {
       const strategies = {
         [ChainType.Near]: () => handleSignOutViaNearWalletSelector(),
-        [ChainType.EMV]: () => handleSignOutViaWalletConnect(),
+        [ChainType.EVM]: () => handleSignOutViaWalletConnect(),
       }
       return strategies[params.id]()
     },
@@ -134,10 +140,11 @@ export const useConnectWallet = (): ConnectWalletAction => {
       const strategies = {
         [ChainType.Near]: async () =>
           await signAndSendTransactions({
-            transactions: params.transactions,
+            transactions:
+              params.transactions as SignAndSendTransactionsParams["transactions"],
           }),
-        [ChainType.EMV]: async () => {
-          throw new Error("Wagmi sendTransaction not implemented")
+        [ChainType.EVM]: async () => {
+          await sendTransactions(params.calldata as SendTransactionParameters)
         },
       }
 

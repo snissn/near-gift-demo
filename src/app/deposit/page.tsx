@@ -6,14 +6,11 @@ import { DepositWidget } from "@defuse-protocol/defuse-sdk"
 import Paper from "@src/components/Paper"
 import { LIST_TOKENS } from "@src/constants/tokens"
 import { ChainType, useConnectWallet } from "@src/hooks/useConnectWallet"
-import { useNotificationStore } from "@src/providers/NotificationProvider"
-import { NotificationType } from "@src/stores/notificationStore"
 import { useAccount } from "wagmi"
 import type { Chain } from "wagmi/chains"
 
 export default function Deposit() {
   const { state, sendTransaction } = useConnectWallet()
-  const setNotification = useNotificationStore((state) => state.setNotification)
   const { chain } = useAccount()
 
   return (
@@ -28,25 +25,15 @@ export default function Deposit() {
             id: ChainType.Near,
             transactions,
           })
-
           // For batch transactions, the result is an array with the transaction hash as the second element
           return Array.isArray(result) ? result[1].transaction.hash : result
         }}
-        onEmit={(event) => {
-          if (event.type === "SUCCESSFUL_DEPOSIT") {
-            setNotification({
-              id: crypto.randomUUID(),
-              message: "Deposit successful",
-              type: NotificationType.SUCCESS,
-            })
-          }
-          if (event.type === "FAILED_DEPOSIT") {
-            setNotification({
-              id: crypto.randomUUID(),
-              message: "Deposit failed",
-              type: NotificationType.ERROR,
-            })
-          }
+        sendTransactionEVM={async (calldata) => {
+          const result = await sendTransaction({
+            id: ChainType.EVM,
+            calldata,
+          })
+          return Array.isArray(result) ? result[1].transaction.hash : result
         }}
       />
     </Paper>

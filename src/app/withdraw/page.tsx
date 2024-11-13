@@ -39,7 +39,7 @@ export default function Withdraw() {
           const chainType = state.chainType
 
           switch (chainType) {
-            case ChainType.EMV: {
+            case ChainType.EVM: {
               const signatureData = await signMessageAsyncWagmi({
                 message: params.ERC191.message,
               })

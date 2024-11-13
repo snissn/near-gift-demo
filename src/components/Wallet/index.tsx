@@ -26,7 +26,7 @@ const ConnectWallet = () => {
   }
 
   const handleWalletConnect = (connector: Connector) => {
-    signIn({ id: ChainType.EMV, connector })
+    signIn({ id: ChainType.EVM, connector })
   }
 
   const handleTradeHistory = () => openWidget()
