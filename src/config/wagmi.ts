@@ -18,7 +18,7 @@ export const config = createConfig({
       projectId: PROJECT_ID,
       showQrModal: true,
     }),
-    coinbaseWallet({ appName: "Defuse" }),
+    coinbaseWallet({ appName: "Near Intents" }),
   ],
   transports: {
     [mainnet.id]: http(),
