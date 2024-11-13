@@ -20,6 +20,7 @@ export default function Withdraw() {
       <WithdrawWidget
         tokenList={tokenList}
         userAddress={state.address}
+        chainType={state.chainType}
         sendNearTransaction={async (tx) => {
           const result = await signAndSendTransactions({ transactions: [tx] })
 
