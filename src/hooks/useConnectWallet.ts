@@ -89,7 +89,7 @@ export const useConnectWallet = (): ConnectWalletAction => {
     } else if (address != null) {
       setState({
         address,
-        network: chain?.id ? `eth:${chain.name.toLowerCase()}` : "unknown",
+        network: chain?.id ? `eth:${chain.id}` : "unknown",
         chainType: ChainType.EMV,
       })
     } else {

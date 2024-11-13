@@ -8,10 +8,13 @@ import { LIST_TOKENS } from "@src/constants/tokens"
 import { ChainType, useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useNotificationStore } from "@src/providers/NotificationProvider"
 import { NotificationType } from "@src/stores/notificationStore"
+import { useAccount } from "wagmi"
+import type { Chain } from "wagmi/chains"
 
 export default function Deposit() {
   const { state, sendTransaction } = useConnectWallet()
   const setNotification = useNotificationStore((state) => state.setNotification)
+  const { chain } = useAccount()
 
   return (
     <Paper title="Deposit">
@@ -20,6 +23,7 @@ export default function Deposit() {
         userAddress={state.address}
         // @ts-expect-error
         chainType={state.chainType}
+        rpcUrl={getRPCUrl(chain)}
         sendTransactionNear={async (transactions) => {
           const result = await sendTransaction({
             id: ChainType.Near,
@@ -48,4 +52,8 @@ export default function Deposit() {
       />
     </Paper>
   )
+}
+
+function getRPCUrl(chain: Chain | undefined) {
+  return chain ? chain.rpcUrls.default?.http[0] : undefined
 }
