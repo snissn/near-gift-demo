@@ -143,9 +143,8 @@ export const useConnectWallet = (): ConnectWalletAction => {
             transactions:
               params.transactions as SignAndSendTransactionsParams["transactions"],
           }),
-        [ChainType.EVM]: async () => {
-          await sendTransactions(params.calldata as SendTransactionParameters)
-        },
+        [ChainType.EVM]: async () =>
+          await sendTransactions(params.calldata as SendTransactionParameters),
       }
 
       const result = await strategies[params.id]()
