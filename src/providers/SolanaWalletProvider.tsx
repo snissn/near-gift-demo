@@ -3,13 +3,13 @@ import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react"
-import { UnsafeBurnerWalletAdapter } from "@solana/wallet-adapter-wallets"
 import { clusterApiUrl } from "@solana/web3.js"
 import React, { type FC, type ReactNode, useMemo } from "react"
 
+import { WalletModalProvider } from "@solana/wallet-adapter-react-ui"
+
 // Default styles that can be overridden by your app
 import "@solana/wallet-adapter-react-ui/styles.css"
-import { WalletModalProvider } from "@solana/wallet-adapter-react-ui"
 
 export const SolanaWalletProvider: FC<{ children: ReactNode }> = ({
   children,
@@ -35,9 +35,7 @@ export const SolanaWalletProvider: FC<{ children: ReactNode }> = ({
        * instantiate its legacy wallet adapter here. Common legacy adapters can be found
        * in the npm package `@solana/wallet-adapter-wallets`.
        */
-      new UnsafeBurnerWalletAdapter(),
     ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [network]
   )
 

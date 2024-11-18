@@ -1,7 +1,6 @@
 "use client"
 
 import type { FinalExecutionOutcome } from "@near-wallet-selector/core"
-import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom"
 import { useWallet as useSolanaWallet } from "@solana/wallet-adapter-react"
 import { useWalletModal } from "@solana/wallet-adapter-react-ui"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
@@ -57,19 +56,15 @@ export const useConnectWallet = (): ConnectWalletAction => {
    * NEAR:
    * Down below are Near Wallet handlers and actions
    */
-  const {
-    selector,
-    modal,
-    accountId: nearWalletAccountId,
-  } = useWalletSelector()
+  const nearWallet = useWalletSelector()
   const { signAndSendTransactions } = useNearWalletActions()
 
   const handleSignInViaNearWalletSelector = async (): Promise<void> => {
-    modal.show()
+    nearWallet.modal.show()
   }
   const handleSignOutViaNearWalletSelector = async () => {
     try {
-      const wallet = await selector.wallet()
+      const wallet = await nearWallet.selector.wallet()
       await wallet.signOut()
     } catch (e) {
       console.log("Failed to sign out", e)
@@ -80,9 +75,9 @@ export const useConnectWallet = (): ConnectWalletAction => {
    * EVM:
    * Down below are Wagmi Wallet handlers and actions
    */
-  const { connectors, connect } = useConnect()
-  const { disconnect } = useDisconnect()
-  const { address, chain } = useAccount()
+  const evmWalletConnect = useConnect()
+  const evmWalletDisconnect = useDisconnect()
+  const evmWalletAccount = useAccount()
   const { sendTransactions } = useEVMWalletActions()
 
   const handleSignInViaWalletConnect = async ({
@@ -93,10 +88,10 @@ export const useConnectWallet = (): ConnectWalletAction => {
     if (!connector) {
       throw new Error("Invalid connector")
     }
-    connect({ connector })
+    evmWalletConnect.connect({ connector })
   }
   const handleSignOutViaWalletConnect = async () => {
-    await disconnect()
+    await evmWalletDisconnect.disconnect()
   }
 
   /**
@@ -104,15 +99,14 @@ export const useConnectWallet = (): ConnectWalletAction => {
    * Down below are Solana Wallet handlers and actions
    */
   const { setVisible } = useWalletModal()
-  const { publicKey: solanaPublicKey, disconnect: disconnectSolana } =
-    useSolanaWallet()
+  const solanaWallet = useSolanaWallet()
 
   const handleSignInViaSolanaSelector = async () => {
     setVisible(true)
   }
 
   const handleSignOutViaSolanaSelector = async () => {
-    await disconnectSolana()
+    await solanaWallet.disconnect()
   }
 
   /**
@@ -120,30 +114,41 @@ export const useConnectWallet = (): ConnectWalletAction => {
    * All wallets connection should be handled here.
    */
   useEffect(() => {
-    if (!nearWalletAccountId && !address && !solanaPublicKey) {
+    if (
+      !nearWallet.accountId &&
+      !evmWalletAccount.address &&
+      !solanaWallet.publicKey
+    ) {
       // Reset the state if all wallets are disconnected
       return setState(defaultState)
     }
-    if (nearWalletAccountId != null) {
+    if (nearWallet.accountId != null) {
       setState({
-        address: nearWalletAccountId,
+        address: nearWallet.accountId,
         network: "near:mainnet",
         chainType: ChainType.Near,
       })
-    } else if (address != null) {
+    } else if (evmWalletAccount.address != null && evmWalletAccount.chain) {
       setState({
-        address,
-        network: chain?.id ? `eth:${chain.id}` : "unknown",
+        address: evmWalletAccount.address,
+        network: evmWalletAccount.chain.id
+          ? `eth:${evmWalletAccount.chain.id}`
+          : "unknown",
         chainType: ChainType.EVM,
       })
-    } else if (solanaPublicKey != null) {
+    } else if (solanaWallet.publicKey != null) {
       setState({
-        address: solanaPublicKey.toBase58(),
+        address: solanaWallet.publicKey.toBase58(),
         network: "sol:mainnet",
         chainType: ChainType.Solana,
       })
     }
-  }, [nearWalletAccountId, address, chain, solanaPublicKey])
+  }, [
+    nearWallet.accountId,
+    evmWalletAccount.address,
+    evmWalletAccount.chain,
+    solanaWallet.publicKey,
+  ])
 
   return {
     async signIn(params: {
@@ -201,7 +206,7 @@ export const useConnectWallet = (): ConnectWalletAction => {
       return result
     },
 
-    connectors: connectors as Connector[],
+    connectors: evmWalletConnect.connectors as Connector[],
     state,
   }
 }
