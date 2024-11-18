@@ -2,10 +2,12 @@
 
 import type { FinalExecutionOutcome } from "@near-wallet-selector/core"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
-import type { SignAndSendTransactionsParams } from "@src/types/interfaces"
+import type {
+  SendTransactionEVMParams,
+  SignAndSendTransactionsParams,
+} from "@src/types/interfaces"
 import type { SendTransactionParameters } from "@wagmi/core"
 import { useEffect, useState } from "react"
-import type { Abi } from "viem"
 import { type Connector, useAccount, useConnect, useDisconnect } from "wagmi"
 import { useEVMWalletActions } from "./useEVMWalletActions"
 import { useNearWalletActions } from "./useNearWalletActions"
@@ -30,14 +32,9 @@ interface ConnectWalletAction {
   signMessage: (params: { id: ChainType; message: string }) => Promise<void>
   sendTransaction: (params: {
     id: ChainType
-    transactions?:
+    tx?:
       | SignAndSendTransactionsParams["transactions"]
-      | SendTransactionParameters[]
-    calldata?: {
-      to?: string
-      value?: bigint
-      data?: string
-    }
+      | SendTransactionEVMParams["transactions"]
   }) => Promise<string | FinalExecutionOutcome[]>
   connectors: Connector[]
   state: State
@@ -141,10 +138,10 @@ export const useConnectWallet = (): ConnectWalletAction => {
         [ChainType.Near]: async () =>
           await signAndSendTransactions({
             transactions:
-              params.transactions as SignAndSendTransactionsParams["transactions"],
+              params.tx as SignAndSendTransactionsParams["transactions"],
           }),
         [ChainType.EVM]: async () =>
-          await sendTransactions(params.calldata as SendTransactionParameters),
+          await sendTransactions(params.tx as SendTransactionParameters),
       }
 
       const result = await strategies[params.id]()
