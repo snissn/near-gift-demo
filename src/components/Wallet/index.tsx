@@ -29,6 +29,10 @@ const ConnectWallet = () => {
     signIn({ id: ChainType.EVM, connector })
   }
 
+  const handleSolanaWalletSelector = () => {
+    signIn({ id: ChainType.Solana })
+  }
+
   const handleTradeHistory = () => openWidget()
 
   if (!state.address || TURN_OFF_APPS) {
@@ -54,7 +58,26 @@ const ConnectWallet = () => {
             <Text size="1" color="gray">
               Popular wallets
             </Text>
-            {/* TODO: Show first 3 connectors */}
+            <Button
+              onClick={handleSolanaWalletSelector}
+              size="4"
+              radius="medium"
+              variant="soft"
+              color="gray"
+              className="px-2.5"
+            >
+              <div className="w-full flex items-center justify-start gap-2">
+                <Image
+                  src="/static/icons/wallets/solana-logo-mark.svg"
+                  alt="Solana Wallet Selector"
+                  width={36}
+                  height={36}
+                />
+                <Text size="2" weight="bold">
+                  Solana wallet selector
+                </Text>
+              </div>
+            </Button>
             <Button
               onClick={handleNearWalletSelector}
               size="4"
