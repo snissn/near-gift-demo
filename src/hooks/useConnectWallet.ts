@@ -9,7 +9,7 @@ import type {
   SignAndSendTransactionsParams,
 } from "@src/types/interfaces"
 import type { SendTransactionParameters } from "@wagmi/core"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { type Connector, useAccount, useConnect, useDisconnect } from "wagmi"
 import { useEVMWalletActions } from "./useEVMWalletActions"
 import { useNearWalletActions } from "./useNearWalletActions"
@@ -48,6 +48,9 @@ const defaultState: State = {
   network: undefined,
   address: undefined,
 }
+
+const NEXT_PUBLIC_SOLANA_ENABLED =
+  process?.env?.NEXT_PUBLIC_SOLANA_ENABLED === "true"
 
 export const useConnectWallet = (): ConnectWalletAction => {
   const [state, setState] = useState<State>(defaultState)
@@ -105,9 +108,9 @@ export const useConnectWallet = (): ConnectWalletAction => {
     setVisible(true)
   }
 
-  const handleSignOutViaSolanaSelector = async () => {
+  const handleSignOutViaSolanaSelector = useCallback(async () => {
     await solanaWallet.disconnect()
-  }
+  }, [solanaWallet])
 
   /**
    * Set the state based on the current wallet connection.
@@ -149,6 +152,16 @@ export const useConnectWallet = (): ConnectWalletAction => {
     evmWalletAccount.chain,
     solanaWallet.publicKey,
   ])
+
+  /**
+   * This hook is used to disconnect the wallet under the feature flag is off
+   * to prevent reconnections again in the next session
+   */
+  useEffect(() => {
+    if (!NEXT_PUBLIC_SOLANA_ENABLED) {
+      handleSignOutViaSolanaSelector()
+    }
+  }, [handleSignOutViaSolanaSelector])
 
   return {
     async signIn(params: {
