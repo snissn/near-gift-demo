@@ -15,7 +15,6 @@ export default function Deposit() {
       <DepositWidget
         tokenList={LIST_TOKENS}
         userAddress={state.address}
-        // @ts-expect-error
         chainType={state.chainType}
         sendTransactionNear={async (tx) => {
           const result = await sendTransaction({
@@ -28,6 +27,13 @@ export default function Deposit() {
         sendTransactionEVM={async (tx) => {
           const result = await sendTransaction({
             id: ChainType.EVM,
+            tx,
+          })
+          return Array.isArray(result) ? result[1].transaction.hash : result
+        }}
+        sendTransactionSolana={async (tx) => {
+          const result = await sendTransaction({
+            id: ChainType.Solana,
             tx,
           })
           return Array.isArray(result) ? result[1].transaction.hash : result

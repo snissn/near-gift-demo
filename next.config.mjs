@@ -43,6 +43,7 @@ const nextConfig = {
     BASE_RPC: process.env.BASE_QUICKNODE_URL,
     BITCOIN_INFO_URL: process.env.BITCOIN_INFO_URL,
     COINGECKO_API_URL: process.env.COINGECKO_API_URL,
+    SOLANA_RPC_URL: process.env.SOLANA_RPC_URL,
   },
   images: {
     remotePatterns: [

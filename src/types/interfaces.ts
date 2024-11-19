@@ -1,4 +1,5 @@
 import type { Transaction } from "@near-wallet-selector/core/src/lib/wallet/transactions.types"
+import type { Transaction as TransactionSolana } from "@solana/web3.js"
 import type { AccountView } from "near-api-js/lib/providers/provider"
 import type { SendTransactionParameters } from "viem"
 
@@ -283,6 +284,10 @@ export interface SignAndSendTransactionsParams {
 
 export type SendTransactionEVMParams = {
   transactions: Partial<SendTransactionParameters>
+}
+
+export type SendTransactionSolanaParams = {
+  transactions: TransactionSolana
 }
 
 export type Settings = {

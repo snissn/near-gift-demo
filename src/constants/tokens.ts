@@ -5,6 +5,8 @@ import type {
 import type { NetworkTokenWithSwapRoute } from "@src/types/interfaces"
 
 const environment = process.env.environment || "production"
+const NEXT_PUBLIC_SOLANA_ENABLED =
+  process?.env?.NEXT_PUBLIC_SOLANA_ENABLED === "true"
 
 /** @deprecated */
 export const NEAR_TOKEN_META = {
@@ -387,6 +389,20 @@ export const LIST_TOKENS: (BaseTokenInfo | UnifiedTokenInfo)[] = [
     name: "Sweat Economy",
   },
 ]
+
+NEXT_PUBLIC_SOLANA_ENABLED &&
+  LIST_TOKENS.unshift({
+    defuseAssetId: "near:native.omft.near",
+    address: "native",
+    decimals: 9,
+    icon: "https://assets.coingecko.com/coins/images/4128/standard/solana.png?1718769756",
+    chainId: "",
+    chainIcon: "/static/icons/network/solana.svg",
+    chainName: "solana",
+    routes: [],
+    symbol: "SOL",
+    name: "Solana",
+  })
 
 /** @deprecated */
 const listNativeTokensTestnet = [
