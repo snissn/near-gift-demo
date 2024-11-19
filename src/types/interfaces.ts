@@ -1,5 +1,6 @@
 import type { Transaction } from "@near-wallet-selector/core/src/lib/wallet/transactions.types"
 import type { AccountView } from "near-api-js/lib/providers/provider"
+import type { SendTransactionParameters } from "viem"
 
 import type { HistoryStatus } from "@src/stores/historyStore"
 
@@ -278,6 +279,10 @@ export interface SignAndSendTransactionsParams {
    * NEAR Transactions(s) to sign and send to the network. You can find more information on `Transaction` {@link https://github.com/near/wallet-selector/blob/main/packages/core/docs/api/transactions.md | here}.
    */
   transactions: Array<Optional<Transaction, "signerId">>
+}
+
+export type SendTransactionEVMParams = {
+  transactions: Partial<SendTransactionParameters>
 }
 
 export type Settings = {

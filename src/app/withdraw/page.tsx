@@ -20,6 +20,7 @@ export default function Withdraw() {
       <WithdrawWidget
         tokenList={tokenList}
         userAddress={state.address}
+        // @ts-expect-error
         chainType={state.chainType}
         sendNearTransaction={async (tx) => {
           const result = await signAndSendTransactions({ transactions: [tx] })
@@ -39,7 +40,7 @@ export default function Withdraw() {
           const chainType = state.chainType
 
           switch (chainType) {
-            case ChainType.EMV: {
+            case ChainType.EVM: {
               const signatureData = await signMessageAsyncWagmi({
                 message: params.ERC191.message,
               })
@@ -58,6 +59,8 @@ export default function Withdraw() {
             }
             case undefined:
               throw new Error("User not signed in")
+            case ChainType.Solana:
+              throw new Error("Solana not supported")
             default:
               chainType satisfies never
               throw new Error(`Unsupported sign in type: ${chainType}`)

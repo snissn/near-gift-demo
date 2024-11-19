@@ -43,7 +43,7 @@ export default function Swap() {
           const chainType = state.chainType
 
           switch (chainType) {
-            case ChainType.EMV: {
+            case ChainType.EVM: {
               const signatureData = await signMessageAsyncWagmi({
                 message: params.ERC191.message,
               })
@@ -62,6 +62,8 @@ export default function Swap() {
             }
             case undefined:
               throw new Error("User not signed in")
+            case ChainType.Solana:
+              throw new Error("Solana not supported")
             default:
               chainType satisfies never
               throw new Error(`Unsupported sign in type: ${chainType}`)
