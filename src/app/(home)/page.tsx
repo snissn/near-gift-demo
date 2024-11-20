@@ -73,7 +73,6 @@ export default function Swap() {
         onNavigateDeposit={() => {
           router.push("/deposit")
         }}
-        // @ts-expect-error
         userChainType={state.chainType ?? null}
       />
     </Paper>
