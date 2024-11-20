@@ -11,6 +11,8 @@ import { WalletModalProvider } from "@solana/wallet-adapter-react-ui"
 // Default styles that can be overridden by your app
 import "@solana/wallet-adapter-react-ui/styles.css"
 
+const SOLANA_RPC_URL = process.env.SOLANA_RPC_URL
+
 export const SolanaWalletProvider: FC<{ children: ReactNode }> = ({
   children,
 }) => {
@@ -40,7 +42,7 @@ export const SolanaWalletProvider: FC<{ children: ReactNode }> = ({
   )
 
   return (
-    <ConnectionProvider endpoint={endpoint}>
+    <ConnectionProvider endpoint={SOLANA_RPC_URL ?? endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>{children}</WalletModalProvider>
       </WalletProvider>

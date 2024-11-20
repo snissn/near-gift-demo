@@ -1,11 +1,15 @@
 "use client"
 
 import type { FinalExecutionOutcome } from "@near-wallet-selector/core"
-import { useWallet as useSolanaWallet } from "@solana/wallet-adapter-react"
+import {
+  useConnection as useSolanaConnection,
+  useWallet as useSolanaWallet,
+} from "@solana/wallet-adapter-react"
 import { useWalletModal } from "@solana/wallet-adapter-react-ui"
 import { useWalletSelector } from "@src/providers/WalletSelectorProvider"
 import type {
   SendTransactionEVMParams,
+  SendTransactionSolanaParams,
   SignAndSendTransactionsParams,
 } from "@src/types/interfaces"
 import type { SendTransactionParameters } from "@wagmi/core"
@@ -17,7 +21,7 @@ import { useNearWalletActions } from "./useNearWalletActions"
 export enum ChainType {
   Near = "near",
   EVM = "evm",
-  Solana = "sol",
+  Solana = "solana",
 }
 
 type State = {
@@ -32,12 +36,12 @@ interface ConnectWalletAction {
     connector?: Connector
   }) => Promise<void>
   signOut: (params: { id: ChainType }) => Promise<void>
-  signMessage: (params: { id: ChainType; message: string }) => Promise<void>
   sendTransaction: (params: {
     id: ChainType
     tx?:
       | SignAndSendTransactionsParams["transactions"]
       | SendTransactionEVMParams["transactions"]
+      | SendTransactionSolanaParams["transactions"]
   }) => Promise<string | FinalExecutionOutcome[]>
   connectors: Connector[]
   state: State
@@ -60,7 +64,7 @@ export const useConnectWallet = (): ConnectWalletAction => {
    * Down below are Near Wallet handlers and actions
    */
   const nearWallet = useWalletSelector()
-  const { signAndSendTransactions } = useNearWalletActions()
+  const nearWalletConnect = useNearWalletActions()
 
   const handleSignInViaNearWalletSelector = async (): Promise<void> => {
     nearWallet.modal.show()
@@ -103,7 +107,7 @@ export const useConnectWallet = (): ConnectWalletAction => {
    */
   const { setVisible } = useWalletModal()
   const solanaWallet = useSolanaWallet()
-
+  const solanaConnection = useSolanaConnection()
   const handleSignInViaSolanaSelector = async () => {
     setVisible(true)
   }
@@ -190,25 +194,26 @@ export const useConnectWallet = (): ConnectWalletAction => {
       return strategies[params.id]()
     },
 
-    // TODO: Implement this
-    signMessage: async ({
-      id,
-      message,
-    }: { id: ChainType; message: string }) => {},
-
     sendTransaction: async (
       params
     ): Promise<string | FinalExecutionOutcome[]> => {
       const strategies = {
         [ChainType.Near]: async () =>
-          await signAndSendTransactions({
+          await nearWalletConnect.signAndSendTransactions({
             transactions:
               params.tx as SignAndSendTransactionsParams["transactions"],
           }),
+
         [ChainType.EVM]: async () =>
           await sendTransactions(params.tx as SendTransactionParameters),
+
         [ChainType.Solana]: async () => {
-          throw new Error("Solana transaction not implemented")
+          const transaction =
+            params.tx as SendTransactionSolanaParams["transactions"]
+          return await solanaWallet.sendTransaction(
+            transaction,
+            solanaConnection.connection
+          )
         },
       }
 
