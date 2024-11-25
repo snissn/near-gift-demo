@@ -134,6 +134,15 @@ export const useConnectWallet = (): ConnectWalletAction => {
     }
   }
 
+  /**
+   * Ensure Solana Wallet state overrides EVM Wallet state:
+   * Context:
+   *   Phantom Wallet supports both Solana and EVM chains.
+   * Issue:
+   *   When Phantom Wallet connects, it may emit an EVM connection event.
+   *   This causes `wagmi` to connect to the EVM chain, leading to unexpected
+   *   address switching. Placing Solana Wallet state last prevents this.
+   */
   if (solanaWallet.publicKey != null) {
     state = {
       address: solanaWallet.publicKey.toBase58(),
