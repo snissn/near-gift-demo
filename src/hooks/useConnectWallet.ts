@@ -13,7 +13,7 @@ import type {
   SignAndSendTransactionsParams,
 } from "@src/types/interfaces"
 import type { SendTransactionParameters } from "@wagmi/core"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect } from "react"
 import { type Connector, useAccount, useConnect, useDisconnect } from "wagmi"
 import { useEVMWalletActions } from "./useEVMWalletActions"
 import { useNearWalletActions } from "./useNearWalletActions"
@@ -57,7 +57,7 @@ const NEXT_PUBLIC_SOLANA_ENABLED =
   process?.env?.NEXT_PUBLIC_SOLANA_ENABLED === "true"
 
 export const useConnectWallet = (): ConnectWalletAction => {
-  const [state, setState] = useState<State>(defaultState)
+  let state: State = defaultState
 
   /**
    * NEAR:
@@ -116,46 +116,31 @@ export const useConnectWallet = (): ConnectWalletAction => {
     await solanaWallet.disconnect()
   }, [solanaWallet])
 
-  /**
-   * Set the state based on the current wallet connection.
-   * All wallets connection should be handled here.
-   */
-  useEffect(() => {
-    if (
-      !nearWallet.accountId &&
-      !evmWalletAccount.address &&
-      !solanaWallet.publicKey
-    ) {
-      // Reset the state if all wallets are disconnected
-      return setState(defaultState)
+  if (nearWallet.accountId != null) {
+    state = {
+      address: nearWallet.accountId,
+      network: "near:mainnet",
+      chainType: ChainType.Near,
     }
-    if (nearWallet.accountId != null) {
-      setState({
-        address: nearWallet.accountId,
-        network: "near:mainnet",
-        chainType: ChainType.Near,
-      })
-    } else if (evmWalletAccount.address != null && evmWalletAccount.chain) {
-      setState({
-        address: evmWalletAccount.address,
-        network: evmWalletAccount.chain.id
-          ? `eth:${evmWalletAccount.chain.id}`
-          : "unknown",
-        chainType: ChainType.EVM,
-      })
-    } else if (solanaWallet.publicKey != null) {
-      setState({
-        address: solanaWallet.publicKey.toBase58(),
-        network: "sol:mainnet",
-        chainType: ChainType.Solana,
-      })
+  }
+
+  if (evmWalletAccount.address != null && evmWalletAccount.chain) {
+    state = {
+      address: evmWalletAccount.address,
+      network: evmWalletAccount.chain.id
+        ? `eth:${evmWalletAccount.chain.id}`
+        : "unknown",
+      chainType: ChainType.EVM,
     }
-  }, [
-    nearWallet.accountId,
-    evmWalletAccount.address,
-    evmWalletAccount.chain,
-    solanaWallet.publicKey,
-  ])
+  }
+
+  if (solanaWallet.publicKey != null) {
+    state = {
+      address: solanaWallet.publicKey.toBase58(),
+      network: "sol:mainnet",
+      chainType: ChainType.Solana,
+    }
+  }
 
   /**
    * This hook is used to disconnect the wallet under the feature flag is off
