@@ -1,9 +1,14 @@
 import { FeatureFlagsContext } from "@src/providers/FeatureFlagsProvider"
-import React from "react"
-import { useContext } from "react"
+import React, { useContext } from "react"
 
 const PageBackground = () => {
   const { whitelabelTemplate } = useContext(FeatureFlagsContext)
+
+  if (whitelabelTemplate === "turboswap") {
+    return (
+      <div className="absolute bottom-0 w-full h-full -z-[1] bg-[linear-gradient(180deg,#F9F9F8_0%,#F9F8E6_81.5%,#F9F8E6_100%)]" />
+    )
+  }
 
   if (whitelabelTemplate === "dogecoinswap") {
     return (

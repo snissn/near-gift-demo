@@ -29,6 +29,10 @@ const Footer = () => {
     )
   }
 
+  if (whitelabelTemplate === "turboswap") {
+    return null
+  }
+
   if (whitelabelTemplate === "dogecoinswap") {
     return (
       <footer className="w-full flex justify-center items-center py-7">
