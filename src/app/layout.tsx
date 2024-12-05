@@ -1,6 +1,5 @@
 "use client"
 
-import { SwapWidgetProvider } from "@defuse-protocol/defuse-sdk"
 import { GoogleAnalytics } from "@next/third-parties/google"
 import { Theme } from "@radix-ui/themes"
 import { QueryClientProvider } from "@tanstack/react-query"
@@ -23,7 +22,7 @@ import { WalletSelectorProvider } from "@src/providers/WalletSelectorProvider"
 import "@radix-ui/themes/styles.css"
 import "@near-wallet-selector/modal-ui/styles.css"
 import "@near-wallet-selector/account-export/styles.css"
-import "@defuse-protocol/defuse-sdk/styles"
+import "@defuse-protocol/defuse-sdk/styles.css"
 import "../styles/global.scss"
 
 const DEV_MODE = process?.env?.NEXT_PUBLIC_DEV_MODE === "true" ?? false
@@ -37,34 +36,32 @@ const RootLayout = ({
     <html lang="en" suppressHydrationWarning>
       <body>
         <WagmiProvider config={config}>
-          <SwapWidgetProvider>
-            <NotificationStoreProvider>
-              <QueryClientProvider client={queryClient}>
-                <WalletSelectorProvider>
-                  <SolanaWalletProvider>
-                    {/*
+          <NotificationStoreProvider>
+            <QueryClientProvider client={queryClient}>
+              <WalletSelectorProvider>
+                <SolanaWalletProvider>
+                  {/*
                       Added `forcedTheme` to prevent the dark theme from being applied.
                       TODO: remove `forcedTheme` when dark mode will be enabled
                     */}
-                    <ThemeProvider attribute="class" forcedTheme="light">
-                      <Theme>
-                        <HistoryStoreProvider>
-                          <TokensStoreProvider>
-                            <ModalStoreProvider>
-                              {children}
-                              <Modal />
-                            </ModalStoreProvider>
-                          </TokensStoreProvider>
-                        </HistoryStoreProvider>
-                      </Theme>
-                    </ThemeProvider>
-                    <SentryTracer />
-                  </SolanaWalletProvider>
-                </WalletSelectorProvider>
-                {DEV_MODE && <ReactQueryDevtools initialIsOpen={false} />}
-              </QueryClientProvider>
-            </NotificationStoreProvider>
-          </SwapWidgetProvider>
+                  <ThemeProvider attribute="class" forcedTheme="light">
+                    <Theme accentColor={"orange"}>
+                      <HistoryStoreProvider>
+                        <TokensStoreProvider>
+                          <ModalStoreProvider>
+                            {children}
+                            <Modal />
+                          </ModalStoreProvider>
+                        </TokensStoreProvider>
+                      </HistoryStoreProvider>
+                    </Theme>
+                  </ThemeProvider>
+                  <SentryTracer />
+                </SolanaWalletProvider>
+              </WalletSelectorProvider>
+              {DEV_MODE && <ReactQueryDevtools initialIsOpen={false} />}
+            </QueryClientProvider>
+          </NotificationStoreProvider>
         </WagmiProvider>
       </body>
       <GoogleAnalytics gaId="G-WNE3NB46KM" />
