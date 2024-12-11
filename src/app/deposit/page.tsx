@@ -23,22 +23,21 @@ export default function Deposit() {
             id: ChainType.Near,
             tx,
           })
-          // For batch transactions, the result is an array with the transaction hash as the second element
-          return Array.isArray(result) ? result[1].transaction.hash : result
+          return Array.isArray(result) ? result[0].transaction.hash : result
         }}
         sendTransactionEVM={async (tx) => {
           const result = await sendTransaction({
             id: ChainType.EVM,
             tx,
           })
-          return Array.isArray(result) ? result[1].transaction.hash : result
+          return Array.isArray(result) ? result[0].transaction.hash : result
         }}
         sendTransactionSolana={async (tx) => {
           const result = await sendTransaction({
             id: ChainType.Solana,
             tx,
           })
-          return Array.isArray(result) ? result[1].transaction.hash : result
+          return Array.isArray(result) ? result[0].transaction.hash : result
         }}
       />
     </Paper>
