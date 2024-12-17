@@ -1,5 +1,6 @@
 "use client"
 
+import { injected } from "@wagmi/core"
 import type { Chain } from "viem"
 import { http, createConfig } from "wagmi"
 import { arbitrum, base, mainnet } from "wagmi/chains"
@@ -9,7 +10,7 @@ const PROJECT_ID = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
 
 export const turbo = {
   id: 1313161567,
-  name: "Turbo",
+  name: "TurboChain",
   nativeCurrency: { name: "Turbo", symbol: "TURBO", decimals: 18 },
   rpcUrls: {
     default: { http: ["https://rpc-0x4e45415f.aurora-cloud.dev"] },
@@ -28,6 +29,7 @@ export const config = createConfig({
         showQrModal: true,
       }),
     coinbaseWallet({ appName: "Near Intents" }),
+    injected(),
   ].filter((a): a is Exclude<typeof a, boolean> => !!a),
   transports: {
     [mainnet.id]: http(),
