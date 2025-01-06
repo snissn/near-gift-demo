@@ -5,11 +5,13 @@ import type { Metadata } from "next"
 import type { ReactNode } from "react"
 import { WagmiProvider } from "wagmi"
 
+import { InitDefuseSDK } from "@src/components/InitDefuseSDK"
 import Modal from "@src/components/Modal"
 import { SentryTracer } from "@src/components/SentryTracer"
 import { whitelabelTemplateFlag } from "@src/config/featureFlags"
 import { config } from "@src/config/wagmi"
 import queryClient from "@src/constants/queryClient"
+import { initSDK } from "@src/libs/defuse-sdk/initSDK"
 import { HistoryStoreProvider } from "@src/providers/HistoryStoreProvider"
 import { ModalStoreProvider } from "@src/providers/ModalStoreProvider"
 import { NotificationStoreProvider } from "@src/providers/NotificationProvider"
@@ -21,7 +23,6 @@ import { WalletSelectorProvider } from "@src/providers/WalletSelectorProvider"
 import "@radix-ui/themes/styles.css"
 import "@near-wallet-selector/modal-ui/styles.css"
 import "@near-wallet-selector/account-export/styles.css"
-import "@defuse-protocol/defuse-sdk/styles.css"
 import "../styles/global.scss"
 
 const DEV_MODE = process?.env?.NEXT_PUBLIC_DEV_MODE === "true" ?? false
@@ -87,10 +88,13 @@ const RootLayout = async ({
   children?: ReactNode
 }>) => {
   const tmpl = await whitelabelTemplateFlag()
+  initSDK()
 
   return (
     <html lang="en" suppressHydrationWarning className={`tmpl-${tmpl}`}>
       <body>
+        <InitDefuseSDK />
+
         <ThemeProvider>
           <WagmiProvider config={config}>
             <NotificationStoreProvider>
