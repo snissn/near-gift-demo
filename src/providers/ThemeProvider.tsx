@@ -15,6 +15,7 @@ const accentsColors: Record<
   solswap: "purple",
   dogecoinswap: "amber",
   turboswap: "amber",
+  trumpswap: "orange",
 }
 
 export async function ThemeProvider({ children }: { children: ReactNode }) {

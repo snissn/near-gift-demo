@@ -27,6 +27,10 @@ const TEMPLATE_PRIORITY_TOKENS: Record<WhitelabelTemplateValue, string[]> = {
     "nep141:eth-0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.omft.near",
     "nep141:a35923162c49cf95e6bf26623385eb431ad920d3.factory.bridge.near",
   ],
+  trumpswap: [
+    "nep141:eth-0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.omft.near",
+    "nep141:sol-c58e6539c2f2e097c251f8edf11f9c03e581f8d4.omft.near",
+  ],
 }
 
 export function useTokenList(tokenList: (BaseTokenInfo | UnifiedTokenInfo)[]) {
