@@ -70,17 +70,20 @@ export async function generateMetadata(): Promise<Metadata> {
   } else if (templ === "trumpswap") {
     Object.assign(metadata, {
       title: "Trump-Swap: Make Swapping Great Again",
-      description: "",
+      description:
+        "Swap $TRUMP directly from BTC, XRP, DOGE and 50+ other cryptocurrencies. Powered by NEAR Intents.",
       openGraph: {
         type: "website",
         images: `/favicons/${templ}/og-image.jpg`,
         title: "Trump-Swap: Make Swapping Great Again",
-        description: "",
+        description:
+          "Swap $TRUMP directly from BTC, XRP, DOGE and 50+ other cryptocurrencies. Powered by NEAR Intents.",
       },
       twitter: {
         images: `/favicons/${templ}/og-image.jpg`,
         title: "Trump-Swap: Make Swapping Great Again",
-        description: "",
+        description:
+          "Swap $TRUMP directly from BTC, XRP, DOGE and 50+ other cryptocurrencies. Powered by NEAR Intents.",
       },
     })
   }
