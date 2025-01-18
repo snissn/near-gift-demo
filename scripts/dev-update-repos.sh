@@ -26,4 +26,5 @@ git pull origin main
 git push origin main:solana
 git push origin main:dogecoinswap
 git push origin main:turboswap
+git push origin main:trumpswap
 

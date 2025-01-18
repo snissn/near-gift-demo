@@ -6,6 +6,7 @@ const validWhitelabelTemplates = [
   "solswap",
   "dogecoinswap",
   "turboswap",
+  "trumpswap",
 ] as const
 export type WhitelabelTemplateValue = (typeof validWhitelabelTemplates)[number]
 
@@ -17,6 +18,7 @@ export const whitelabelTemplateFlag = flag({
     { label: "SolSwap.org", value: "solswap" },
     { label: "DogecoinSwap.org", value: "dogecoinswap" },
     { label: "TurboSwap.org", value: "turboswap" },
+    { label: "trump-swap.org", value: "trumpswap" },
   ],
   decide(): WhitelabelTemplateValue {
     const val = process.env.FF_WHITELABEL_TEMPLATE
