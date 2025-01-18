@@ -67,6 +67,22 @@ export async function generateMetadata(): Promise<Metadata> {
           "Experience zero-fee trading with TurboSwap. Powered by NEAR and Aurora Cloud, TurboSwap delivers unmatched speed and advanced functionality, setting a new standard for decentralized trading in the TURBO ecosystem.",
       },
     })
+  } else if (templ === "trumpswap") {
+    Object.assign(metadata, {
+      title: "Trump-Swap: Make Swapping Great Again",
+      description: "",
+      openGraph: {
+        type: "website",
+        images: `/favicons/${templ}/og-image.jpg`,
+        title: "Trump-Swap: Make Swapping Great Again",
+        description: "",
+      },
+      twitter: {
+        images: `/favicons/${templ}/og-image.jpg`,
+        title: "Trump-Swap: Make Swapping Great Again",
+        description: "",
+      },
+    })
   }
 
   return {
