@@ -69,10 +69,11 @@ function DefaultContent({
           <LockClosedIcon className="w-6 h-6 text-blue-600 darkL:text-blue-400" />
         </div>
         <AlertDialog.Title className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Wallet Verification Required
+          Wallet Feature Check Required
         </AlertDialog.Title>
         <AlertDialog.Description className="mt-2 text-gray-600 dark:text-gray-400">
-          Please verify your wallet to enable full platform functionality
+          Please sign a message to verify your wallet's compatibility with our
+          features
         </AlertDialog.Description>
       </div>
 
@@ -105,8 +106,8 @@ function DefaultContent({
       {/* Warning Message */}
       <Callout.Root className="mb-6 bg-warning px-3 py-2 text-warning-foreground">
         <Callout.Text className="text-xs">
-          Canceling this verification will disconnect your wallet. You can
-          reconnect and verify anytime.
+          Canceling this check will disconnect your wallet. You can reconnect
+          and verify anytime.
         </Callout.Text>
       </Callout.Root>
 
@@ -125,7 +126,7 @@ function DefaultContent({
         <themes_AlertDialog.Action>
           <Button size="4" type="button" onClick={onConfirm}>
             <Spinner loading={isVerifying} />
-            {isVerifying ? "Verifying..." : "Verify Now"}
+            {isVerifying ? "Checking..." : "Check Compatibility"}
           </Button>
         </themes_AlertDialog.Action>
       </div>
@@ -152,10 +153,10 @@ function FailureContent({
           <ExclamationTriangleIcon className="w-6 h-6 text-amber-600 dark:text-amber-400" />
         </div>
         <AlertDialog.Title className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Unable to Verify Wallet
+          Unable to Verify Wallet Features
         </AlertDialog.Title>
         <AlertDialog.Description className="mt-2 text-gray-600 dark:text-gray-400">
-          The verification process couldn't be completed
+          The compatibility check couldn't be completed
         </AlertDialog.Description>
       </div>
 
