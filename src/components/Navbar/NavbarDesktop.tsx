@@ -1,34 +1,40 @@
 "use client"
 
 import { Button, Text } from "@radix-ui/themes"
-import clsx from "clsx"
-import { usePathname } from "next/navigation"
-
-import { LINKS_HEADER, type NavigationLinks } from "@src/constants/routes"
+import {
+  type AppRoutes,
+  type NavigationLinks,
+  navigation,
+} from "@src/constants/routes"
+import { cn } from "@src/utils/cn"
 import { TURN_OFF_APPS } from "@src/utils/environment"
-
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { LabelComingSoon } from "../ComingSoon"
 
-type Props = {
-  links?: NavigationLinks[]
+type NavbarDesktopProps = {
+  links: Record<AppRoutes, NavigationLinks>
 }
 
-const NavbarDesktop = ({ links = LINKS_HEADER }: Props) => {
+const NavbarDesktop = ({ links }: NavbarDesktopProps) => {
   const pathname = usePathname()
   return (
     <nav className="flex justify-between items-center gap-4">
-      {links.map((route, i) => {
+      {Object.values(links).map((route) => {
         const isCurrentPage = route.href === pathname
+
+        // We don't want to show this routes in the navbar
+        if (route.href === navigation.otc || route.href === navigation.jobs)
+          return null
+
         return (
-          // biome-ignore lint/suspicious/noArrayIndexKey: <reason>
-          <Link key={i} href={route.href}>
+          <Link key={route.href} href={route.href}>
             <Button
               radius="full"
               color="gray"
               highContrast
               variant={isCurrentPage ? "solid" : "soft"}
-              className={clsx(
+              className={cn(
                 "relative text-sm",
                 TURN_OFF_APPS || route.comingSoon
                   ? "pointer-events-none text-gray-500"
