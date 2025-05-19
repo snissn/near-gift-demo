@@ -1,5 +1,6 @@
 import { base64 } from "@scure/base"
 import type {
+  CreateOtcTradeRequest,
   CreateOtcTradeResponse,
   ErrorResponse,
   OtcTrade,
@@ -9,12 +10,12 @@ import { logger } from "@src/utils/logger"
 import { NextResponse } from "next/server"
 import { z } from "zod"
 
-const otcTradesSchema: z.ZodType<OtcTrade> = z.object({
+const otcTradesSchema: z.ZodType<CreateOtcTradeRequest> = z.object({
   encrypted_payload: z.string().refine((val) => {
     try {
       const decoded = base64.decode(val)
-      // AES-256 requires 32 bytes (256 bits) key and produces output in blocks of 16 bytes
-      return decoded.length % 16 === 0
+      // AES-GCM produces variable length output, but should be at least 16 bytes
+      return decoded.length >= 16
     } catch (err) {
       return false
     }

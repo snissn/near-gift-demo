@@ -3,7 +3,7 @@ import { base64, base64urlnopad } from "@scure/base"
 export function encodeOrder(order: unknown): string {
   const format = {
     version: 1,
-    payload: JSON.stringify(order),
+    payload: order,
   }
   return base64urlnopad.encode(new TextEncoder().encode(JSON.stringify(format)))
 }
@@ -16,7 +16,7 @@ export function decodeOrder(encodedOrder: string): string {
 export async function encodeAES256Order(
   order: unknown,
   pKey: string,
-  iv: string
+  iv: Uint8Array
 ): Promise<string> {
   validateKey(pKey)
 
@@ -41,10 +41,10 @@ export async function decodeAES256Order(
     const iv_ = base64.decode(iv)
 
     // Convert the key to a CryptoKey object
-    const keyData = new TextEncoder().encode(pKey)
+    const keyBytes = base64urlnopad.decode(pKey)
     const cryptoKey = await crypto.subtle.importKey(
       "raw",
-      keyData,
+      keyBytes,
       { name: "AES-GCM" },
       false,
       ["decrypt"]
@@ -75,15 +75,13 @@ export async function decodeAES256Order(
 async function createEncryptedPayload(
   jsonString: string,
   pKey: string,
-  iv: string
+  iv: Uint8Array
 ): Promise<Uint8Array> {
-  const iv_ = base64.decode(iv)
-
   // Convert the key to a CryptoKey object
-  const keyData = new TextEncoder().encode(pKey)
+  const keyBytes = base64urlnopad.decode(pKey)
   const cryptoKey = await crypto.subtle.importKey(
     "raw",
-    keyData,
+    keyBytes,
     { name: "AES-GCM" },
     false,
     ["encrypt"]
@@ -94,7 +92,7 @@ async function createEncryptedPayload(
   const ciphertext = await crypto.subtle.encrypt(
     {
       name: "AES-GCM",
-      iv: iv_,
+      iv,
     },
     cryptoKey,
     data
@@ -104,7 +102,12 @@ async function createEncryptedPayload(
 }
 
 function validateKey(pKey: string): void {
-  if (pKey.length !== 32) {
-    throw new Error("Key must be 32-bytes")
+  try {
+    const keyBytes = base64urlnopad.decode(pKey)
+    if (keyBytes.length !== 32) {
+      throw new Error("Key must be exactly 32 bytes (AES-256)")
+    }
+  } catch {
+    throw new Error("Key must be exactly 32 bytes (AES-256)")
   }
 }
