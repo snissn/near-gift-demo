@@ -1,4 +1,4 @@
-import { base64 } from "@scure/base"
+import { base64urlnopad } from "@scure/base"
 import {
   decodeAES256Order,
   decodeOrder,
@@ -17,15 +17,19 @@ import { useQuery } from "@tanstack/react-query"
 import { useSearchParams } from "next/navigation"
 
 export function createOtcOrderLink(
+  /** @deprecated Required for backwards compatibility */
   tradeId: string,
+  /** @deprecated Required for backwards compatibility */
   pKey: string,
-  /**
-   * Required for backwards compatibility
-   * @deprecated
-   */
-  multiPayload: unknown
+  /** @deprecated Required for backwards compatibility */
+  multiPayload: unknown,
+  iv: string
 ) {
   const url = new URL("/otc-desk/view-order", window.location.origin)
+  if (iv) {
+    url.hash = iv
+    return url.toString()
+  }
   if (tradeId && pKey) {
     url.hash = encodeOrder(`${tradeId}#${pKey}`)
     return url.toString()
@@ -38,19 +42,22 @@ export function createOtcOrderLink(
 export async function createOtcOrder(payload: unknown): Promise<{
   tradeId: string
   pKey: string
+  iv: string
 }> {
   try {
     // Generate client-side IV and pKey for the order
     const iv = crypto.getRandomValues(new Uint8Array(12))
     const pKey = await genPKey()
-    const tradeId = deriveTradeIdFromIV(base64.encode(iv))
 
     const encrypted = await encodeAES256Order(payload, pKey, iv)
+
+    const encodedIv = base64urlnopad.encode(iv)
+    const tradeId = deriveTradeIdFromIV(encodedIv)
 
     const result = await saveTrade({
       trade_id: tradeId,
       encrypted_payload: encrypted,
-      iv: base64.encode(iv),
+      p_key: pKey,
     })
     if (!result.success) {
       throw new Error("Failed to save trade")
@@ -58,6 +65,7 @@ export async function createOtcOrder(payload: unknown): Promise<{
     return {
       tradeId,
       pKey,
+      iv: encodedIv,
     }
   } catch (e) {
     throw new Error("Failed to create order")

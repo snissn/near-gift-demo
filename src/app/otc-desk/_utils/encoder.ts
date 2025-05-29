@@ -9,9 +9,17 @@ export function encodeOrder(order: unknown): string {
   return base64urlnopad.encode(new TextEncoder().encode(JSON.stringify(format)))
 }
 
+/**
+ * First try to decode legacy format which contains version and payload components.
+ * If this fails, assume the encoded order is just an IV string.
+ */
 export function decodeOrder(encodedOrder: string): string {
-  const json = new TextDecoder().decode(base64urlnopad.decode(encodedOrder))
-  return JSON.parse(json).payload
+  try {
+    const json = new TextDecoder().decode(base64urlnopad.decode(encodedOrder))
+    return JSON.parse(json).payload
+  } catch {
+    return encodedOrder
+  }
 }
 
 export async function encodeAES256Order(
@@ -39,7 +47,7 @@ export async function decodeAES256Order(
 
   try {
     const decoded = base64.decode(encodedOrder)
-    const iv_ = base64.decode(iv)
+    const iv_ = base64urlnopad.decode(iv)
 
     // Convert the key to a CryptoKey object
     const keyBytes = base64urlnopad.decode(pKey)
