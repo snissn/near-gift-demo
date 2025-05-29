@@ -5,7 +5,7 @@ import {
   deriveTradeIdFromIV,
   encodeAES256Order,
   encodeOrder,
-} from "@src/app/otc-desk/_utils/encoder"
+} from "@src/app/otc/_utils/encoder"
 import {
   genLocalTradeId,
   genPKey,
@@ -25,7 +25,7 @@ export function createOtcOrderLink(
   multiPayload: unknown,
   iv: string
 ) {
-  const url = new URL("/otc-desk/view-order", window.location.origin)
+  const url = new URL("/otc/order", window.location.origin)
   if (iv) {
     url.hash = iv
     return url.toString()
