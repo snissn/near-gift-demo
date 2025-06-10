@@ -3051,6 +3051,15 @@
     borsh "2.0.0"
     near-api-js "5.0.0"
 
+"@near-wallet-selector/nightly@^9.0.2":
+  version "9.0.2"
+  resolved "https://registry.yarnpkg.com/@near-wallet-selector/nightly/-/nightly-9.0.2.tgz#904e67c573e3ec9c5dcefd31fb92c97b2fc17ef9"
+  integrity sha512-R0KVu/7FXZqr63M1ohpGt3x5l4yMoMH0aUEC/XXiFYG9esDUNZm3wEzeUUVQI3giktlCKixldUNf08HPjVoqKA==
+  dependencies:
+    "@near-wallet-selector/core" "9.0.2"
+    "@near-wallet-selector/wallet-utils" "9.0.2"
+    near-api-js "5.0.0"
+
 "@near-wallet-selector/wallet-utils@9.0.2":
   version "9.0.2"
   resolved "https://registry.yarnpkg.com/@near-wallet-selector/wallet-utils/-/wallet-utils-9.0.2.tgz#20918a07aca143d23862a6650bee05636636996e"
@@ -8853,6 +8862,11 @@ borsh@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/borsh/-/borsh-1.0.0.tgz#b564c8cc8f7a91e3772b9aef9e07f62b84213c1f"
   integrity sha512-fSVWzzemnyfF89EPwlUNsrS5swF5CrtiN4e+h0/lLf4dz2he4L3ndM20PS9wj7ICSkXJe/TQUHdaPTq15b1mNQ==
+
+borsh@2.0.0, borsh@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/borsh/-/borsh-2.0.0.tgz#042a9f109565caac3c6a21297cd8c0ae8db3149d"
+  integrity sha512-kc9+BgR3zz9+cjbwM8ODoUB4fs3X3I5A/HtX7LZKxCLaMrEeDFoBpnhZY//DTS1VZBSs6S5v46RZRbZjRFspEg==
 
 borsh@2.0.0, borsh@^2.0.0:
   version "2.0.0"
