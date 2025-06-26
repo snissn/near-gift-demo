@@ -6,15 +6,16 @@ import type {
   ExchangeResponse,
 } from "@src/app/api/integrations/dextools/types"
 
-import { isErr, ok, tryCatch } from "../../shared/result"
+import { CONTRACT_ADDRESS } from "../../shared/constants"
+import { err, isErr, ok, tryCatch } from "../../shared/result"
 import type { ApiResult } from "../../shared/types"
 import { validateQueryParams } from "../../shared/utils"
 
 const querySchema = z.object({ id: z.string() })
-
 /**
  * Returns details for an individual DEX (factory / router).
- * NOTE: This is a stub
+ * test:
+ * http://localhost:3000/api/integrations/dextools/exchange?id=intents.near
  */
 export const GET = tryCatch(
   async (request: NextRequest): ApiResult<ExchangeResponse> => {
@@ -24,10 +25,18 @@ export const GET = tryCatch(
       return res
     }
 
+    if (res.ok.id !== CONTRACT_ADDRESS) {
+      return err(
+        "Not Found",
+        `Exchange not found for ${res.ok.id}. ${CONTRACT_ADDRESS} is the only supported exchange.`
+      )
+    }
+
     const exchange: Exchange = {
-      factoryAddress: res.ok.id,
-      name: "Stubbed Exchange",
-      logoURL: "https://defuse.fi/logo_placeholder.png",
+      factoryAddress: CONTRACT_ADDRESS,
+      name: "Near Intents",
+      logoURL:
+        "https://app.near-intents.org/favicons/near-intents/android-chrome-192x192.png",
     }
 
     return ok({ exchange })
