@@ -110,6 +110,7 @@ const cspConfig = {
     "https://toncenter.com/api/v2/jsonRPC",
     "https://fullnode.mainnet.sui.io:443",
     "https://horizon.stellar.org",
+    "https://mainnet.optimism.io",
   ],
   "object-src": ["'none'"],
   "base-uri": ["'self'"],

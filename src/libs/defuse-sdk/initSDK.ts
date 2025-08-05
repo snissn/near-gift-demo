@@ -37,6 +37,7 @@ export function initSDK() {
         sui: true,
         // TODO: Make it true when Stellar is supported
         stellar: stellarEnabled,
+        optimism: true,
       },
     })
   } else {
@@ -77,6 +78,7 @@ export function initSDK() {
         ton: true,
         near_intents: true,
         sui: true,
+        optimism: true,
         // TODO: Make it true when Stellar is supported
         stellar: stellarEnabled,
       },
