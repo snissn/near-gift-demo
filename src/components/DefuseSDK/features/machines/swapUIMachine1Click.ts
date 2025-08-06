@@ -1,3 +1,5 @@
+import { authIdentity } from "@defuse-protocol/internal-utils"
+import type { AuthMethod } from "@defuse-protocol/internal-utils"
 import { APP_FEE_BPS } from "@src/utils/environment"
 import type { providers } from "near-api-js"
 import {
@@ -11,7 +13,6 @@ import {
 } from "xstate"
 import { logger } from "../../logger"
 import type { QuoteResult } from "../../services/quoteService"
-import type { AuthMethod } from "../../types/authHandle"
 import type {
   BaseTokenInfo,
   TokenValue,
@@ -19,7 +20,6 @@ import type {
 } from "../../types/base"
 import type { SwappableToken } from "../../types/swap"
 import { assert } from "../../utils/assert"
-import { authHandleToIntentsUserId } from "../../utils/authIdentity"
 import { parseUnits } from "../../utils/parse"
 import {
   getAnyBaseTokenInfo,
@@ -419,7 +419,7 @@ export const swapUIMachine = setup({
           return {
             userAddress: event.params.userAddress,
             userChainType: event.params.userChainType,
-            defuseUserId: authHandleToIntentsUserId(
+            defuseUserId: authIdentity.authHandleToIntentsUserId(
               event.params.userAddress,
               event.params.userChainType
             ),

@@ -3,6 +3,9 @@ import type {
   WithdrawalParams,
 } from "@defuse-protocol/bridge-sdk"
 import { errors, solverRelay } from "@defuse-protocol/internal-utils"
+import type { walletMessage } from "@defuse-protocol/internal-utils"
+import { messageFactory } from "@defuse-protocol/internal-utils"
+import type { AuthMethod } from "@defuse-protocol/internal-utils"
 import { secp256k1 } from "@noble/curves/secp256k1"
 import { APP_FEE_RECIPIENT } from "@src/utils/environment"
 import type { providers } from "near-api-js"
@@ -12,7 +15,6 @@ import { logger } from "../../logger"
 import { convertPublishIntentToLegacyFormat } from "../../sdk/solverRelay/utils/parseFailedPublishError"
 import { emitEvent } from "../../services/emitter"
 import type { AggregatedQuote } from "../../services/quoteService"
-import type { AuthMethod } from "../../types/authHandle"
 import type {
   BaseTokenInfo,
   SupportedChainName,
@@ -23,15 +25,7 @@ import type {
   Nep413DefuseMessageFor_DefuseIntents,
 } from "../../types/defuse-contracts-types"
 import type { IntentsUserId } from "../../types/intentsUserId"
-import type {
-  WalletMessage,
-  WalletSignatureResult,
-} from "../../types/walletMessage"
 import { assert } from "../../utils/assert"
-import {
-  makeInnerSwapMessage,
-  makeSwapMessage,
-} from "../../utils/messageFactory"
 import { PriorityQueue } from "../../utils/priorityQueue"
 import {
   accountSlippageExactIn,
@@ -105,10 +99,10 @@ type Context = {
   // Queue stores all quotes coming from the background quoter
   quotes: PriorityQueue<AggregatedQuote>
   messageToSign: null | {
-    walletMessage: WalletMessage
+    walletMessage: walletMessage.WalletMessage
     innerMessage: Nep413DefuseMessageFor_DefuseIntents
   }
-  signature: WalletSignatureResult | null
+  signature: walletMessage.WalletSignatureResult | null
   intentHash: string | null
   error: null | {
     tag: "err"
@@ -216,7 +210,7 @@ export const swapIntentMachine = setup({
           "Operation must be swap"
         )
 
-        const innerMessage = makeInnerSwapMessage({
+        const innerMessage = messageFactory.makeInnerSwapMessage({
           tokenDeltas: accountSlippageExactIn(
             context.intentOperationParams.quote.tokenDeltas,
             context.slippageBasisPoints
@@ -230,12 +224,13 @@ export const swapIntentMachine = setup({
 
         return {
           innerMessage,
-          walletMessage: makeSwapMessage({ innerMessage }),
+          walletMessage: messageFactory.makeSwapMessage({ innerMessage }),
         }
       },
     }),
     setSignature: assign({
-      signature: (_, signature: WalletSignatureResult | null) => signature,
+      signature: (_, signature: walletMessage.WalletSignatureResult | null) =>
+        signature,
     }),
     setIntentHash: assign({
       intentHash: (_, intentHash: string) => intentHash,
@@ -249,7 +244,10 @@ export const swapIntentMachine = setup({
       ({
         input,
       }: {
-        input: { signature: WalletSignatureResult; userAddress: string }
+        input: {
+          signature: walletMessage.WalletSignatureResult
+          userAddress: string
+        }
       }) => {
         return verifyWalletSignature(input.signature, input.userAddress)
       }
@@ -257,8 +255,8 @@ export const swapIntentMachine = setup({
     publicKeyVerifierActor: publicKeyVerifierMachine,
     signMessage: fromPromise(
       async (_: {
-        input: WalletMessage
-      }): Promise<WalletSignatureResult | null> => {
+        input: walletMessage.WalletMessage
+      }): Promise<walletMessage.WalletSignatureResult | null> => {
         throw new Error("not implemented")
       }
     ),
@@ -267,7 +265,7 @@ export const swapIntentMachine = setup({
         input,
       }: {
         input: {
-          signatureData: WalletSignatureResult
+          signatureData: walletMessage.WalletSignatureResult
           userInfo: { userAddress: string; userChainType: AuthMethod }
           quoteHashes: string[]
         }
@@ -289,7 +287,8 @@ export const swapIntentMachine = setup({
       const hasQuote = context.quoteToPublish != null
       return hadQuote === hasQuote
     },
-    isSigned: (_, params: WalletSignatureResult | null) => params != null,
+    isSigned: (_, params: walletMessage.WalletSignatureResult | null) =>
+      params != null,
     isTrue: (_, params: boolean) => params,
     isOk: (_, params: { tag: "ok" } | { tag: "err" }) => params.tag === "ok",
     isQuoteOk: ({ event }) => {
