@@ -304,6 +304,23 @@ export const WithdrawForm = ({
     token,
     tokensUsdPriceData
   )
+  const receivedAmountUsd = totalAmountReceived?.amount
+    ? getTokenUsdPrice(
+        formatTokenValue(
+          totalAmountReceived.amount,
+          totalAmountReceived.decimals
+        ),
+        tokenOut,
+        tokensUsdPriceData
+      )
+    : null
+  const feeUsd = withdtrawalFee
+    ? getTokenUsdPrice(
+        formatTokenValue(withdtrawalFee.amount, withdtrawalFee.decimals),
+        tokenOut,
+        tokensUsdPriceData
+      )
+    : null
 
   const increaseAmount = (tokenValue: TokenValue) => {
     if (parsedAmountIn == null) return
@@ -486,6 +503,8 @@ export const WithdrawForm = ({
           <ReceivedAmountAndFee
             fee={withdtrawalFee}
             totalAmountReceived={totalAmountReceived}
+            feeUsd={feeUsd}
+            totalAmountReceivedUsd={receivedAmountUsd}
             symbol={token.symbol}
             isLoading={
               state.matches({ editing: "preparation" }) &&
