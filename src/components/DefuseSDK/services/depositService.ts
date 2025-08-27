@@ -22,6 +22,7 @@ import {
   Operation,
   TransactionBuilder,
 } from "@stellar/stellar-sdk"
+import { TronWeb } from "tronweb"
 import {
   http,
   type Address,
@@ -45,6 +46,7 @@ import type { BaseTokenInfo, SupportedChainName } from "../types/base"
 import type {
   SendTransactionEVMParams,
   SendTransactionStellarParams,
+  SendTransactionTronParams,
   Transaction,
 } from "../types/deposit"
 import type { SendTransactionTonParams } from "../types/deposit"
@@ -767,6 +769,41 @@ function createTrustlineTransferStellarTransaction(
   }
 
   return { transaction: transaction.setTimeout(30).build() }
+}
+
+/**
+ * Creates a deposit transaction for Tron
+ */
+export async function createDepositTronNativeTransaction(
+  userAddress: string,
+  depositAddress: string,
+  amount: bigint
+): Promise<SendTransactionTronParams> {
+  const client = new TronWeb({ fullHost: settings.rpcUrls.tron })
+  return await client.transactionBuilder.sendTrx(
+    depositAddress,
+    Number(amount),
+    userAddress
+  )
+}
+
+export async function createDepositTronERC20Transaction(
+  userAddress: string,
+  assetAccountId: string,
+  generatedAddress: string,
+  amount: bigint
+): Promise<SendTransactionTronParams> {
+  const client = new TronWeb({ fullHost: settings.rpcUrls.tron })
+  return await client.transactionBuilder.triggerSmartContract(
+    assetAccountId,
+    "transfer(address,uint256)",
+    {}, // It might be enhanced in the future with feeLimit
+    [
+      { type: "address", value: generatedAddress },
+      { type: "uint256", value: amount.toString() },
+    ],
+    userAddress
+  )
 }
 
 /**
