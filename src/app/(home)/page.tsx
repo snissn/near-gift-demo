@@ -8,9 +8,9 @@ import Paper from "@src/components/Paper"
 import { LIST_TOKENS } from "@src/constants/tokens"
 import { useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useIntentsReferral } from "@src/hooks/useIntentsReferral"
-import { useNearWalletActions } from "@src/hooks/useNearWalletActions"
 import { useTokenList } from "@src/hooks/useTokenList"
 import { useWalletAgnosticSignMessage } from "@src/hooks/useWalletAgnosticSignMessage"
+import { useNearWallet } from "@src/providers/NearWalletProvider"
 import { ONE_CLICK_SWAP_FRACTION } from "@src/utils/environment"
 import { isFeatureEnabled } from "@src/utils/isFeatureEnabled"
 import { renderAppLink } from "@src/utils/renderAppLink"
@@ -25,7 +25,7 @@ import { useMemo } from "react"
 export default function Swap() {
   const { state } = useConnectWallet()
   const signMessage = useWalletAgnosticSignMessage()
-  const { signAndSendTransactions } = useNearWalletActions()
+  const { signAndSendTransactions } = useNearWallet()
   const searchParams = useSearchParams()
   const userAddress = state.isVerified ? state.address : undefined
   const userChainType = state.chainType
