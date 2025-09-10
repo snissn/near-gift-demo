@@ -1,15 +1,10 @@
 import { setUser } from "@sentry/nextjs"
-import { useWallet as useSolanaWallet } from "@solana/wallet-adapter-react"
 import { useNearWallet } from "@src/providers/NearWalletProvider"
-import { EthereumProvider } from "@walletconnect/ethereum-provider"
 import { useEffect } from "react"
-import { useAccount } from "wagmi"
 import { useConnectWallet } from "./useConnectWallet"
 
 export const useSentrySetUser = () => {
   const { connector: nearWallet } = useNearWallet()
-  const { connector } = useAccount()
-  const { wallet: solanaWallet } = useSolanaWallet()
   const { state: userConnectionState } = useConnectWallet()
 
   useEffect(() => {
@@ -33,39 +28,17 @@ export const useSentrySetUser = () => {
       let walletProvider: string | undefined = undefined
       let walletAppName: string | undefined = undefined
 
-      switch (userConnectionState.chainType) {
-        case "solana": {
-          walletProvider = "solana" // todo: how to distinguish between injected wallet or WalletConnect?
-          walletAppName = solanaWallet?.adapter.name
-          break
-        }
-        case "near": {
-          if (!nearWallet) {
-            // Connector not initialized yet; report minimal info
-            walletProvider = "near"
-            break
-          }
+      if (userConnectionState.chainType === "near") {
+        if (nearWallet) {
           const wallet = await nearWallet.wallet()
           walletProvider = "near"
           walletAppName = wallet.manifest.name
-          break
+        } else {
+          walletProvider = "near"
         }
-        case "evm": {
-          walletProvider = connector?.type
-          walletAppName = connector?.name
-          if (connector?.name === "WalletConnect") {
-            try {
-              const provider = await connector.getProvider()
-              if (provider instanceof EthereumProvider) {
-                walletAppName =
-                  provider.session?.peer.metadata?.name ?? connector.name
-              }
-            } catch {
-              walletAppName = connector.name
-            }
-          }
-          break
-        }
+      } else if (userConnectionState.chainType === "webauthn") {
+        walletProvider = "webauthn"
+        walletAppName = "passkey"
       }
 
       return {
@@ -75,5 +48,5 @@ export const useSentrySetUser = () => {
         walletAppName,
       }
     }
-  }, [nearWallet, connector, solanaWallet, userConnectionState])
+  }, [nearWallet, userConnectionState])
 }
