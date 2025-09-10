@@ -28,7 +28,11 @@ type WalletConnectionActions = {
   isCopied: boolean
 }
 
-const connections: MapsEnum[] = [MapsEnum.NEAR_MAINNET, MapsEnum.WEBAUTHN]
+const connections: MapsEnum[] = [
+  MapsEnum.NEAR_MAINNET,
+  MapsEnum.EVM_ETHEREUM,
+  MapsEnum.WEBAUTHN,
+]
 
 const WalletConnectionsConnector = ({
   accountId,
@@ -135,6 +139,26 @@ const WalletConnections = () => {
                 index={i}
               />
             )
+          case MapsEnum.EVM_ETHEREUM:
+            if (state.chainType !== ChainType.EVM) {
+              return null
+            }
+            chainIcon = getChainIconFromId("eth")
+            return (
+              <WalletConnectionsConnector
+                accountId={userAddress}
+                chainLabel={state?.network ?? ""}
+                chainName="eth"
+                chainIcon={chainIcon}
+                onCopy={() => setCopyWalletAddress(MapsEnum.EVM_ETHEREUM)}
+                isCopied={copyWalletAddress === MapsEnum.EVM_ETHEREUM}
+                onDisconnect={() => signOut({ id: ChainType.EVM })}
+                onConnect={() => {}}
+                key={connector}
+                index={i}
+              />
+            )
+
           case MapsEnum.WEBAUTHN: {
             if (state.chainType !== ChainType.WebAuthn) {
               return null

@@ -8,6 +8,8 @@ import { InitDefuseSDK } from "@src/components/InitDefuseSDK"
 import { SentryTracer } from "@src/components/SentryTracer"
 import { whitelabelTemplateFlag } from "@src/config/featureFlags"
 import queryClient from "@src/constants/queryClient"
+import { WagmiProvider } from "wagmi"
+import { config as wagmiConfig } from "@src/config/wagmi"
 import { WebAuthnProvider } from "@src/features/webauthn/providers/WebAuthnProvider"
 import { initSDK } from "@src/libs/defuse-sdk/initSDK"
 // Learning edition: only NEAR and WebAuthn providers kept
@@ -118,17 +120,19 @@ const RootLayout = async ({
         <InitDefuseSDK />
 
         <ThemeProvider>
-          <QueryClientProvider client={queryClient}>
-            <NearWalletProvider>
-              <WebAuthnProvider>
-                <MixpanelProvider>{children}</MixpanelProvider>
-              </WebAuthnProvider>
-              <SentryTracer />
-            </NearWalletProvider>
-            {APP_ENV === "development" && (
-              <ReactQueryDevtools initialIsOpen={false} />
-            )}
-          </QueryClientProvider>
+          <WagmiProvider config={wagmiConfig}>
+            <QueryClientProvider client={queryClient}>
+              <NearWalletProvider>
+                <WebAuthnProvider>
+                  <MixpanelProvider>{children}</MixpanelProvider>
+                </WebAuthnProvider>
+                <SentryTracer />
+              </NearWalletProvider>
+              {APP_ENV === "development" && (
+                <ReactQueryDevtools initialIsOpen={false} />
+              )}
+            </QueryClientProvider>
+          </WagmiProvider>
         </ThemeProvider>
       </body>
       <GoogleAnalytics gaId="G-WNE3NB46KM" />

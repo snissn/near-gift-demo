@@ -26,6 +26,9 @@ const ConnectWallet = () => {
   const handlePasskey = () => {
     return signIn({ id: ChainType.WebAuthn })
   }
+  const handleMetaMask = () => {
+    return signIn({ id: ChainType.EVM })
+  }
 
   if (!state.address) {
     return (
@@ -71,6 +74,27 @@ const ConnectWallet = () => {
                 </div>
               </Button>
             )}
+
+            <Button
+              onClick={() => handleMetaMask()}
+              size="4"
+              radius="medium"
+              variant="soft"
+              color="gray"
+              className="px-2.5"
+            >
+              <div className="w-full flex items-center justify-start gap-2">
+                <Image
+                  src="/static/icons/wallets/meta-mask.svg"
+                  alt="MetaMask"
+                  width={36}
+                  height={36}
+                />
+                <Text size="2" weight="bold">
+                  MetaMask
+                </Text>
+              </div>
+            </Button>
 
             <Button
               onClick={handleNearWalletSelector}

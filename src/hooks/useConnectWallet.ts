@@ -14,6 +14,12 @@ import type { SignAndSendTransactionsParams } from "@src/types/interfaces"
 import { useSearchParams } from "next/navigation"
 import { useCallback } from "react"
 
+import {
+  useAccount as useEvmAccount,
+  useConnect as useEvmConnect,
+  useConnections as useEvmConnections,
+  useDisconnect as useEvmDisconnect,
+} from "wagmi"
 export enum ChainType {
   Near = "near",
   WebAuthn = "webauthn",
@@ -108,9 +114,15 @@ export const useConnectWallet = (): ConnectWalletAction => {
 
   return {
     async signIn(params: { id: ChainType }): Promise<void> {
+      const evmConnect = useEvmConnect()
       const strategies: Partial<Record<ChainType, () => void | Promise<void>>> = {
         [ChainType.Near]: () => nearWallet.connect(),
         [ChainType.WebAuthn]: () => webAuthnUI.open(),
+        [ChainType.EVM]: async () => {
+          const connector = evmConnect.connectors.find((c) => c.id === "injected") ?? evmConnect.connectors[0]
+          if (!connector) throw new Error("No EVM connector available")
+          await evmConnect.connectAsync({ connector })
+        },
       }
       const fn = strategies[params.id]
       if (!fn) throw new Error(`Unsupported sign in type: ${params.id}`)
@@ -119,9 +131,17 @@ export const useConnectWallet = (): ConnectWalletAction => {
 
     async signOut(params: { id: ChainType }): Promise<void> {
       try {
+        const evmDisconnect = useEvmDisconnect()
+        const evmConnections = useEvmConnections()
         const strategies: Partial<Record<ChainType, () => void | Promise<void>>> = {
           [ChainType.Near]: () => nearWallet.disconnect(),
           [ChainType.WebAuthn]: () => webAuthnActions.signOut(),
+          [ChainType.EVM]: async () => {
+            const tasks = evmConnections.map(({ connector }) =>
+              evmDisconnect.disconnectAsync ? evmDisconnect.disconnectAsync({ connector }) : Promise.resolve(evmDisconnect.disconnect({ connector }))
+            )
+            await Promise.all(tasks)
+          },
         }
         onSignOut()
         const fn = strategies[params.id]
@@ -150,6 +170,9 @@ export const useConnectWallet = (): ConnectWalletAction => {
         },
         [ChainType.WebAuthn]: async () => {
           throw new Error("WebAuthn does not support transactions")
+        },
+        [ChainType.EVM]: async () => {
+          throw new Error("EVM transactions not supported in learning edition")
         },
       }
       const fn = strategies[params.id]
