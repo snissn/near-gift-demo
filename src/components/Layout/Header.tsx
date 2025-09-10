@@ -1,6 +1,4 @@
 "use client"
-
-import AddTurboChainButton from "@src/components/AddTurboChainButton"
 import Logo from "@src/components/Logo"
 import Settings from "@src/components/Settings"
 import ConnectWallet from "@src/components/Wallet"
@@ -35,11 +33,6 @@ export function Header({
           </div>
 
           <div className="flex justify-end items-center gap-4 flex-shrink-0">
-            {whitelabelTemplate === "turboswap" && (
-              <div className="hidden md:block">
-                <AddTurboChainButton />
-              </div>
-            )}
             <ConnectWallet />
             <Settings />
           </div>

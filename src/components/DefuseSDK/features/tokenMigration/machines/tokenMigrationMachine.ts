@@ -10,8 +10,8 @@ import { getDepositedBalances } from "../../../services/defuseBalanceService"
 import type { IntentsUserId } from "../../../types/intentsUserId"
 import { assert } from "../../../utils/assert"
 import { signIntentMachine } from "../../machines/signIntentMachine"
-import type { SignMessage } from "../../otcDesk/types/sharedTypes"
-import type { TokenBalances } from "../../otcDesk/utils/fillWithMinimalExchanges"
+import type { SignMessage } from "../../gift/types/sharedTypes"
+type TokenBalances = Record<string, bigint>
 import { tokensToMigrate } from "../config"
 import { getTokenAccountId } from "../utils"
 

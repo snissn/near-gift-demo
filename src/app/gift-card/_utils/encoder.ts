@@ -45,7 +45,7 @@ export async function decodeAES256Gift(
     const keyBytes = base64urlnopad.decode(pKey)
     const cryptoKey = await crypto.subtle.importKey(
       "raw",
-      keyBytes,
+      toArrayBuffer(keyBytes),
       { name: "AES-GCM" },
       false,
       ["decrypt"]
@@ -54,10 +54,10 @@ export async function decodeAES256Gift(
     const decrypted = await crypto.subtle.decrypt(
       {
         name: "AES-GCM",
-        iv: iv_,
+        iv: toArrayBuffer(iv_),
       },
       cryptoKey,
-      decoded
+      toArrayBuffer(decoded)
     )
 
     const json = new TextDecoder().decode(decrypted)
@@ -82,7 +82,7 @@ async function createEncryptedPayload(
   const keyBytes = base64urlnopad.decode(pKey)
   const cryptoKey = await crypto.subtle.importKey(
     "raw",
-    keyBytes,
+    toArrayBuffer(keyBytes),
     { name: "AES-GCM" },
     false,
     ["encrypt"]
@@ -93,10 +93,10 @@ async function createEncryptedPayload(
   const ciphertext = await crypto.subtle.encrypt(
     {
       name: "AES-GCM",
-      iv,
+      iv: toArrayBuffer(iv),
     },
     cryptoKey,
-    data
+    toArrayBuffer(data)
   )
 
   return new Uint8Array(ciphertext)
@@ -111,4 +111,11 @@ function validateKey(pKey: string): void {
   } catch {
     throw new Error("Key must be exactly 32 bytes (AES-256)")
   }
+}
+
+function toArrayBuffer(u8: Uint8Array | ArrayBuffer): ArrayBuffer {
+  if (u8 instanceof ArrayBuffer) return u8
+  const copy = new Uint8Array(u8.byteLength)
+  copy.set(u8)
+  return copy.buffer
 }

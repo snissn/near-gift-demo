@@ -11,7 +11,7 @@ export function NavbarDesktop() {
   const { isActive } = useIsActiveLink()
 
   const isAccountActive = isActive(navigation.account)
-  const isTradeActive = isActive(navigation.home) || isActive(navigation.otc)
+  // Trade removed in learning edition
 
   return (
     <nav className="flex justify-between items-center gap-4">
@@ -22,8 +22,7 @@ export function NavbarDesktop() {
         href={navigation.account}
       />
 
-      {/* Trade */}
-      <NavItem label="Trade" isActive={isTradeActive} href={navigation.home} />
+      {/* Trade removed */}
     </nav>
   )
 }

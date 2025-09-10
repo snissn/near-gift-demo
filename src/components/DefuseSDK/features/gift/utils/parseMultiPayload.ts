@@ -1,7 +1,6 @@
 import type { Intent, MultiPayload } from "@defuse-protocol/contract-types"
 import { safeParse } from "valibot"
 import { logger } from "../../../logger"
-import { MultiPayloadDeepSchema } from "../../otcDesk/utils/schemaMultipayload"
 
 type TransferIntentSubset = {
   intent: "transfer"
@@ -14,40 +13,30 @@ type TransferIntentSubset = {
 export function parseMultiPayloadTransferMessage(
   multiPayload: MultiPayload
 ): null | TransferIntentSubset {
-  const result = safeParse(MultiPayloadDeepSchema, multiPayload)
-  if (!result.success) {
-    logger.error(result.issues)
+  try {
+    const anyPayload = multiPayload as unknown as {
+      standard?: string
+      payload?: any
+    }
+    const standard = anyPayload.standard
+    if (!standard) return null
+
+    if (standard === "nep413") {
+      const intents = anyPayload.payload?.message?.intents as Intent[] | undefined
+      const firstIntent = intents?.[0]
+      return firstIntent && isTransferIntent(firstIntent) ? firstIntent : null
+    }
+
+    if (standard === "erc191" || standard === "raw_ed25519" || standard === "webauthn") {
+      const intents = anyPayload.payload?.intents as Intent[] | undefined
+      const firstIntent = intents?.[0]
+      return firstIntent && isTransferIntent(firstIntent) ? firstIntent : null
+    }
+
     return null
-  }
-  const standard = result.output.standard
-  switch (standard) {
-    case "nep413": {
-      const intents = result.output.payload.message.intents as Intent[]
-      if (intents.length === 0) {
-        return null
-      }
-      const firstIntent = intents[0]
-      if (firstIntent && isTransferIntent(firstIntent)) {
-        return firstIntent
-      }
-      return null
-    }
-    case "erc191":
-    case "raw_ed25519":
-    case "webauthn": {
-      const intents = result.output.payload.intents as Intent[]
-      if (intents.length === 0) {
-        return null
-      }
-      const firstIntent = intents[0]
-      if (firstIntent && isTransferIntent(firstIntent)) {
-        return firstIntent
-      }
-      return null
-    }
-    default:
-      standard satisfies never
-      throw new Error("Unsupported multi payload standard")
+  } catch (e) {
+    logger.error(e)
+    return null
   }
 }
 

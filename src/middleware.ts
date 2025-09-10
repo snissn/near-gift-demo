@@ -55,6 +55,11 @@ export async function middleware(request: NextRequest) {
 function handleLegacyRedirects(request: NextRequest): NextResponse | null {
   const url = new URL(request.url)
 
+  // Redirect home to account in the learning edition
+  if (url.pathname === "/") {
+    return NextResponse.redirect(new URL("/account", request.url))
+  }
+
   if (url.pathname === "/otc-desk/create-order") {
     return NextResponse.redirect(new URL("/otc/create-order", request.url))
   }

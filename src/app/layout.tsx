@@ -3,26 +3,21 @@ import { QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import type { Metadata, Viewport } from "next"
 import type { ReactNode } from "react"
-import { WagmiProvider } from "wagmi"
 
 import { InitDefuseSDK } from "@src/components/InitDefuseSDK"
 import { SentryTracer } from "@src/components/SentryTracer"
 import { whitelabelTemplateFlag } from "@src/config/featureFlags"
-import { config } from "@src/config/wagmi"
 import queryClient from "@src/constants/queryClient"
 import { WebAuthnProvider } from "@src/features/webauthn/providers/WebAuthnProvider"
 import { initSDK } from "@src/libs/defuse-sdk/initSDK"
-import { SolanaWalletProvider } from "@src/providers/SolanaWalletProvider"
-import { StellarWalletProvider } from "@src/providers/StellarWalletProvider"
+// Learning edition: only NEAR and WebAuthn providers kept
 import { ThemeProvider } from "@src/providers/ThemeProvider"
-import { TonConnectUIProvider } from "@src/providers/TonConnectUIProvider"
 
 import "@radix-ui/themes/styles.css"
 import "../styles/global.scss"
 import Helpscout from "@src/components/Helpscout"
 import { MixpanelProvider } from "@src/providers/MixpanelProvider"
 import { NearWalletProvider } from "@src/providers/NearWalletProvider"
-import { TronWalletProvider } from "@src/providers/TronWalletProvider"
 import {
   APP_ENV,
   HELPSCOUT_BEACON_ID,
@@ -123,27 +118,17 @@ const RootLayout = async ({
         <InitDefuseSDK />
 
         <ThemeProvider>
-          <WagmiProvider config={config}>
-            <QueryClientProvider client={queryClient}>
-              <NearWalletProvider>
-                <SolanaWalletProvider>
-                  <StellarWalletProvider>
-                    <TonConnectUIProvider>
-                      <TronWalletProvider>
-                        <WebAuthnProvider>
-                          <MixpanelProvider>{children}</MixpanelProvider>
-                        </WebAuthnProvider>
-                        <SentryTracer />
-                      </TronWalletProvider>
-                    </TonConnectUIProvider>
-                  </StellarWalletProvider>
-                </SolanaWalletProvider>
-              </NearWalletProvider>
-              {APP_ENV === "development" && (
-                <ReactQueryDevtools initialIsOpen={false} />
-              )}
-            </QueryClientProvider>
-          </WagmiProvider>
+          <QueryClientProvider client={queryClient}>
+            <NearWalletProvider>
+              <WebAuthnProvider>
+                <MixpanelProvider>{children}</MixpanelProvider>
+              </WebAuthnProvider>
+              <SentryTracer />
+            </NearWalletProvider>
+            {APP_ENV === "development" && (
+              <ReactQueryDevtools initialIsOpen={false} />
+            )}
+          </QueryClientProvider>
         </ThemeProvider>
       </body>
       <GoogleAnalytics gaId="G-WNE3NB46KM" />

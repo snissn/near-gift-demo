@@ -14,7 +14,7 @@ import {
   type WalletErrorCode,
   extractWalletErrorCode,
 } from "../../utils/walletErrorExtractor"
-import type { SignMessage } from "../otcDesk/types/sharedTypes"
+import type { SignMessage } from "../gift/types/sharedTypes"
 import {
   type ErrorCodes as PublicKeyVerifierErr,
   publicKeyVerifierMachine,

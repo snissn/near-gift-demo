@@ -1,6 +1,6 @@
 import type { AuthMethod } from "@defuse-protocol/internal-utils"
 import { useEffect, useState } from "react"
-import type { SignMessage } from "../../otcDesk/types/sharedTypes"
+import type { SignMessage } from "../../gift/types/sharedTypes"
 import { TokenMigrationDialog } from "./TokenMigrationDialog"
 
 interface TokenMigrationProps {

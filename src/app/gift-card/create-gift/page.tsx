@@ -1,5 +1,4 @@
 "use client"
-import { useDeterminePair } from "@src/app/(home)/_utils/useDeterminePair"
 import { GiftHistoryWidget } from "@src/components/DefuseSDK/features/gift/components/GiftHistoryWidget"
 import { GiftMakerWidget } from "@src/components/DefuseSDK/features/gift/components/GiftMakerWidget"
 import Paper from "@src/components/Paper"
@@ -16,7 +15,6 @@ export default function CreateGiftPage() {
   const { state } = useConnectWallet()
   const tokenList = useTokenList(LIST_TOKENS)
   const signMessage = useWalletAgnosticSignMessage()
-  const { tokenIn } = useDeterminePair()
   const referral = useIntentsReferral()
   const { signAndSendTransactions } = useNearWallet()
 
@@ -48,7 +46,7 @@ export default function CreateGiftPage() {
           referral={referral}
           createGiftIntent={async (payload) => createGiftIntent(payload)}
           generateLink={(giftLinkData) => createGiftLink(giftLinkData)}
-          initialToken={tokenIn ?? undefined}
+          // initialToken omitted in learning edition
           renderHostAppLink={renderAppLink}
         />
         <GiftHistoryWidget

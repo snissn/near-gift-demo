@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowsLeftRight, Plus } from "@phosphor-icons/react"
+import { Plus } from "@phosphor-icons/react"
 import { navigation } from "@src/constants/routes"
 import { useIsActiveLink } from "@src/hooks/useIsActiveLink"
 import { cn } from "@src/utils/cn"
@@ -12,7 +12,6 @@ export function NavbarMobile() {
   const { isActive } = useIsActiveLink()
 
   const isAccountActive = isActive(navigation.account)
-  const isTradeActive = isActive(navigation.home) || isActive(navigation.otc)
   const isDepositActive = isActive(navigation.deposit)
 
   return (
@@ -31,23 +30,7 @@ export function NavbarMobile() {
             }
           />
 
-          {/* Trade */}
-          <NavItem
-            href={navigation.home}
-            label="Trade"
-            isActive={isTradeActive}
-            iconSlot={
-              <NavItem.DisplayIcon>
-                <ArrowsLeftRight
-                  className={cn(
-                    "size-4",
-                    isTradeActive ? "text-gray-12" : "text-gray-11"
-                  )}
-                  weight="bold"
-                />
-              </NavItem.DisplayIcon>
-            }
-          />
+          {/* Trade removed */}
 
           {/* Deposit */}
           <NavItem

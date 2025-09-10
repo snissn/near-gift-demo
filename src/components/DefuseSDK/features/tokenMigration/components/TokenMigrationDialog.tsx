@@ -5,7 +5,7 @@ import { useActor } from "@xstate/react"
 import { CopyButton } from "../../../components/IntentCard/CopyButton"
 import { BaseModalDialog } from "../../../components/Modal/ModalDialog"
 import { blockExplorerTxLinkFactory } from "../../../utils/chainTxExplorer"
-import type { SignMessage } from "../../otcDesk/types/sharedTypes"
+import type { SignMessage } from "../../gift/types/sharedTypes"
 import { tokenMigrationMachine } from "../machines/tokenMigrationMachine"
 
 export function TokenMigrationDialog({

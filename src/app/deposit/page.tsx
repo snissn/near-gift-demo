@@ -7,15 +7,10 @@ import { ChainType, useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useTokenList } from "@src/hooks/useTokenList"
 import { renderAppLink } from "@src/utils/renderAppLink"
 import { useRouter, useSearchParams } from "next/navigation"
-import {
-  updateURLParams,
-  useDeterminePair,
-} from "../(home)/_utils/useDeterminePair"
 
 export default function Deposit() {
   const { state, sendTransaction } = useConnectWallet()
   const tokenList = useTokenList(LIST_TOKENS)
-  const { tokenIn } = useDeterminePair()
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -39,54 +34,13 @@ export default function Deposit() {
           })
           return Array.isArray(result) ? result[0].transaction.hash : result
         }}
-        sendTransactionEVM={async ({ from, ...tx }) => {
-          const result = await sendTransaction({
-            id: ChainType.EVM,
-            tx: {
-              ...tx,
-              account: from,
-            },
-          })
-          return Array.isArray(result) ? result[0].transaction.hash : result
-        }}
-        sendTransactionSolana={async (tx) => {
-          const result = await sendTransaction({
-            id: ChainType.Solana,
-            tx,
-          })
-          return Array.isArray(result) ? result[0].transaction.hash : result
-        }}
-        sendTransactionTon={async (tx) => {
-          const result = await sendTransaction({
-            id: ChainType.Ton,
-            tx,
-          })
-          return Array.isArray(result) ? result[0].transaction.hash : result
-        }}
-        sendTransactionStellar={async (tx) => {
-          const result = await sendTransaction({
-            id: ChainType.Stellar,
-            tx,
-          })
-          return Array.isArray(result) ? result[0].transaction.hash : result
-        }}
-        sendTransactionTron={async (tx) => {
-          const result = await sendTransaction({
-            id: ChainType.Tron,
-            tx,
-          })
-          return Array.isArray(result) ? result[0].transaction.hash : result
-        }}
+        sendTransactionEVM={async () => Promise.reject("Unsupported chain")}
+        sendTransactionSolana={async () => Promise.reject("Unsupported chain")}
+        sendTransactionTon={async () => Promise.reject("Unsupported chain")}
+        sendTransactionStellar={async () => Promise.reject("Unsupported chain")}
+        sendTransactionTron={async () => Promise.reject("Unsupported chain")}
         renderHostAppLink={renderAppLink}
-        initialToken={tokenIn ?? undefined}
-        onTokenChange={(params) =>
-          updateURLParams({
-            router,
-            searchParams,
-            tokenIn: params.token,
-            tokenOut: null,
-          })
-        }
+        // initialToken omitted; simplified URL handling for learning edition
       />
     </Paper>
   )

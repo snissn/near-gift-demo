@@ -1,25 +1,14 @@
 import type { walletMessage as walletMessage_ } from "@defuse-protocol/internal-utils"
-import { useWallet as useWalletSolana } from "@solana/wallet-adapter-react"
 import { useWebAuthnActions } from "@src/features/webauthn/hooks/useWebAuthnStore"
 import { ChainType, useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useNearWallet } from "@src/providers/NearWalletProvider"
-import { signMessageStellar } from "@src/providers/StellarWalletProvider"
-import { useTronWallet } from "@src/providers/TronWalletProvider"
-import {
-  createHotWalletCloseObserver,
-  raceFirst,
-} from "@src/utils/hotWalletIframe"
-import { useTonConnectUI } from "@tonconnect/ui-react"
-import { useSignMessage } from "wagmi"
+import { createHotWalletCloseObserver, raceFirst } from "@src/utils/hotWalletIframe"
 
 export function useWalletAgnosticSignMessage() {
   const { state } = useConnectWallet()
   const { signMessage: signMessageNear } = useNearWallet()
-  const { signMessageAsync: signMessageAsyncWagmi } = useSignMessage()
-  const solanaWallet = useWalletSolana()
   const { signMessage: signMessageWebAuthn } = useWebAuthnActions()
-  const [tonConnectUi] = useTonConnectUI()
-  const { signMessage: signMessageTron } = useTronWallet()
+  // Learning edition: only Near and WebAuthn supported
 
   return async (
     walletMessage: walletMessage_.WalletMessage
@@ -27,17 +16,6 @@ export function useWalletAgnosticSignMessage() {
     const chainType = state.chainType
 
     switch (chainType) {
-      case ChainType.EVM: {
-        const signatureData = await signMessageAsyncWagmi({
-          message: walletMessage.ERC191.message,
-        })
-        return {
-          type: "ERC191",
-          signatureData,
-          signedData: walletMessage.ERC191,
-        }
-      }
-
       case ChainType.Near: {
         const { signatureData, signedData } = await raceFirst(
           signMessageNear({
@@ -47,22 +25,6 @@ export function useWalletAgnosticSignMessage() {
           createHotWalletCloseObserver()
         )
         return { type: "NEP413", signatureData, signedData }
-      }
-
-      case ChainType.Solana: {
-        if (solanaWallet.signMessage == null) {
-          throw new Error("Solana wallet does not support signMessage")
-        }
-
-        const signatureData = await solanaWallet.signMessage(
-          walletMessage.SOLANA.message
-        )
-
-        return {
-          type: "SOLANA",
-          signatureData,
-          signedData: walletMessage.SOLANA,
-        }
       }
 
       case ChainType.WebAuthn: {
@@ -76,38 +38,11 @@ export function useWalletAgnosticSignMessage() {
         }
       }
 
-      case ChainType.Ton: {
-        const signatureData = await tonConnectUi.signData(
-          walletMessage.TON_CONNECT.message
-        )
-        return {
-          type: "TON_CONNECT",
-          signatureData,
-          signedData: walletMessage.TON_CONNECT,
-        }
-      }
-
-      case ChainType.Stellar: {
-        const signatureData = await signMessageStellar(
-          walletMessage.STELLAR.message
-        )
-        return {
-          type: "STELLAR_SEP53",
-          signatureData,
-          signedData: walletMessage.STELLAR,
-        }
-      }
-
-      case ChainType.Tron: {
-        const signatureData = await signMessageTron(walletMessage.TRON.message)
-        return { type: "TRON", signatureData, signedData: walletMessage.TRON }
-      }
-
+      // Other chains not supported in learning edition
       case undefined:
         throw new Error("User not signed in")
 
       default:
-        chainType satisfies never
         throw new Error(`Unsupported sign in type: ${chainType}`)
     }
   }

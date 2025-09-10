@@ -22,7 +22,7 @@ import { TokenAmountInputCard } from "../../deposit/components/DepositForm/Token
 import { balanceAllSelector } from "../../machines/depositedBalanceMachine"
 import type { SendNearTransaction } from "../../machines/publicKeyVerifierMachine"
 import type { publicKeyVerifierMachine } from "../../machines/publicKeyVerifierMachine"
-import { usePublicKeyModalOpener } from "../../swap/hooks/usePublicKeyModalOpener"
+// Learning edition: swap public key modal opener removed
 import { formValuesSelector } from "../actors/giftMakerFormMachine"
 import type { giftMakerReadyActor } from "../actors/giftMakerReadyActor"
 import { giftMakerRootMachine } from "../actors/giftMakerRootMachine"
@@ -232,7 +232,7 @@ export function GiftMakerForm({
     }
   )
 
-  usePublicKeyModalOpener(publicKeyVerifierRef, sendNearTransaction)
+  // Public key modal opener removed in learning edition
 
   const handleSetMaxValue = async () => {
     if (tokenBalance != null) {

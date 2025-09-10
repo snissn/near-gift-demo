@@ -40,7 +40,7 @@ import { getEVMChainId } from "../../../utils/evmChainId"
 import { isFungibleToken, isNativeToken } from "../../../utils/token"
 import { depositGenerateAddressMachine } from "../../machines/depositGenerateAddressMachine"
 import { depositUIMachine } from "../../machines/depositUIMachine"
-import { useDepositTokenChangeNotifier } from "../../swap/hooks/useTokenChangeNotifier"
+import { useEffect } from "react"
 import type { DepositFormValues } from "./DepositForm"
 
 /**
@@ -586,9 +586,10 @@ function TokenChangeNotifier({
   }) => void
   token: SwappableToken
 }) {
-  useDepositTokenChangeNotifier({
-    onTokenChange,
-    prevTokenRef: useRef({ token }),
-  })
+  const prevTokenRef = useRef<{ token: SwappableToken }>({ token })
+  useEffect(() => {
+    if (onTokenChange) onTokenChange({ token })
+    prevTokenRef.current = { token }
+  }, [token, onTokenChange])
   return null
 }

@@ -96,10 +96,13 @@ export async function verifyWebAuthnSignature({
   curveType: CurveType
   publicKey: Uint8Array
 }) {
-  const clientDataHash = await crypto.subtle.digest("SHA-256", clientDataJSON)
+  const clientDataHash = await crypto.subtle.digest(
+    "SHA-256",
+    toArrayBuffer(clientDataJSON)
+  )
 
   const signedBytes = concatUint8Arrays([
-    new Uint8Array(authenticatorData),
+    new Uint8Array(toArrayBuffer(authenticatorData)),
     new Uint8Array(clientDataHash),
   ])
 
@@ -110,9 +113,10 @@ export async function verifyWebAuthnSignature({
 
   switch (curveType) {
     case "p256": {
+      const pubKeyRaw = new Uint8Array(toArrayBuffer(publicKeyWebCryptoAPI))
       const key = await crypto.subtle.importKey(
         "raw",
-        publicKeyWebCryptoAPI,
+        pubKeyRaw,
         { name: "ECDSA", namedCurve: "P-256" },
         true,
         ["verify"]
@@ -120,8 +124,8 @@ export async function verifyWebAuthnSignature({
       return crypto.subtle.verify(
         { name: "ECDSA", hash: { name: "SHA-256" } },
         key,
-        signature,
-        signedBytes
+        new Uint8Array(toArrayBuffer(signature)),
+        new Uint8Array(toArrayBuffer(signedBytes))
       )
     }
 
@@ -133,6 +137,13 @@ export async function verifyWebAuthnSignature({
       curveType satisfies never
       throw new Error(`Unsupported curve type ${curveType}`)
   }
+}
+
+function toArrayBuffer(input: Uint8Array | ArrayBuffer): ArrayBuffer {
+  if (input instanceof ArrayBuffer) return input
+  const copy = new Uint8Array(input.byteLength)
+  copy.set(input)
+  return copy.buffer
 }
 
 /**

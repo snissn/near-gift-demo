@@ -11,7 +11,7 @@ export async function signIn(): Promise<string> {
   const assertion = await navigator.credentials.get({
     publicKey: {
       rpId: getRelayingPartyId(),
-      challenge: new Uint8Array(32),
+      challenge: toArrayBuffer(new Uint8Array(32)),
       allowCredentials: [],
       timeout: 60000,
     },
@@ -121,10 +121,10 @@ export async function signMessage(
   const assertion = await navigator.credentials.get({
     publicKey: {
       rpId: getRelayingPartyId(),
-      challenge,
+      challenge: toArrayBuffer(challenge),
       allowCredentials: [
         {
-          id: base58.decode(credential_.rawId),
+          id: toArrayBuffer(base58.decode(credential_.rawId)),
           type: "public-key",
         },
       ],
@@ -145,6 +145,13 @@ export async function signMessage(
   const credential = assertion as PublicKeyCredential
 
   return credential.response as AuthenticatorAssertionResponse
+}
+
+function toArrayBuffer(input: Uint8Array | ArrayBuffer): ArrayBuffer {
+  if (input instanceof ArrayBuffer) return input
+  const copy = new Uint8Array(input.byteLength)
+  copy.set(input)
+  return copy.buffer
 }
 
 async function extractCredentialPublicKey(credential: PublicKeyCredential) {

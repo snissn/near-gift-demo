@@ -9,7 +9,6 @@ import { FeatureFlagsContext } from "@src/providers/FeatureFlagsProvider"
 import Themes from "@src/types/themes"
 import { LINK_DOCS, LINK_TG, MAIL } from "@src/utils/environment"
 
-import AddTurboChainButton from "./AddTurboChainButton"
 
 const Settings = () => {
   const { whitelabelTemplate } = useContext(FeatureFlagsContext)
@@ -30,12 +29,7 @@ const Settings = () => {
         </Popover.Trigger>
         <Popover.Content className="min-w-[180px] mt-1 dark:bg-black-800 rounded-2xl">
           <div className="flex flex-col gap-4">
-            {whitelabelTemplate === "turboswap" && (
-              <div className="md:hidden">
-                <AddTurboChainButton />
-                <Separator orientation="horizontal" size="4" className="mt-4" />
-              </div>
-            )}
+            {/* TurboChain adder removed in learning edition */}
 
             <DarkMode />
             <Separator orientation="horizontal" size="4" />

@@ -39,8 +39,7 @@ import {
   transitBalanceSelector,
 } from "../../../machines/depositedBalanceMachine"
 import { getPOABridgeInfo } from "../../../machines/poaBridgeInfoActor"
-import { renderIntentCreationResult } from "../../../swap/components/SwapForm"
-import { usePublicKeyModalOpener } from "../../../swap/hooks/usePublicKeyModalOpener"
+// Learning edition: swap dependencies removed
 import { WithdrawUIMachineContext } from "../../WithdrawUIMachineContext"
 import { isCexIncompatible } from "../../utils/cexCompatibility"
 import { getMinWithdrawalHiperliquidAmount } from "../../utils/hyperliquid"
@@ -119,7 +118,7 @@ export const WithdrawForm = ({
   })
 
   // biome-ignore lint/suspicious/noExplicitAny: types should've been correct, but `publicKeyVerifierRef` is commented out
-  usePublicKeyModalOpener(publicKeyVerifierRef as any, sendNearTransaction)
+  // Public key modal opener removed in learning edition
 
   useEffect(() => {
     if (userAddress != null && chainType != null) {
@@ -532,7 +531,7 @@ export const WithdrawForm = ({
         increaseAmount={increaseAmount}
         decreaseAmount={decreaseAmount}
       />
-      {renderIntentCreationResult(intentCreationResult)}
+      {/* Intent creation result rendering removed in learning edition */}
 
       {intentRefs.length !== 0 && <Intents intentRefs={intentRefs} />}
     </Island>
