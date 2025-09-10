@@ -1,5 +1,5 @@
 import type { GetGiftResponse } from "@src/features/gift/types/giftTypes"
-import { supabase } from "@src/libs/supabase"
+import { SupabaseConfigError, getSupabase } from "@src/libs/supabaseServer"
 import { logger } from "@src/utils/logger"
 import { NextResponse } from "next/server"
 import { z } from "zod"
@@ -13,10 +13,11 @@ const giftIdSchema = z
   }, "Invalid gift_id format") as z.ZodType<string>
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ giftId: string }> }
 ) {
   try {
+    const supabase = getSupabase()
     const { giftId } = await params
     const validatedData = giftIdSchema.parse(giftId)
 
@@ -46,6 +47,9 @@ export async function GET(
       p_key: data.p_key,
     } satisfies GetGiftResponse)
   } catch (error) {
+    if (error instanceof SupabaseConfigError) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.errors }, { status: 400 })
     }

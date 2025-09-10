@@ -5,7 +5,7 @@ import type {
   CreateGiftResponse,
   ErrorResponse,
 } from "@src/features/gift/types/giftTypes"
-import { supabase } from "@src/libs/supabase"
+import { SupabaseConfigError, getSupabase } from "@src/libs/supabaseServer"
 import { logger } from "@src/utils/logger"
 import { NextResponse } from "next/server"
 import { z } from "zod"
@@ -23,7 +23,7 @@ const giftsSchema = z.object({
       const decoded = base64.decode(val)
       // AES-GCM produces variable length output, but should be at least 16 bytes
       return decoded.length >= 16
-    } catch (err) {
+    } catch (_err) {
       return false
     }
   }, "Invalid encrypted_payload format"),
@@ -39,6 +39,7 @@ const giftsSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    const supabase = getSupabase()
     const body = await request.json()
     const validatedData = giftsSchema.parse(body)
     const { error } = await supabase.from("gifts").insert(validatedData)
@@ -62,6 +63,12 @@ export async function POST(request: Request) {
       }
     )
   } catch (error) {
+    if (error instanceof SupabaseConfigError) {
+      return NextResponse.json(
+        { error: error.message } satisfies ErrorResponse,
+        { status: 500 }
+      )
+    }
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: error.errors } satisfies ErrorResponse,

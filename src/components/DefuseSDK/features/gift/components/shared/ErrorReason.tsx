@@ -27,7 +27,10 @@ function renderErrorMessages(reason: string): string {
 
     case "ERR_STORAGE_OPERATION_EXCEPTION":
     case "EXCEPTION":
-      return "Something went wrong while creating the gift link. Please check your internet connection or try again shortly."
+      return (
+        "Something went wrong while creating the gift link. " +
+        "If this persists, verify the API and server configuration (e.g., SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY) and try again."
+      )
 
     case "ERR_SET_ITEM_FAILED_TO_STORAGE":
       return "Unable to save your gift. Please try again in a moment."
