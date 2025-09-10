@@ -13,7 +13,6 @@ import { useVerifiedWalletsStore } from "@src/stores/useVerifiedWalletsStore"
 import type { SignAndSendTransactionsParams } from "@src/types/interfaces"
 import { useSearchParams } from "next/navigation"
 import { useCallback } from "react"
-import type { SendTransactionResponse } from "@tonconnect/ui-react"
 
 export enum ChainType {
   Near = "near",
@@ -41,7 +40,7 @@ interface ConnectWalletAction {
   sendTransaction: (params: {
     id: ChainType
     tx?: SignAndSendTransactionsParams["transactions"]
-  }) => Promise<string | FinalExecutionOutcome[] | SendTransactionResponse>
+  }) => Promise<string | FinalExecutionOutcome[]>
   state: State
 }
 
@@ -193,4 +192,3 @@ class WalletDisconnectError extends BaseError {
     this.originalError = originalError
   }
 }
-
