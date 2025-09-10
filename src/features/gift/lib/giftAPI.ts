@@ -38,8 +38,13 @@ export async function getGift(tradeId: string) {
 }
 
 async function handleApiError(response: Response, fallbackMessage: string) {
-  const error = (await response.json()) as ErrorResponse
-  throw new Error(
-    typeof error.error === "string" ? error.error : fallbackMessage
-  )
+  try {
+    const error = (await response.json()) as ErrorResponse
+    throw new Error(
+      typeof error.error === "string" ? error.error : fallbackMessage
+    )
+  } catch {
+    // Non-JSON or empty response body; fall back to generic message
+    throw new Error(fallbackMessage)
+  }
 }

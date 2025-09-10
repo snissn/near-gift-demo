@@ -1,5 +1,6 @@
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons"
 import { Callout } from "@radix-ui/themes"
+import { APP_ENV } from "@src/utils/environment"
 
 type ErrorReasonProps = {
   reason: string
@@ -11,7 +12,10 @@ export function ErrorReason({ reason }: ErrorReasonProps) {
       <Callout.Icon>
         <ExclamationTriangleIcon />
       </Callout.Icon>
-      <Callout.Text>{renderErrorMessages(reason)}</Callout.Text>
+      <Callout.Text>
+        {renderErrorMessages(reason)}
+        {APP_ENV === "development" && reason && ` [code: ${reason}]`}
+      </Callout.Text>
     </Callout.Root>
   )
 }
@@ -48,6 +52,6 @@ function renderErrorMessages(reason: string): string {
       return "This gift link is invalid. Please contact the gift creator for assistance."
 
     default:
-      return reason
+      return "Something went wrong while creating the gift link. Please check your internet connection or try again shortly."
   }
 }
