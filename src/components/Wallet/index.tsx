@@ -2,7 +2,7 @@
 
 import { Button, Popover, Text } from "@radix-ui/themes"
 import Image from "next/image"
-import { useContext } from "react"
+import { useContext, useEffect, useState } from "react"
 
 import WalletConnections from "@src/components/Wallet/WalletConnections"
 import { isSupportedByBrowser } from "@src/features/webauthn/lib/webauthnService"
@@ -14,6 +14,9 @@ import { mapStringToEmojis } from "@src/utils/emoji"
 // Learning edition: only Near and Passkey
 
 const ConnectWallet = () => {
+  // Avoid hydration mismatch by rendering after mount
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
   const { isOpen, setIsOpen } = useSignInWindowOpenState()
   const { state, signIn } = useConnectWallet()
   const { shortAccountId } = useShortAccountId(state.displayAddress ?? "")
@@ -28,6 +31,7 @@ const ConnectWallet = () => {
   // Single Ethereum Wallet entry; hook decides best connector
   const handleEthereum = () => signIn({ id: ChainType.EVM })
 
+  if (!mounted) return null
   if (!state.address) {
     return (
       <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
