@@ -20,21 +20,44 @@ export function parseMultiPayloadTransferMessage(
     const standard = anyPayload.standard
     if (!standard) return null
 
+    // Normalize payload: some signers return JSON-encoded string
+    const normalizedPayload: unknown =
+      typeof anyPayload.payload === "string"
+        ? safeJsonParse(anyPayload.payload)
+        : anyPayload.payload
+
     // Try standard-specific known shapes first
     let intents: Intent[] | undefined
     if (standard === "nep413") {
-      intents = anyPayload.payload?.message?.intents as Intent[] | undefined
+      if (
+        normalizedPayload &&
+        typeof normalizedPayload === "object" &&
+        (normalizedPayload as Record<string, unknown>).message &&
+        typeof (normalizedPayload as Record<string, unknown>).message ===
+          "object"
+      ) {
+        const msg = (normalizedPayload as Record<string, unknown>)
+          .message as Record<string, unknown>
+        if (Array.isArray(msg.intents)) intents = msg.intents as Intent[]
+      }
     } else if (
       standard === "erc191" ||
       standard === "raw_ed25519" ||
       standard === "webauthn"
     ) {
-      intents = anyPayload.payload?.intents as Intent[] | undefined
+      if (
+        normalizedPayload &&
+        typeof normalizedPayload === "object" &&
+        Array.isArray((normalizedPayload as Record<string, unknown>).intents)
+      ) {
+        intents = (normalizedPayload as Record<string, unknown>)
+          .intents as Intent[]
+      }
     }
 
     // Fallback: try alternate nesting patterns found in older/newer payloads
     if (!intents) {
-      intents = findIntents(anyPayload.payload)
+      intents = findIntents(normalizedPayload)
     }
 
     const firstIntent = intents?.[0]
@@ -75,6 +98,14 @@ function findIntents(payload: unknown): Intent[] | undefined {
     if (found) return found
   }
   return undefined
+}
+
+function safeJsonParse(text: string): unknown {
+  try {
+    return JSON.parse(text)
+  } catch {
+    return text
+  }
 }
 
 function isTransferIntent(intent: Intent): intent is TransferIntentSubset {
