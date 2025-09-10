@@ -170,7 +170,12 @@ export const giftMakerRootMachine = setup({
           })
 
           return { tag: "ok", value: { iv } }
-        } catch {
+        } catch (err) {
+          // Surface detailed error to console/Sentry via SDK logger in dev/prod
+          logger.error(err, {
+            where: "giftMaker.savingGift",
+            note: "Supabase insert or client createGift failed",
+          })
           return { tag: "err", reason: "ERR_STORAGE_OPERATION_EXCEPTION" }
         }
       }

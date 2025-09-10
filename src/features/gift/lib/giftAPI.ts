@@ -1,4 +1,4 @@
-import { BASE_URL } from "@src/utils/environment"
+import { APP_ENV, BASE_URL } from "@src/utils/environment"
 import type {
   CreateGiftRequest,
   CreateGiftResponse,
@@ -40,9 +40,16 @@ export async function getGift(tradeId: string) {
 async function handleApiError(response: Response, fallbackMessage: string) {
   try {
     const error = (await response.json()) as ErrorResponse
-    throw new Error(
-      typeof error.error === "string" ? error.error : fallbackMessage
-    )
+    if (typeof error.error === "string") {
+      throw new Error(error.error)
+    }
+    // When error is an object, include details in development to aid debugging
+    if (APP_ENV === "development") {
+      throw new Error(
+        `API error (${response.status}): ${JSON.stringify(error.error)}`
+      )
+    }
+    throw new Error(fallbackMessage)
   } catch {
     // Non-JSON or empty response body; fall back to generic message
     throw new Error(fallbackMessage)

@@ -6,6 +6,7 @@ import type {
   ErrorResponse,
 } from "@src/features/gift/types/giftTypes"
 import { SupabaseConfigError, getSupabase } from "@src/libs/supabaseServer"
+import { APP_ENV } from "@src/utils/environment"
 import { logger } from "@src/utils/logger"
 import { NextResponse } from "next/server"
 import { z } from "zod"
@@ -46,12 +47,18 @@ export async function POST(request: Request) {
 
     if (error) {
       logger.error(error)
-      return NextResponse.json(
-        {
-          error: "Failed to create gift",
-        } satisfies ErrorResponse,
-        { status: 500 }
-      )
+      const payload =
+        APP_ENV === "development"
+          ? {
+              error: {
+                message: error.message,
+                code: error.code,
+                details: error.details,
+                hint: "Check Supabase URL/key and DB 'gifts' table exists.",
+              },
+            }
+          : ({ error: "Failed to create gift" } satisfies ErrorResponse)
+      return NextResponse.json(payload, { status: 500 })
     }
 
     return NextResponse.json(
