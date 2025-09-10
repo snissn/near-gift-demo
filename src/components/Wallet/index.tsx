@@ -17,18 +17,16 @@ const ConnectWallet = () => {
   const { isOpen, setIsOpen } = useSignInWindowOpenState()
   const { state, signIn } = useConnectWallet()
   const { shortAccountId } = useShortAccountId(state.displayAddress ?? "")
-  const { whitelabelTemplate } = useContext(FeatureFlagsContext)
+  // keep context ready if needed later; not used now
+  useContext(FeatureFlagsContext)
 
   const handleNearWalletSelector = () => {
     return signIn({ id: ChainType.Near })
   }
 
-  const handlePasskey = () => {
-    return signIn({ id: ChainType.WebAuthn })
-  }
-  const handleMetaMask = () => {
-    return signIn({ id: ChainType.EVM })
-  }
+  const handlePasskey = () => signIn({ id: ChainType.WebAuthn })
+  // Single Ethereum Wallet entry; hook decides best connector
+  const handleEthereum = () => signIn({ id: ChainType.EVM })
 
   if (!state.address) {
     return (
@@ -76,7 +74,7 @@ const ConnectWallet = () => {
             )}
 
             <Button
-              onClick={() => handleMetaMask()}
+              onClick={handleEthereum}
               size="4"
               radius="medium"
               variant="soft"
@@ -86,12 +84,12 @@ const ConnectWallet = () => {
               <div className="w-full flex items-center justify-start gap-2">
                 <Image
                   src="/static/icons/wallets/meta-mask.svg"
-                  alt="MetaMask"
+                  alt="Ethereum Wallet"
                   width={36}
                   height={36}
                 />
                 <Text size="2" weight="bold">
-                  MetaMask
+                  Ethereum Wallet
                 </Text>
               </div>
             </Button>

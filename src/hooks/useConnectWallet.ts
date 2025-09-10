@@ -41,7 +41,10 @@ export type State = {
 }
 
 interface ConnectWalletAction {
-  signIn: (params: { id: ChainType }) => Promise<void>
+  signIn: (params: {
+    id: ChainType
+    connectorKey?: "injected" | "walletConnect" | "coinbaseWallet"
+  }) => Promise<void>
   signOut: (params: { id: ChainType }) => Promise<void>
   sendTransaction: (params: {
     id: ChainType
@@ -64,6 +67,11 @@ export const useConnectWallet = (): ConnectWalletAction => {
 
   // NEAR
   const nearWallet = useNearWallet()
+  // EVM (top-level hooks to satisfy Rules of Hooks)
+  const evmAccount = useEvmAccount()
+  const evmConnect = useEvmConnect()
+  const evmDisconnect = useEvmDisconnect()
+  const evmConnections = useEvmConnections()
   if (nearWallet.accountId != null) {
     state = {
       address: nearWallet.accountId,
@@ -85,6 +93,30 @@ export const useConnectWallet = (): ConnectWalletAction => {
       address: currentPasskey.publicKey,
       displayAddress: currentPasskey.publicKey,
       chainType: ChainType.WebAuthn,
+      isVerified: false,
+      isFake: false,
+    }
+  }
+
+  // EVM account (if connected)
+  if (evmAccount.address) {
+    const network = (() => {
+      switch (evmAccount.chainId) {
+        case 1:
+          return "eth:mainnet"
+        case 5:
+          return "eth:goerli"
+        case 11155111:
+          return "eth:sepolia"
+        default:
+          return `evm:chain-${evmAccount.chainId ?? "unknown"}`
+      }
+    })()
+    state = {
+      address: evmAccount.address,
+      displayAddress: evmAccount.address,
+      network,
+      chainType: ChainType.EVM,
       isVerified: false,
       isFake: false,
     }
@@ -113,17 +145,25 @@ export const useConnectWallet = (): ConnectWalletAction => {
   )
 
   return {
-    async signIn(params: { id: ChainType }): Promise<void> {
-      const evmConnect = useEvmConnect()
-      const strategies: Partial<Record<ChainType, () => void | Promise<void>>> = {
-        [ChainType.Near]: () => nearWallet.connect(),
-        [ChainType.WebAuthn]: () => webAuthnUI.open(),
-        [ChainType.EVM]: async () => {
-          const connector = evmConnect.connectors.find((c) => c.id === "injected") ?? evmConnect.connectors[0]
-          if (!connector) throw new Error("No EVM connector available")
-          await evmConnect.connectAsync({ connector })
-        },
-      }
+    async signIn(params: {
+      id: ChainType
+      connectorKey?: "injected" | "walletConnect" | "coinbaseWallet"
+    }): Promise<void> {
+      const strategies: Partial<Record<ChainType, () => void | Promise<void>>> =
+        {
+          [ChainType.Near]: () => nearWallet.connect(),
+          [ChainType.WebAuthn]: () => webAuthnUI.open(),
+          [ChainType.EVM]: async () => {
+            const preferred = params.connectorKey
+            const connector =
+              (preferred &&
+                evmConnect.connectors.find((c) => c.id === preferred)) ||
+              evmConnect.connectors.find((c) => c.id === "injected") ||
+              evmConnect.connectors[0]
+            if (!connector) throw new Error("No EVM connector available")
+            await evmConnect.connectAsync({ connector })
+          },
+        }
       const fn = strategies[params.id]
       if (!fn) throw new Error(`Unsupported sign in type: ${params.id}`)
       return fn()
@@ -131,21 +171,27 @@ export const useConnectWallet = (): ConnectWalletAction => {
 
     async signOut(params: { id: ChainType }): Promise<void> {
       try {
-        const evmDisconnect = useEvmDisconnect()
-        const evmConnections = useEvmConnections()
-        const strategies: Partial<Record<ChainType, () => void | Promise<void>>> = {
+        const strategies: Partial<
+          Record<ChainType, () => void | Promise<void>>
+        > = {
           [ChainType.Near]: () => nearWallet.disconnect(),
           [ChainType.WebAuthn]: () => webAuthnActions.signOut(),
           [ChainType.EVM]: async () => {
             const tasks = evmConnections.map(({ connector }) =>
-              evmDisconnect.disconnectAsync ? evmDisconnect.disconnectAsync({ connector }) : Promise.resolve(evmDisconnect.disconnect({ connector }))
+              evmDisconnect.disconnectAsync
+                ? evmDisconnect.disconnectAsync({ connector })
+                : Promise.resolve(evmDisconnect.disconnect({ connector }))
             )
             await Promise.all(tasks)
           },
         }
         onSignOut()
         const fn = strategies[params.id]
-        if (!fn) throw new WalletDisconnectError(params.id, "Unsupported sign out type")
+        if (!fn)
+          throw new WalletDisconnectError(
+            params.id,
+            "Unsupported sign out type"
+          )
         return fn()
       } catch (error) {
         const errorMessage =
@@ -158,7 +204,9 @@ export const useConnectWallet = (): ConnectWalletAction => {
     sendTransaction: async (
       params
     ): Promise<string | FinalExecutionOutcome[]> => {
-      const strategies: Partial<Record<ChainType, () => Promise<string | FinalExecutionOutcome[]>>> = {
+      const strategies: Partial<
+        Record<ChainType, () => Promise<string | FinalExecutionOutcome[]>>
+      > = {
         [ChainType.Near]: async () => {
           if (!nearWallet.accountId) {
             throw new Error("NEAR wallet not connected")
