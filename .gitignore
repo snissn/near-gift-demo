@@ -25,6 +25,7 @@
 npm-debug.log*
 
 # local env files, except .env.local.example
+.env
 .env*.local
 !.env.local.example
 .envrc
