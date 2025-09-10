@@ -175,6 +175,17 @@ export const giftMakerRootMachine = setup({
           logger.error(err, {
             where: "giftMaker.savingGift",
             note: "Supabase insert or client createGift failed",
+            signDataPresent: Boolean(input.signData),
+            multipayload: (() => {
+              try {
+                return JSON.stringify(input.signData?.multiPayload)?.slice(
+                  0,
+                  2000
+                )
+              } catch {
+                return "<unserializable>"
+              }
+            })(),
           })
           return { tag: "err", reason: "ERR_STORAGE_OPERATION_EXCEPTION" }
         }
