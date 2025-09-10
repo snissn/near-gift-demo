@@ -137,8 +137,8 @@ export const useConnectWallet = (): ConnectWalletAction => {
 
     sendTransaction: async (
       params
-    ): Promise<string | FinalExecutionOutcome[] | SendTransactionResponse> => {
-      const strategies: Partial<Record<ChainType, () => Promise<string | FinalExecutionOutcome[] | SendTransactionResponse>>> = {
+    ): Promise<string | FinalExecutionOutcome[]> => {
+      const strategies: Partial<Record<ChainType, () => Promise<string | FinalExecutionOutcome[]>>> = {
         [ChainType.Near]: async () => {
           if (!nearWallet.accountId) {
             throw new Error("NEAR wallet not connected")

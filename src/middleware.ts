@@ -60,20 +60,7 @@ function handleLegacyRedirects(request: NextRequest): NextResponse | null {
     return NextResponse.redirect(new URL("/account", request.url))
   }
 
-  if (url.pathname === "/otc-desk/create-order") {
-    return NextResponse.redirect(new URL("/otc/create-order", request.url))
-  }
-
-  if (url.pathname === "/otc-desk/view-order") {
-    const newUrl = new URL("/otc/order", request.url)
-
-    const orderParam = url.searchParams.get("order")
-    if (orderParam) {
-      newUrl.searchParams.set("order", orderParam)
-    }
-
-    return NextResponse.redirect(newUrl)
-  }
+  // OTC legacy routes removed in learning edition
 
   return null
 }
