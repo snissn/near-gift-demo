@@ -1,3 +1,4 @@
+import { safeLocalStorage } from "@src/utils/safeStorage"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 
@@ -89,7 +90,7 @@ export const createWebAuthnStore = <T, P, C>(
       }),
       {
         name: "app_wallets_passkey",
-        storage: createJSONStorage(() => localStorage),
+        storage: createJSONStorage(() => safeLocalStorage),
         partialize: (state) => ({ credential: state.credential }),
       }
     )

@@ -16,6 +16,11 @@ export const config = {
 
 export const indexedDBStorage = {
   openDB: () => {
+    // Fallback on environments without IndexedDB (SSR/Edge)
+    if (typeof indexedDB === "undefined") {
+      // Mimic IDB API shape enough for callers using our helpers
+      return Promise.reject(new Error("IndexedDB is not available"))
+    }
     const request = indexedDB.open(config.dbName, config.version)
     request.onupgradeneeded = () => {
       const db = request.result
@@ -27,6 +32,12 @@ export const indexedDBStorage = {
   },
 
   getItem: async (name: string) => {
+    if (typeof indexedDB === "undefined") {
+      if (typeof window !== "undefined" && window.localStorage) {
+        return Promise.resolve(window.localStorage.getItem(name))
+      }
+      return Promise.resolve(null)
+    }
     const db = await indexedDBStorage.openDB()
     const transaction = db.transaction(
       config.storeName,
@@ -37,6 +48,12 @@ export const indexedDBStorage = {
   },
 
   setItem: async (name: string, value: string) => {
+    if (typeof indexedDB === "undefined") {
+      if (typeof window !== "undefined" && window.localStorage) {
+        window.localStorage.setItem(name, value)
+      }
+      return Promise.resolve()
+    }
     const db = await indexedDBStorage.openDB()
     const transaction = db.transaction(
       config.storeName,
@@ -47,6 +64,12 @@ export const indexedDBStorage = {
   },
 
   removeItem: async (name: string) => {
+    if (typeof indexedDB === "undefined") {
+      if (typeof window !== "undefined" && window.localStorage) {
+        window.localStorage.removeItem(name)
+      }
+      return Promise.resolve()
+    }
     const db = await indexedDBStorage.openDB()
     const transaction = db.transaction(
       config.storeName,

@@ -1,3 +1,4 @@
+import { safeLocalStorage } from "@src/utils/safeStorage"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 
@@ -22,7 +23,7 @@ export const useVerifiedWalletsStore = create<Store>()(
     }),
     {
       name: "app_wallets_verified_list",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => safeLocalStorage),
     }
   )
 )
