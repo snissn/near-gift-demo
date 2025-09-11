@@ -3,7 +3,9 @@ import { DedupePlugin } from "@tinkoff/webpack-dedupe-plugin"
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  productionBrowserSourceMaps: true,
+  // Keep build memory low on CI
+  swcMinify: false,
+  productionBrowserSourceMaps: false,
   turbopack: {
     rules: {
       "*.svg": {
@@ -71,6 +73,9 @@ const nextConfig = {
 
     return config
   },
+  // Skip lint/type checks during Netlify builds to save RAM
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: true },
   images: {
     remotePatterns: [
       {

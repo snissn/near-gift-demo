@@ -1,0 +1,6 @@
+[build.environment]
+# Modestly raise Node.js heap and reduce parallel workers to lower RAM spikes
+NODE_OPTIONS = "--max-old-space-size=3072"
+SWC_WORKER_COUNT = "1"
+NEXT_TELEMETRY_DISABLED = "1"
+
