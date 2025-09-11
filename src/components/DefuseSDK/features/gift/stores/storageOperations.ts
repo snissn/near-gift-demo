@@ -1,3 +1,4 @@
+"use client"
 import { authIdentity } from "@defuse-protocol/internal-utils"
 import type { IntentsUserId, SignerCredentials } from "../../../core/formatters"
 import { logger } from "../../../logger"
@@ -93,3 +94,4 @@ export function getUserId(
         user.credentialType
       )
 }
+// end of file

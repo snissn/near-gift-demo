@@ -7,13 +7,12 @@ import type { ReactNode } from "react"
 import { InitDefuseSDK } from "@src/components/InitDefuseSDK"
 import { SentryTracer } from "@src/components/SentryTracer"
 import { whitelabelTemplateFlag } from "@src/config/featureFlags"
-import queryClient from "@src/constants/queryClient"
-import { WagmiProvider } from "wagmi"
 import { config as wagmiConfig } from "@src/config/wagmi"
+import queryClient from "@src/constants/queryClient"
 import { WebAuthnProvider } from "@src/features/webauthn/providers/WebAuthnProvider"
-import { initSDK } from "@src/libs/defuse-sdk/initSDK"
 // Learning edition: only NEAR and WebAuthn providers kept
 import { ThemeProvider } from "@src/providers/ThemeProvider"
+import { WagmiProvider } from "wagmi"
 
 import "@radix-ui/themes/styles.css"
 import "../styles/global.scss"
@@ -112,7 +111,6 @@ const RootLayout = async ({
   children?: ReactNode
 }>) => {
   const tmpl = await whitelabelTemplateFlag()
-  initSDK()
 
   return (
     <html lang="en" suppressHydrationWarning className={`tmpl-${tmpl}`}>

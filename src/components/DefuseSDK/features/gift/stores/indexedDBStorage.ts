@@ -1,3 +1,4 @@
+"use client"
 export const config = {
   dbName: "intents_sdk.gift_maker_gifts",
   storeName: "gifts",
@@ -79,3 +80,4 @@ export const indexedDBStorage = {
     return config.handleRequest(store.delete(name))
   },
 }
+// end of file

@@ -1,3 +1,4 @@
+"use client"
 import type { BaseTokenInfo } from "@src/components/DefuseSDK/types/base"
 import type { KeyPairString } from "near-api-js/lib/utils"
 import { create } from "zustand"

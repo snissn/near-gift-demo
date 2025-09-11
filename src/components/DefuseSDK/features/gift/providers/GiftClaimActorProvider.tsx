@@ -1,3 +1,4 @@
+"use client"
 import type { SignerCredentials } from "@src/components/DefuseSDK/core/formatters"
 import { Err, Ok, type Result } from "@thames/monads"
 import { type ReactNode, createContext, useEffect, useState } from "react"
@@ -112,3 +113,4 @@ export function GiftClaimActorProvider({
     </GiftClaimActorContext.Provider>
   )
 }
+// end of file
