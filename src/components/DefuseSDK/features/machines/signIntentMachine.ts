@@ -132,6 +132,7 @@ export const signIntentMachine = setup({
 
   states: {
     Signing: {
+      entry: [{ type: "logError", params: { error: "enter:signing:wallet" } }],
       invoke: {
         src: "task",
 
@@ -175,6 +176,18 @@ export const signIntentMachine = setup({
               },
             },
           ],
+        },
+      },
+      after: {
+        30000: {
+          target: "Generic Error",
+          actions: {
+            type: "setError",
+            params: {
+              reason: "ERR_USER_DIDNT_SIGN",
+              error: null,
+            },
+          },
         },
       },
     },
@@ -229,16 +242,26 @@ export const signIntentMachine = setup({
           ],
         },
       },
+      after: {
+        15000: {
+          target: "Generic Error",
+          actions: {
+            type: "setError",
+            params: {
+              reason: "ERR_CANNOT_VERIFY_SIGNATURE",
+              error: null,
+            },
+          },
+        },
+      },
     },
 
     "Verifying Public Key Presence": {
       invoke: {
         id: "publicKeyVerifierRef",
         src: "publicKeyVerifierActor",
-
         input: ({ context }) => {
           assert(context.signature != null)
-
           return {
             nearAccount:
               context.signature.type === "NEP413"
@@ -247,17 +270,14 @@ export const signIntentMachine = setup({
             nearClient,
           }
         },
-
         onError: {
           target: "Generic Error",
           description: "ERR_PUBKEY_EXCEPTION",
-
           actions: [
             { type: "logError", params: ({ event }) => event },
             { type: "setError", params: { reason: "EXCEPTION", error: null } },
           ],
         },
-
         onDone: [
           {
             target: "Completed",
@@ -269,7 +289,6 @@ export const signIntentMachine = setup({
           {
             target: "Generic Error",
             description: "ERR_PUBKEY_*",
-
             actions: {
               type: "setError",
               params: ({ event }) => {
@@ -279,6 +298,18 @@ export const signIntentMachine = setup({
             },
           },
         ],
+      },
+      after: {
+        15000: {
+          target: "Generic Error",
+          actions: {
+            type: "setError",
+            params: {
+              reason: "EXCEPTION",
+              error: null,
+            },
+          },
+        },
       },
     },
 

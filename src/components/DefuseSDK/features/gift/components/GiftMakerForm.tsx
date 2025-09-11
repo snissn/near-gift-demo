@@ -85,7 +85,7 @@ export function GiftMakerForm({
   chainType,
   initialToken,
   signMessage,
-  sendNearTransaction,
+  _sendNearTransaction,
   generateLink,
   referral,
   renderHostAppLink,
@@ -189,9 +189,19 @@ export function GiftMakerForm({
     rootSnapshot.matches("settling") ||
     rootSnapshot.matches("removing")
 
+  const processingLabel = (() => {
+    if (rootSnapshot.matches("signing")) return "Signing…"
+    if (rootSnapshot.matches("saving")) return "Saving…"
+    if (rootSnapshot.matches("publishing")) return "Publishing…"
+    if (rootSnapshot.matches("settling")) return "Waiting for settlement…"
+    if (rootSnapshot.matches("updating")) return "Finalizing…"
+    if (rootSnapshot.matches("removing")) return "Cleaning up…"
+    return null
+  })()
+
   const error = rootSnapshot.context.error
 
-  const publicKeyVerifierRef = useSelector(
+  const _publicKeyVerifierRef = useSelector(
     useSelector(
       useSelector(
         rootActorRef,
@@ -394,6 +404,9 @@ export function GiftMakerForm({
           >
             {getButtonText(balanceInsufficient, editing, processing)}
           </ButtonCustom>
+          {processingLabel && (
+            <div className="mt-2 text-xs text-gray-11">{processingLabel}</div>
+          )}
         </AuthGate>
       </form>
       {error != null && (

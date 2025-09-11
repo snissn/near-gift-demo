@@ -342,7 +342,11 @@ export const giftMakerRootMachine = setup({
       },
     },
     signing: {
-      entry: ["cleanup", "generateEscrowCredentials"],
+      entry: [
+        "cleanup",
+        "generateEscrowCredentials",
+        { type: "logError", params: { error: "enter:signing" } },
+      ],
 
       on: {
         COMPLETE_SIGN: {
@@ -414,6 +418,7 @@ export const giftMakerRootMachine = setup({
     },
     saving: {
       entry: [
+        { type: "logError", params: { error: "enter:saving" } },
         assign({
           signData: ({ event }) => {
             assertEvent(event, "COMPLETE_SIGN")
@@ -463,6 +468,7 @@ export const giftMakerRootMachine = setup({
       },
     },
     publishing: {
+      entry: [{ type: "logError", params: { error: "enter:publishing" } }],
       invoke: {
         src: "publishingActor",
         input: ({ context }) => {
@@ -508,8 +514,22 @@ export const giftMakerRootMachine = setup({
           ],
         },
       },
+      after: {
+        // Fail-safe timeout if publishing never resolves
+        30000: {
+          target: "removing",
+          actions: {
+            type: "setError",
+            params: {
+              tag: "err",
+              value: { reason: "ERR_GIFT_PUBLISHING" },
+            },
+          },
+        },
+      },
     },
     settling: {
+      entry: [{ type: "logError", params: { error: "enter:settling" } }],
       invoke: {
         src: "settlingActor",
         input: ({ context }) => {
@@ -527,6 +547,19 @@ export const giftMakerRootMachine = setup({
           actions: {
             type: "logError",
             params: ({ event }) => event,
+          },
+        },
+        // Safety timeout for settlement
+      },
+      after: {
+        45000: {
+          target: "editing",
+          actions: {
+            type: "setError",
+            params: {
+              tag: "err",
+              value: { reason: "EXCEPTION" },
+            },
           },
         },
       },

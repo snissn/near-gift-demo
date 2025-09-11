@@ -44,8 +44,22 @@ function renderErrorMessages(reason: string): string {
     case "ERR_GIFT_PUBLISHING":
       return "Unable to publish your gift. Please try again in a moment."
 
+    case "ERR_GIFT_PUBLISHING_TIMEOUT":
+      return "Publishing took too long. Your gift was not published. Please try again in a moment."
+
     case "ERR_GIFT_SIGNING":
       return "Unable to sign your gift. Please try again in a moment."
+    case "ERR_USER_DIDNT_SIGN":
+      return "Signature not completed. Please sign in your wallet and try again."
+
+    case "ERR_CANNOT_VERIFY_SIGNATURE":
+      return "Could not verify the wallet signature. Please retry signing."
+
+    case "ERR_PUBKEY_EXCEPTION":
+      return "Could not verify NEAR public key presence. Please retry or check network."
+
+    case "ERR_INTENT_SETTLEMENT_TIMEOUT":
+      return "Settlement is taking longer than expected. Please check later or try again."
 
     case "NOT_FOUND_OR_NOT_VALID":
     case "NO_TOKEN_OR_GIFT_HAS_BEEN_CLAIMED":

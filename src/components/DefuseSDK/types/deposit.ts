@@ -1,7 +1,6 @@
 import type { authHandle } from "@defuse-protocol/internal-utils"
 import type { Transaction as TransactionSolana } from "@solana/web3.js"
 import type { Transaction as TransactionStellar } from "@stellar/stellar-sdk"
-import type { Transaction as TransactionTron } from "@tronweb3/tronwallet-abstract-adapter"
 import type { Address, Hash } from "viem"
 import type { RenderHostAppLink } from "./hostAppLink"
 import type { SwappableToken } from "./swap"
@@ -81,4 +80,6 @@ export interface SendTransactionStellarParams {
   transaction: TransactionStellar
 }
 
-export interface SendTransactionTronParams extends TransactionTron {}
+// Learning edition: avoid external Tron wallet adapter types
+// Define a minimal structural type to satisfy references without adding deps
+export type SendTransactionTronParams = unknown
