@@ -12,7 +12,7 @@
     "check": "biome check",
     "prepare": "husky && ./scripts/gen-banned-near-address.sh",
     "update-types": "supabase gen types --lang=typescript --local > src/types/database-generated.ts",
-    "db:setup": "psql \"$POSTGRES_PRISMA_URL\" -f scripts/setup-db.sql"
+    "db:setup:js": "node scripts/setup-db.js"
   },
   "dependencies": {
     
