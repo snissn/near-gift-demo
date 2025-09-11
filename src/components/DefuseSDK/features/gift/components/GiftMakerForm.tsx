@@ -85,7 +85,6 @@ export function GiftMakerForm({
   chainType,
   initialToken,
   signMessage,
-  _sendNearTransaction,
   generateLink,
   referral,
   renderHostAppLink,
