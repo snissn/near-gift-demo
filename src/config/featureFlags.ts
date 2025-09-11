@@ -1,4 +1,3 @@
-import { get } from "@vercel/edge-config"
 import { flag } from "@vercel/flags/next"
 import { headers } from "next/headers"
 
@@ -43,7 +42,13 @@ export const maintenanceModeFlag = flag({
     { label: "Off", value: false },
   ],
   async decide() {
+    // Only attempt Edge Config when a connection string is present at build time
+    // This avoids Netlify edge runtime errors when EDGE_CONFIG is not configured
+    const hasEdgeConfig = Boolean(process.env.EDGE_CONFIG)
+    if (!hasEdgeConfig) return false
+
     try {
+      const { get } = await import("@vercel/edge-config")
       const isMaintenanceMode = await get("isMaintenanceMode")
       return isMaintenanceMode === true
     } catch (err) {
