@@ -10,3 +10,10 @@ from = "/favicon.ico"
 to = "/vercel.svg"
 status = 200
 force = true
+
+[[redirects]]
+# Move root to account (middleware removed)
+from = "/"
+to = "/account"
+status = 301
+force = true

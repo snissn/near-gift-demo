@@ -6,7 +6,7 @@ import type { ReactNode } from "react"
 
 import { InitDefuseSDK } from "@src/components/InitDefuseSDK"
 import { SentryTracer } from "@src/components/SentryTracer"
-import { whitelabelTemplateFlag } from "@src/config/featureFlags"
+// Learning edition: static template without server-side flags
 import { config as wagmiConfig } from "@src/config/wagmi"
 import queryClient from "@src/constants/queryClient"
 import { WebAuthnProvider } from "@src/features/webauthn/providers/WebAuthnProvider"
@@ -33,76 +33,15 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 }
 
-export async function generateMetadata(): Promise<Metadata> {
-  const templ = await whitelabelTemplateFlag()
-
-  const metadata: Metadata = {}
-
-  if (templ === "dogecoinswap") {
-    Object.assign(metadata, {
-      title: "DogecoinSwap: Let Your Meme Coins Run Wild",
-      description: "Fast, easy cross-chain swaps for DOGE and more",
-      openGraph: {
-        type: "website",
-        images: `/favicons/${templ}/og-image.jpg`,
-        title: "DogecoinSwap: Let Your Meme Coins Run Wild",
-        description: "Fast, easy cross-chain swaps for DOGE and more",
-      },
-      twitter: {
-        images: `/favicons/${templ}/og-image.jpg`,
-        title: "DogecoinSwap: Let Your Meme Coins Run Wild",
-        description: "Fast, easy cross-chain swaps for DOGE and more",
-      },
-    })
-  } else if (templ === "turboswap") {
-    Object.assign(metadata, {
-      title: "TurboSwap: Revolutionizing Web3 Trading",
-      description:
-        "Experience zero-fee trading with TurboSwap. Powered by NEAR and Aurora Cloud, TurboSwap delivers unmatched speed and advanced functionality, setting a new standard for decentralized trading in the TURBO ecosystem.",
-      openGraph: {
-        type: "website",
-        images: `/favicons/${templ}/og-image.jpg`,
-        title: "TurboSwap: Revolutionizing Web3 Trading",
-        description:
-          "Experience zero-fee trading with TurboSwap. Powered by NEAR and Aurora Cloud, TurboSwap delivers unmatched speed and advanced functionality, setting a new standard for decentralized trading in the TURBO ecosystem.",
-      },
-      twitter: {
-        images: `/favicons/${templ}/og-image.jpg`,
-        title: "TurboSwap: Revolutionizing Web3 Trading",
-        description:
-          "Experience zero-fee trading with TurboSwap. Powered by NEAR and Aurora Cloud, TurboSwap delivers unmatched speed and advanced functionality, setting a new standard for decentralized trading in the TURBO ecosystem.",
-      },
-    })
-  } else if (templ === "trumpswap") {
-    Object.assign(metadata, {
-      title: "Trump-Swap: Make Swapping Great Again",
-      description:
-        "Swap $TRUMP directly from BTC, XRP, DOGE and 50+ other cryptocurrencies. Powered by NEAR Intents.",
-      openGraph: {
-        type: "website",
-        images: `/favicons/${templ}/og-image.jpg`,
-        title: "Trump-Swap: Make Swapping Great Again",
-        description:
-          "Swap $TRUMP directly from BTC, XRP, DOGE and 50+ other cryptocurrencies. Powered by NEAR Intents.",
-      },
-      twitter: {
-        images: `/favicons/${templ}/og-image.jpg`,
-        title: "Trump-Swap: Make Swapping Great Again",
-        description:
-          "Swap $TRUMP directly from BTC, XRP, DOGE and 50+ other cryptocurrencies. Powered by NEAR Intents.",
-      },
-    })
-  }
-
-  return {
-    metadataBase: VERCEL_PROJECT_PRODUCTION_URL,
-    icons: {
-      icon: `/favicons/${templ}/favicon-32x32.png`,
-      apple: `/favicons/${templ}/apple-touch-icon.png`,
-    },
-    manifest: `/favicons/${templ}/site.webmanifest`,
-    ...metadata,
-  }
+export const metadata: Metadata = {
+  metadataBase: VERCEL_PROJECT_PRODUCTION_URL,
+  title: "NEAR Intents",
+  description: "Learning edition of Defuse Frontend",
+  icons: {
+    icon: "/favicons/near-intents/favicon-32x32.png",
+    apple: "/favicons/near-intents/apple-touch-icon.png",
+  },
+  manifest: "/favicons/near-intents/site.webmanifest",
 }
 
 const RootLayout = async ({
@@ -110,10 +49,8 @@ const RootLayout = async ({
 }: Readonly<{
   children?: ReactNode
 }>) => {
-  const tmpl = await whitelabelTemplateFlag()
-
   return (
-    <html lang="en" suppressHydrationWarning className={`tmpl-${tmpl}`}>
+    <html lang="en" suppressHydrationWarning className={"tmpl-near-intents"}>
       <body>
         <InitDefuseSDK />
 

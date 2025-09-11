@@ -1,27 +1,13 @@
-import { evaluate } from "@vercel/flags/next"
+"use client"
 import type { ReactNode } from "react"
 
-import {
-  type WhitelabelTemplateValue,
-  whitelabelTemplateFlag,
-} from "@src/config/featureFlags"
+import type { WhitelabelTemplateValue } from "@src/config/featureFlags"
 import { FeatureFlagsProvider } from "@src/providers/FeatureFlagsProvider"
 
-export async function PreloadFeatureFlags({
-  children,
-}: {
-  children: ReactNode
-}) {
-  const flags = await getEvaluatedFeatureFlags()
-
+export function PreloadFeatureFlags({ children }: { children: ReactNode }) {
+  // Learning edition: avoid server/edge flags evaluation; use static defaults
+  const flags: FeatureFlagValues = { whitelabelTemplate: "near-intents" }
   return <FeatureFlagsProvider flags={flags}>{children}</FeatureFlagsProvider>
-}
-
-async function getEvaluatedFeatureFlags(): Promise<FeatureFlagValues> {
-  const flags = [whitelabelTemplateFlag] as const
-  const [whitelabelTemplate_] = await evaluate(flags)
-  const whitelabelTemplate = whitelabelTemplate_ as WhitelabelTemplateValue
-  return { whitelabelTemplate }
 }
 
 export interface FeatureFlagValues {
