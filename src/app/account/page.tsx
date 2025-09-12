@@ -1,4 +1,5 @@
 "use client"
+import { Suspense } from "react"
 
 import { AccountWidget } from "@src/components/DefuseSDK/features/account/components/AccountWidget"
 
@@ -8,7 +9,7 @@ import { useConnectWallet } from "@src/hooks/useConnectWallet"
 import { useTokenList } from "@src/hooks/useTokenList"
 import { renderAppLink } from "@src/utils/renderAppLink"
 
-export default function AccountPage() {
+function AccountContent() {
   const { state } = useConnectWallet()
   const tokenList = useTokenList(LIST_TOKENS)
 
@@ -21,5 +22,12 @@ export default function AccountPage() {
         renderHostAppLink={renderAppLink}
       />
     </Paper>
+  )
+}
+export default function AccountPage() {
+  return (
+    <Suspense fallback={null}>
+      <AccountContent />
+    </Suspense>
   )
 }

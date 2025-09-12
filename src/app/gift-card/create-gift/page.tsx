@@ -9,9 +9,10 @@ import { useTokenList } from "@src/hooks/useTokenList"
 import { useWalletAgnosticSignMessage } from "@src/hooks/useWalletAgnosticSignMessage"
 import { useNearWallet } from "@src/providers/NearWalletProvider"
 import { renderAppLink } from "@src/utils/renderAppLink"
+import { Suspense } from "react"
 import { createGiftIntent, createGiftLink } from "../_utils/link"
 
-export default function CreateGiftPage() {
+function CreateGiftContent() {
   const { state } = useConnectWallet()
   const tokenList = useTokenList(LIST_TOKENS)
   const signMessage = useWalletAgnosticSignMessage()
@@ -57,5 +58,12 @@ export default function CreateGiftPage() {
         />
       </div>
     </Paper>
+  )
+}
+export default function CreateGiftPage() {
+  return (
+    <Suspense fallback={null}>
+      <CreateGiftContent />
+    </Suspense>
   )
 }

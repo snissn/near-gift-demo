@@ -4,7 +4,7 @@ import { DedupePlugin } from "@tinkoff/webpack-dedupe-plugin"
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Keep build memory low on CI
-  swcMinify: false,
+  // Disable browser sourcemaps; avoid opt-in minification to reduce memory
   productionBrowserSourceMaps: false,
   turbopack: {
     rules: {

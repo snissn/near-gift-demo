@@ -9,8 +9,9 @@ import { useWalletAgnosticSignMessage } from "@src/hooks/useWalletAgnosticSignMe
 import { useNearWallet } from "@src/providers/NearWalletProvider"
 import { renderAppLink } from "@src/utils/renderAppLink"
 import { useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 
-export default function Withdraw() {
+function WithdrawContent() {
   const { state } = useConnectWallet()
   const signMessage = useWalletAgnosticSignMessage()
   const { signAndSendTransactions } = useNearWallet()
@@ -55,5 +56,12 @@ export default function Withdraw() {
         referral={referral}
       />
     </Paper>
+  )
+}
+export default function Withdraw() {
+  return (
+    <Suspense fallback={null}>
+      <WithdrawContent />
+    </Suspense>
   )
 }

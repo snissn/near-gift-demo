@@ -1,4 +1,5 @@
 "use client"
+import { Suspense } from "react"
 
 import { GiftTakerWidget } from "@src/components/DefuseSDK/features/gift/components/GiftTakerWidget"
 import Paper from "@src/components/Paper"
@@ -9,7 +10,7 @@ import { renderAppLink } from "@src/utils/renderAppLink"
 
 import { useGiftIntent } from "../_utils/link"
 
-export default function ViewGiftPage() {
+function ViewGiftContent() {
   const { state } = useConnectWallet()
   const tokenList = useTokenList(LIST_TOKENS)
   const {
@@ -29,5 +30,12 @@ export default function ViewGiftPage() {
         renderHostAppLink={renderAppLink}
       />
     </Paper>
+  )
+}
+export default function ViewGiftPage() {
+  return (
+    <Suspense fallback={null}>
+      <ViewGiftContent />
+    </Suspense>
   )
 }

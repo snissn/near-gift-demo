@@ -1,4 +1,5 @@
 "use client"
+import { Suspense } from "react"
 
 import { DepositWidget } from "@src/components/DefuseSDK/features/deposit/components/DepositWidget"
 import Paper from "@src/components/Paper"
@@ -8,11 +9,11 @@ import { useTokenList } from "@src/hooks/useTokenList"
 import { renderAppLink } from "@src/utils/renderAppLink"
 import { useRouter, useSearchParams } from "next/navigation"
 
-export default function Deposit() {
+function DepositContent() {
   const { state, sendTransaction } = useConnectWallet()
   const tokenList = useTokenList(LIST_TOKENS)
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const _router = useRouter()
+  const _searchParams = useSearchParams()
 
   return (
     <Paper>
@@ -43,5 +44,12 @@ export default function Deposit() {
         // initialToken omitted; simplified URL handling for learning edition
       />
     </Paper>
+  )
+}
+export default function Deposit() {
+  return (
+    <Suspense fallback={null}>
+      <DepositContent />
+    </Suspense>
   )
 }
