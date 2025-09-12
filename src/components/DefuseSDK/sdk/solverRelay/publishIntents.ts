@@ -1,5 +1,7 @@
 import type { solverRelay } from "@defuse-protocol/internal-utils"
 import { Err, Ok, type Result } from "@thames/monads"
+import { config } from "../../config"
+import { logger } from "../../logger"
 import type { ParsedPublishErrors } from "./utils/parseFailedPublishError"
 
 export type PublishIntentsOk = string[]
@@ -18,7 +20,19 @@ export function convertPublishIntentsToLegacyFormat(
   }
 
   const error = result.unwrapErr()
-  const errorCode = error.code
+  const errorCode = (error as { code?: string } | undefined)?.code ?? "UNKNOWN"
+
+  // Extra diagnostics to help CORS/network debugging in learning edition
+  try {
+    logger.error("solverRelay.publishIntents failed", {
+      where: "convertPublishIntentsToLegacyFormat",
+      solverRelayBaseURL: config.env.solverRelayBaseURL,
+      errorCode,
+      error: JSON.parse(JSON.stringify(error)),
+    })
+  } catch {
+    // ignore JSON stringify issues
+  }
 
   // Map new PublishErrorCode to old ParsedPublishErrors format
   let reason: ParsedPublishErrors["reason"]

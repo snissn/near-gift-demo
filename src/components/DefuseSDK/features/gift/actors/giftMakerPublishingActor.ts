@@ -42,6 +42,22 @@ export const giftMakerPublishingActor = setup({
   },
   actors: {
     publishActor: fromPromise(({ input }: { input: MultiPayload }) => {
+      // Extra diagnostics: log the relay endpoint and payload shape size
+      try {
+        logger.error("publishActor: attempting relay publish", {
+          solverRelayBaseURL: (
+            require("../../config") as typeof import("../../config")
+          ).config.env.solverRelayBaseURL,
+          payloadBytes: (() => {
+            try {
+              return new TextEncoder().encode(JSON.stringify(input)).length
+            } catch {
+              return -1
+            }
+          })(),
+        })
+      } catch {}
+
       return solverRelay
         .publishIntents({
           quote_hashes: [],
@@ -50,11 +66,25 @@ export const giftMakerPublishingActor = setup({
         .then(convertPublishIntentsToLegacyFormat)
         .then((result) => {
           if (result.isErr()) {
+            try {
+              logger.error("publishActor: relay returned error", {
+                error: result.unwrapErr(),
+              })
+            } catch {}
             return { tag: "err" as const, value: result.unwrapErr() }
           }
           const intentHashes = result.unwrap()
           assert(intentHashes != null)
           return { tag: "ok" as const, value: intentHashes }
+        })
+        .catch((e) => {
+          // Network or unexpected runtime error
+          try {
+            logger.error("publishActor: network/exception", {
+              error: e instanceof Error ? e.message : String(e),
+            })
+          } catch {}
+          throw e
         })
     }),
   },
