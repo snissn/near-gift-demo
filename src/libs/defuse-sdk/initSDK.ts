@@ -1,7 +1,14 @@
 import * as Sentry from "@sentry/core"
 import type { Context, Contexts } from "@sentry/types"
-import { configureSDK } from "@src/components/DefuseSDK/config"
-import { APP_ENV, INTENTS_ENV } from "@src/utils/environment"
+import {
+  configureSDK,
+  config as currentSDKConfig,
+} from "@src/components/DefuseSDK/config"
+import {
+  APP_ENV,
+  INTENTS_ENV,
+  SOLVER_RELAY_BASE_URL,
+} from "@src/utils/environment"
 
 let hasInitialized = false
 
@@ -11,9 +18,13 @@ export function initSDK() {
   }
   hasInitialized = true
 
+  const envArg = SOLVER_RELAY_BASE_URL
+    ? { ...currentSDKConfig.env, solverRelayBaseURL: SOLVER_RELAY_BASE_URL }
+    : INTENTS_ENV
+
   if (APP_ENV === "development") {
     configureSDK({
-      env: INTENTS_ENV,
+      env: envArg,
       logger: {
         verbose: console.log,
         debug: console.info,
@@ -34,7 +45,7 @@ export function initSDK() {
     })
   } else {
     configureSDK({
-      env: INTENTS_ENV,
+      env: envArg,
       logger: {
         verbose: (msg, data) => {
           Sentry.addBreadcrumb({
