@@ -6,8 +6,14 @@ import type {
   GetGiftResponse,
 } from "../types/giftTypes"
 
+// Use relative URL on the client to avoid hard-coding localhost in production
+function apiBase(): string {
+  if (typeof window !== "undefined") return ""
+  return BASE_URL ?? ""
+}
+
 export async function createGift(request: CreateGiftRequest) {
-  const response = await fetch(`${BASE_URL}/api/gifts`, {
+  const response = await fetch(`${apiBase()}/api/gifts`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -23,7 +29,7 @@ export async function createGift(request: CreateGiftRequest) {
 }
 
 export async function getGift(tradeId: string) {
-  const response = await fetch(`${BASE_URL}/api/gifts/${tradeId}`, {
+  const response = await fetch(`${apiBase()}/api/gifts/${tradeId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
