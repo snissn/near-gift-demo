@@ -29,16 +29,18 @@ export function parseMultiPayloadTransferMessage(
     // Try standard-specific known shapes first
     let intents: Intent[] | undefined
     if (standard === "nep413") {
-      if (
-        normalizedPayload &&
-        typeof normalizedPayload === "object" &&
-        (normalizedPayload as Record<string, unknown>).message &&
-        typeof (normalizedPayload as Record<string, unknown>).message ===
-          "object"
-      ) {
-        const msg = (normalizedPayload as Record<string, unknown>)
-          .message as Record<string, unknown>
-        if (Array.isArray(msg.intents)) intents = msg.intents as Intent[]
+      if (normalizedPayload && typeof normalizedPayload === "object") {
+        const messageField = (normalizedPayload as Record<string, unknown>)
+          .message
+        // NEP-413 often encodes `message` as a JSON string; parse if needed
+        const msgObj =
+          typeof messageField === "string"
+            ? (safeJsonParse(messageField) as unknown)
+            : messageField
+        if (msgObj && typeof msgObj === "object") {
+          const msg = msgObj as Record<string, unknown>
+          if (Array.isArray(msg.intents)) intents = msg.intents as Intent[]
+        }
       }
     } else if (
       standard === "erc191" ||
@@ -75,7 +77,9 @@ function findIntents(payload: unknown): Intent[] | undefined {
   const direct = obj.intents
   if (Array.isArray(direct)) return direct as Intent[]
   // Under message
-  const message = obj.message
+  const messageRaw = obj.message
+  const message =
+    typeof messageRaw === "string" ? safeJsonParse(messageRaw) : messageRaw
   if (message && typeof message === "object") {
     const intents = (message as Record<string, unknown>).intents
     if (Array.isArray(intents)) return intents as Intent[]
