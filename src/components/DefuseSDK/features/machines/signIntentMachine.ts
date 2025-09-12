@@ -2,7 +2,6 @@ import type { MultiPayload } from "@defuse-protocol/contract-types"
 import { errors } from "@defuse-protocol/internal-utils"
 import type { walletMessage } from "@defuse-protocol/internal-utils"
 import { assertEvent, assign, fromPromise, setup } from "xstate"
-import { nearClient } from "../../constants/nearClient"
 import {
   type SignerCredentials,
   formatSignedIntent,
@@ -204,7 +203,8 @@ export const signIntentMachine = setup({
         },
         onDone: [
           {
-            target: "Verifying Public Key Presence",
+            // Learning edition: skip public key presence verification to reduce friction
+            target: "Completed",
             guard: {
               type: "isTrue",
               params: ({ event }) => event.output,
@@ -256,62 +256,7 @@ export const signIntentMachine = setup({
       },
     },
 
-    "Verifying Public Key Presence": {
-      invoke: {
-        id: "publicKeyVerifierRef",
-        src: "publicKeyVerifierActor",
-        input: ({ context }) => {
-          assert(context.signature != null)
-          return {
-            nearAccount:
-              context.signature.type === "NEP413"
-                ? context.signature.signatureData
-                : null,
-            nearClient,
-          }
-        },
-        onError: {
-          target: "Generic Error",
-          description: "ERR_PUBKEY_EXCEPTION",
-          actions: [
-            { type: "logError", params: ({ event }) => event },
-            { type: "setError", params: { reason: "EXCEPTION", error: null } },
-          ],
-        },
-        onDone: [
-          {
-            target: "Completed",
-            guard: {
-              type: "isOk",
-              params: ({ event }) => event.output,
-            },
-          },
-          {
-            target: "Generic Error",
-            description: "ERR_PUBKEY_*",
-            actions: {
-              type: "setError",
-              params: ({ event }) => {
-                assert(event.output.tag === "err")
-                return { reason: event.output.value, error: null }
-              },
-            },
-          },
-        ],
-      },
-      after: {
-        15000: {
-          target: "Generic Error",
-          actions: {
-            type: "setError",
-            params: {
-              reason: "EXCEPTION",
-              error: null,
-            },
-          },
-        },
-      },
-    },
+    // Learning edition: Public key presence verification removed
 
     Completed: {
       type: "final",
