@@ -120,16 +120,32 @@ export const giftMakerRootMachine = setup({
       GiftMakerReadyActorInput
     >,
     settlingActor: fromPromise(
-      ({
+      async ({
         input,
         signal,
-      }: { input: { intentHashes: string[] }; signal: AbortSignal }) => {
+      }: {
+        input: { intentHashes: string[] }
+        signal: AbortSignal
+      }) => {
         const intentHash = input.intentHashes[0]
         assert(intentHash, "intentHash is not defined")
-        return solverRelay.waitForIntentSettlement({
-          signal,
-          intentHash,
-        })
+        try {
+          logger.info("settlingActor: waiting for settlement", {
+            intentHash,
+          })
+          const res = await solverRelay.waitForIntentSettlement({
+            signal,
+            intentHash,
+          })
+          logger.info("settlingActor: settled", { intentHash })
+          return res
+        } catch (e) {
+          logger.error("settlingActor: wait failed", {
+            intentHash,
+            error: e instanceof Error ? e.message : String(e),
+          })
+          throw e
+        }
       }
     ),
     savingGift: fromPromise(
@@ -547,22 +563,36 @@ export const giftMakerRootMachine = setup({
           target: "updating",
         },
         onError: {
-          target: "editing",
-          actions: {
-            type: "logError",
-            params: ({ event }) => event,
-          },
+          // Publishing succeeded but receipt polling failed; proceed to update history
+          target: "updating",
+          actions: [
+            {
+              type: "logError",
+              params: ({ event }) => ({
+                error: "settlement_poll_failed",
+                details: event,
+              }),
+            },
+            {
+              type: "setError",
+              params: {
+                tag: "err",
+                value: { reason: "ERR_INTENT_SETTLEMENT_TIMEOUT" },
+              },
+            },
+          ],
         },
         // Safety timeout for settlement
       },
       after: {
-        45000: {
-          target: "editing",
+        30000: {
+          // Do not block the flow; continue to finalize even if settlement is slow
+          target: "updating",
           actions: {
             type: "setError",
             params: {
               tag: "err",
-              value: { reason: "EXCEPTION" },
+              value: { reason: "ERR_INTENT_SETTLEMENT_TIMEOUT" },
             },
           },
         },
