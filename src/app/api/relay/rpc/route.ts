@@ -1,10 +1,20 @@
-import { config } from "@src/components/DefuseSDK/config"
+import {
+  INTENTS_ENV,
+  SOLVER_RELAY_UPSTREAM_BASE_URL,
+} from "@src/utils/environment"
 import { logger } from "@src/utils/logger"
 import { NextResponse } from "next/server"
 
 export async function POST(request: Request) {
   try {
-    const targetBase = config.env.solverRelayBaseURL
+    const ensureSlash = (s: string) => (s.endsWith("/") ? s : `${s}/`)
+    const defaultUpstream =
+      INTENTS_ENV === "stage"
+        ? "https://solver-relay-stage.intents-near.org/"
+        : "https://solver-relay-v2.chaindefuser.com/"
+    const targetBase = ensureSlash(
+      SOLVER_RELAY_UPSTREAM_BASE_URL || defaultUpstream
+    )
     const incomingUrl = new URL(request.url)
     const target = new URL("rpc", targetBase)
     // Preserve query params like method=publish_intents
@@ -15,6 +25,7 @@ export async function POST(request: Request) {
     logger.info("Proxy POST /api/relay/rpc -> solver relay", {
       relay: {
         target: target.toString(),
+        upstreamBase: targetBase,
         method: incomingUrl.searchParams.get("method"),
       },
     })
