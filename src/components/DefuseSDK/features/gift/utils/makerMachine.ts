@@ -46,6 +46,11 @@ export function getParsedValues(context: GiftMakerRootMachineContext) {
 }
 
 function getTokenDiff(signData: GiftSignedResult) {
+  // Prefer explicit tokenDiff when provided by sign actor
+  if (signData.tokenDiff) {
+    return signData.tokenDiff
+  }
+
   const parsed = parseMultiPayloadTransferMessage(signData.multiPayload)
   assert(parsed !== null, "Invalid parsed multiPayload")
 

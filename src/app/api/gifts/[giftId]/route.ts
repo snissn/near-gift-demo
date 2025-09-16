@@ -21,6 +21,10 @@ export async function GET(
     const supabase = getSupabase()
     const { giftId } = await params
     const validatedData = giftIdSchema.parse(giftId)
+    logger.info("API GET /api/gifts/[giftId]: fetching from Supabase", {
+      api: { route: "/api/gifts/[giftId]" },
+      gift: { gift_id: validatedData },
+    })
 
     const { data, error } = await supabase
       .from("gifts")

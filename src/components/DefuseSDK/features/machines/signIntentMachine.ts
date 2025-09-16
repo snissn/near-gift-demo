@@ -203,7 +203,7 @@ export const signIntentMachine = setup({
         },
         onDone: [
           {
-            // Learning edition: skip public key presence verification to reduce friction
+            // Learning edition: skip public key presence verification
             target: "Completed",
             guard: {
               type: "isTrue",
@@ -256,7 +256,7 @@ export const signIntentMachine = setup({
       },
     },
 
-    // Learning edition: Public key presence verification removed
+    // Learning edition: removed public key presence verification to simplify flow
 
     Completed: {
       type: "final",

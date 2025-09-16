@@ -61,6 +61,7 @@ export type GiftMakerSignActorOutput =
         signatureResult: walletMessage.WalletSignatureResult
         escrowCredentials: EscrowCredentials
         giftId: string
+        tokenDiff?: Record<string, bigint>
       }
     }
 
@@ -69,6 +70,7 @@ export type GiftMakerSignActorContext = {
   signerCredentials: GiftMakerSignActorInput["signerCredentials"]
   walletMessage: walletMessage.WalletMessage
   escrowCredentials: EscrowCredentials
+  tokenDiff: Record<string, bigint>
 }
 
 export const giftMakerSignActor = setup({
@@ -142,6 +144,7 @@ export const giftMakerSignActor = setup({
       parsed: input.parsed,
       signerCredentials: input.signerCredentials,
       escrowCredentials: input.escrowCredentials,
+      tokenDiff,
     }
   },
 
@@ -228,6 +231,7 @@ export const giftMakerSignActor = setup({
           value: {
             ...event.output.value,
             multiPayload,
+            tokenDiff: context.tokenDiff,
           },
         }
       },

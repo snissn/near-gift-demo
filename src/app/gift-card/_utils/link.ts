@@ -40,35 +40,37 @@ export async function createGiftIntent(payload: GiftLinkData): Promise<{
   iv: string
   giftId: string
 }> {
-  try {
-    // Generate client-side IV and pKey for the order
-    const iv = crypto.getRandomValues(new Uint8Array(12))
-    const pKey = await genPKey()
+  // Generate client-side IV and pKey for the order
+  const iv = crypto.getRandomValues(new Uint8Array(12))
+  const pKey = await genPKey()
 
-    const encrypted = await encodeAES256Gift(payload, pKey, iv)
+  const encrypted = await encodeAES256Gift(payload, pKey, iv)
 
-    const encodedIv = base64urlnopad.encode(iv)
-    const giftId = deriveIdFromIV(encodedIv)
+  const encodedIv = base64urlnopad.encode(iv)
+  const giftId = deriveIdFromIV(encodedIv)
 
-    const result = await saveGiftIntent({
-      gift_id: giftId,
-      encrypted_payload: encrypted,
-      p_key: pKey,
-    })
-    if (!result.success) {
-      throw new Error("Failed to save trade")
-    }
-    return {
-      iv: encodedIv,
+  logger.info("createGiftIntent: attempting server save", {
+    createGiftIntent: {
       giftId,
-    }
-  } catch (e) {
-    throw new Error("Failed to create order")
+      ivLength: encodedIv.length,
+      payloadBytes: encrypted.length,
+    },
+  })
+
+  const result = await saveGiftIntent({
+    gift_id: giftId,
+    encrypted_payload: encrypted,
+    p_key: pKey,
+  })
+  if (!result.success) {
+    throw new Error("Failed to save gift")
   }
+  return { iv: encodedIv, giftId }
 }
 
 export function useGiftIntent() {
-  const encodedGift = window.location.hash.slice(1)
+  const encodedGift =
+    typeof window !== "undefined" ? window.location.hash.slice(1) : ""
 
   const { data } = useQuery({
     queryKey: ["gift_intent", encodedGift],
@@ -88,7 +90,7 @@ export function useGiftIntent() {
               giftId: deriveIdFromIV(iv),
             }
           }
-        } catch (error) {
+        } catch (_error) {
           logger.error("Failed to decrypt order")
         }
       }
@@ -99,7 +101,7 @@ export function useGiftIntent() {
         return {
           payload: decoded,
         }
-      } catch (error) {
+      } catch (_error) {
         logger.error("Failed to decode legacy order")
       }
 
@@ -107,7 +109,7 @@ export function useGiftIntent() {
         payload: "",
       }
     },
-    enabled: !!encodedGift,
+    enabled: typeof window !== "undefined" && !!encodedGift,
   })
 
   return {

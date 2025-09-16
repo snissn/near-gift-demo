@@ -1,4 +1,4 @@
-import { errors, solverRelay } from "@defuse-protocol/internal-utils"
+import { solverRelay } from "@defuse-protocol/internal-utils"
 import type { walletMessage } from "@defuse-protocol/internal-utils"
 import {
   type ActorRefFrom,
@@ -234,8 +234,12 @@ export const giftMakerRootMachine = setup({
   },
   actions: {
     logError: (_, event: { error: unknown }) => {
-      const err = errors.toError(event.error)
-      logger.error(err)
+      // Be lenient: avoid throwing inside logging
+      try {
+        logger.error(event.error)
+      } catch {
+        logger.error("[giftMakerRootMachine] logError: unable to log event")
+      }
     },
     setError: assign({
       error: (

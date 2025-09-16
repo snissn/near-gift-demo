@@ -16,6 +16,8 @@ export type GiftSignedResult = {
   multiPayload: MultiPayload
   signerCredentials: SignerCredentials
   signatureResult: walletMessage.WalletSignatureResult
+  // Learning edition: include explicit token diff to avoid parsing ambiguity
+  tokenDiff?: Record<string, bigint>
 }
 
 export type CreateGiftIntent = (

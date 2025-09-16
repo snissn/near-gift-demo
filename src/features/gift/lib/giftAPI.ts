@@ -1,4 +1,5 @@
 import { APP_ENV, BASE_URL } from "@src/utils/environment"
+import { logger } from "@src/utils/logger"
 import type {
   CreateGiftRequest,
   CreateGiftResponse,
@@ -6,21 +7,37 @@ import type {
   GetGiftResponse,
 } from "../types/giftTypes"
 
-// Use relative URL on the client to avoid hard-coding localhost in production
-function apiBase(): string {
-  if (typeof window !== "undefined") return ""
-  return BASE_URL ?? ""
+function makeEndpoint(path: string): string {
+  if (!BASE_URL) return path
+  const base = BASE_URL.endsWith("/") ? BASE_URL.slice(0, -1) : BASE_URL
+  return `${base}${path}`
 }
 
 export async function createGift(request: CreateGiftRequest) {
-  const response = await fetch(`${apiBase()}/api/gifts`, {
+  const endpoint = makeEndpoint("/api/gifts")
+  const t0 = performance.now()
+  logger.info("giftAPI.createGift: sending request", {
+    api: { endpoint, hasBaseUrl: Boolean(BASE_URL) },
+    gift: {
+      gift_id: request.gift_id,
+      payloadBytes: request.encrypted_payload.length,
+    },
+  })
+  const response = await fetch(endpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "x-debug-request-id": request.gift_id,
     },
     body: JSON.stringify(request),
   })
-
+  logger.info("giftAPI.createGift: response received", {
+    api: {
+      endpoint,
+      status: response.status,
+      ms: Math.round(performance.now() - t0),
+    },
+  })
   if (!response.ok) {
     await handleApiError(response, "Failed to request Gift")
   }
@@ -29,13 +46,26 @@ export async function createGift(request: CreateGiftRequest) {
 }
 
 export async function getGift(tradeId: string) {
-  const response = await fetch(`${apiBase()}/api/gifts/${tradeId}`, {
+  const endpoint = makeEndpoint(`/api/gifts/${tradeId}`)
+  const t0 = performance.now()
+  logger.info("giftAPI.getGift: sending request", {
+    api: { endpoint, hasBaseUrl: Boolean(BASE_URL) },
+    gift: { gift_id: tradeId },
+  })
+  const response = await fetch(endpoint, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      "x-debug-request-id": tradeId,
     },
   })
-
+  logger.info("giftAPI.getGift: response received", {
+    api: {
+      endpoint,
+      status: response.status,
+      ms: Math.round(performance.now() - t0),
+    },
+  })
   if (!response.ok) {
     await handleApiError(response, "Failed to verify Gift")
   }

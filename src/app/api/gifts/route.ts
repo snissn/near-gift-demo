@@ -40,9 +40,20 @@ const giftsSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    const debugId = request.headers.get("x-debug-request-id")
+    logger.info("API POST /api/gifts: request received", {
+      api: { route: "/api/gifts", debugId },
+    })
     const supabase = getSupabase()
     const body = await request.json()
     const validatedData = giftsSchema.parse(body)
+    logger.info("API POST /api/gifts: inserting into Supabase", {
+      api: { route: "/api/gifts", debugId },
+      gift: {
+        gift_id: validatedData.gift_id,
+        payloadBytes: validatedData.encrypted_payload.length,
+      },
+    })
     const { error } = await supabase.from("gifts").insert(validatedData)
 
     if (error) {
