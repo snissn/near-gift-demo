@@ -85,6 +85,7 @@ export function GiftMakerForm({
   chainType,
   initialToken,
   signMessage,
+  sendNearTransaction,
   generateLink,
   referral,
   renderHostAppLink,
@@ -254,9 +255,7 @@ export function GiftMakerForm({
         sendNearTransaction,
       })
     }
-    // Intentionally omitting sendNearTransaction to avoid effect churn; value is stable from provider
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [publicKeyVerifierSnapshot, _publicKeyVerifierRef])
+  }, [publicKeyVerifierSnapshot, _publicKeyVerifierRef, sendNearTransaction])
 
   const handleSetMaxValue = async () => {
     if (tokenBalance != null) {
