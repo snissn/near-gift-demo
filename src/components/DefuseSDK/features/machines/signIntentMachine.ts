@@ -2,6 +2,7 @@ import type { MultiPayload } from "@defuse-protocol/contract-types"
 import { errors } from "@defuse-protocol/internal-utils"
 import type { walletMessage } from "@defuse-protocol/internal-utils"
 import { assertEvent, assign, fromPromise, setup } from "xstate"
+import { nearClient } from "../../constants/nearClient"
 import {
   type SignerCredentials,
   formatSignedIntent,
