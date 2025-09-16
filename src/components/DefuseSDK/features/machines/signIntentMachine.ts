@@ -203,8 +203,8 @@ export const signIntentMachine = setup({
         },
         onDone: [
           {
-            // Learning edition: skip public key presence verification
-            target: "Completed",
+            // If the signature is valid for the provided account, verify pubkey presence on contract
+            target: "Verifying Public Key Presence",
             guard: {
               type: "isTrue",
               params: ({ event }) => event.output,
@@ -256,7 +256,63 @@ export const signIntentMachine = setup({
       },
     },
 
-    // Learning edition: removed public key presence verification to simplify flow
+    // Verify that the Near Intents contract has this account's public key; if not, UI can add it
+    "Verifying Public Key Presence": {
+      invoke: {
+        id: "publicKeyVerifierRef",
+        src: "publicKeyVerifierActor",
+        input: ({ context }) => {
+          assert(context.signature != null)
+          return {
+            nearAccount:
+              context.signature.type === "NEP413"
+                ? context.signature.signatureData
+                : null,
+            nearClient,
+          }
+        },
+        onError: {
+          target: "Generic Error",
+          description: "ERR_PUBKEY_EXCEPTION",
+          actions: [
+            { type: "logError", params: ({ event }) => event },
+            { type: "setError", params: { reason: "EXCEPTION", error: null } },
+          ],
+        },
+        onDone: [
+          {
+            target: "Completed",
+            guard: {
+              type: "isOk",
+              params: ({ event }) => event.output,
+            },
+          },
+          {
+            target: "Generic Error",
+            description: "ERR_PUBKEY_*",
+            actions: {
+              type: "setError",
+              params: ({ event }) => {
+                assert(event.output.tag === "err")
+                return { reason: event.output.value, error: null }
+              },
+            },
+          },
+        ],
+      },
+      after: {
+        15000: {
+          target: "Generic Error",
+          actions: {
+            type: "setError",
+            params: {
+              reason: "EXCEPTION",
+              error: null,
+            },
+          },
+        },
+      },
+    },
 
     Completed: {
       type: "final",

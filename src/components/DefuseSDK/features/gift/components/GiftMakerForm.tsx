@@ -241,7 +241,22 @@ export function GiftMakerForm({
     }
   )
 
-  // Public key modal opener removed in learning edition
+  // Auto-add public key when the verifier reports it's missing (Near accounts only)
+  const publicKeyVerifierSnapshot = useSelector(
+    _publicKeyVerifierRef ?? undefined,
+    (s) => s
+  )
+
+  useEffect(() => {
+    if (publicKeyVerifierSnapshot?.matches("checked")) {
+      _publicKeyVerifierRef?.send({
+        type: "ADD_PUBLIC_KEY",
+        sendNearTransaction,
+      })
+    }
+    // Intentionally omitting sendNearTransaction to avoid effect churn; value is stable from provider
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [publicKeyVerifierSnapshot, _publicKeyVerifierRef])
 
   const handleSetMaxValue = async () => {
     if (tokenBalance != null) {
