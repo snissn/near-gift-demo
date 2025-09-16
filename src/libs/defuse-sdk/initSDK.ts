@@ -18,8 +18,15 @@ export function initSDK() {
   }
   hasInitialized = true
 
-  const envArg = SOLVER_RELAY_BASE_URL
-    ? { ...currentSDKConfig.env, solverRelayBaseURL: SOLVER_RELAY_BASE_URL }
+  // Normalize optional override to ensure trailing slash so URL("rpc", base) -> base/rpc
+  const overrideBase = SOLVER_RELAY_BASE_URL
+    ? SOLVER_RELAY_BASE_URL.endsWith("/")
+      ? SOLVER_RELAY_BASE_URL
+      : `${SOLVER_RELAY_BASE_URL}/`
+    : undefined
+
+  const envArg = overrideBase
+    ? { ...currentSDKConfig.env, solverRelayBaseURL: overrideBase }
     : INTENTS_ENV
 
   if (APP_ENV === "development") {
