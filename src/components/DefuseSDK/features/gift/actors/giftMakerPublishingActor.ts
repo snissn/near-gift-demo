@@ -1,6 +1,7 @@
 import type { MultiPayload } from "@defuse-protocol/contract-types"
 import { solverRelay } from "@defuse-protocol/internal-utils"
 import { assign, fromPromise, setup } from "xstate"
+import { config } from "../../../config"
 import { logger } from "../../../logger"
 import {
   type PublishIntentsErr,
@@ -45,9 +46,7 @@ export const giftMakerPublishingActor = setup({
       // Extra diagnostics: log the relay endpoint and payload shape size
       try {
         logger.error("publishActor: attempting relay publish", {
-          solverRelayBaseURL: (
-            require("../../config") as typeof import("../../config")
-          ).config.env.solverRelayBaseURL,
+          solverRelayBaseURL: config.env.solverRelayBaseURL,
           payloadBytes: (() => {
             try {
               return new TextEncoder().encode(JSON.stringify(input)).length
