@@ -17,6 +17,7 @@ import { GiftTakerSuccessScreen } from "./GiftTakerSuccessScreen"
 export type GiftTakerWidgetProps = {
   giftId: string | null
   payload: string | null
+  imageCid?: string | null
 
   /** List of available tokens for trading */
   tokenList: (BaseTokenInfo | UnifiedTokenInfo)[]
@@ -46,6 +47,7 @@ export function GiftTakerWidget(props: GiftTakerWidgetProps) {
 function GiftTakerScreens({
   giftId,
   payload,
+  imageCid,
   tokenList,
   userAddress,
   userChainType,
@@ -113,6 +115,11 @@ function GiftTakerScreens({
           signerCredentials={signerCredentials}
           giftTakerRootRef={giftTakerRootRef}
           intentHashes={intentHashes}
+          imageUrl={
+            imageCid
+              ? `https://gateway.lighthouse.storage/ipfs/${imageCid}`
+              : undefined
+          }
           renderHostAppLink={renderHostAppLink}
         />
       )}

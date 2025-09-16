@@ -159,9 +159,16 @@ export const giftMakerRootMachine = setup({
           const giftInfo = assembleGiftInfo(input)
 
           // Create a record and generate an IV
+          const form = input.formRef.getSnapshot()
+          const formValues = form.context.formValues.getSnapshot().context as {
+            amount: string
+            message: string
+            imageCid: string | null
+          }
           const { iv, giftId } = await input.createGiftIntent({
             secretKey: giftInfo.secretKey,
             message: giftInfo.message,
+            imageCid: formValues.imageCid ?? null,
           })
 
           const result = await giftMakerHistoryStore.getState().addGift(

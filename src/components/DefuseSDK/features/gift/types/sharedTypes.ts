@@ -10,6 +10,7 @@ export type SignMessage = (
 export type GiftLinkData = {
   secretKey: string
   message: string
+  imageCid?: string | null
 }
 
 export type GiftSignedResult = {

@@ -36,6 +36,7 @@ const giftsSchema = z.object({
       return false
     }
   }, "Key must be exactly 32 bytes (AES-256)"),
+  image_cid: z.string().min(1).optional().nullable(),
 }) as z.ZodType<CreateGiftRequest>
 
 export async function POST(request: Request) {

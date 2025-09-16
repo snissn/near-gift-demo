@@ -17,6 +17,7 @@ import {
 type GiftLinkData = {
   secretKey: string
   message: string
+  imageCid?: string | null
 }
 
 type GiftLinkPayload = {
@@ -61,6 +62,7 @@ export async function createGiftIntent(payload: GiftLinkData): Promise<{
     gift_id: giftId,
     encrypted_payload: encrypted,
     p_key: pKey,
+    image_cid: payload.imageCid ?? null,
   })
   if (!result.success) {
     throw new Error("Failed to save gift")
@@ -68,11 +70,17 @@ export async function createGiftIntent(payload: GiftLinkData): Promise<{
   return { iv: encodedIv, giftId }
 }
 
+type GiftIntentQueryResult = {
+  payload: string
+  giftId?: string
+  imageCid?: string | null
+}
+
 export function useGiftIntent() {
   const encodedGift =
     typeof window !== "undefined" ? window.location.hash.slice(1) : ""
 
-  const { data } = useQuery({
+  const { data } = useQuery<GiftIntentQueryResult>({
     queryKey: ["gift_intent", encodedGift],
     queryFn: async () => {
       // 1. Attempt: Try to fetch and decrypt the order from the database
@@ -88,6 +96,7 @@ export function useGiftIntent() {
             return {
               payload: decrypted,
               giftId: deriveIdFromIV(iv),
+              imageCid: gift.imageCid ?? null,
             }
           }
         } catch (_error) {
@@ -105,9 +114,7 @@ export function useGiftIntent() {
         logger.error("Failed to decode legacy order")
       }
 
-      return {
-        payload: "",
-      }
+      return { payload: "" }
     },
     enabled: typeof window !== "undefined" && !!encodedGift,
   })
@@ -115,5 +122,6 @@ export function useGiftIntent() {
   return {
     payload: data?.payload ?? null,
     giftId: data?.giftId ?? null,
+    imageCid: data?.imageCid ?? null,
   }
 }

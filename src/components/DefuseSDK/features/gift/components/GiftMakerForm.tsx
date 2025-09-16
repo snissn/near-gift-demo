@@ -1,7 +1,8 @@
+"use client"
 import type { authHandle } from "@defuse-protocol/internal-utils"
 import { useActorRef, useSelector } from "@xstate/react"
 import clsx from "clsx"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import type { ActorRefFrom, PromiseActorLogic } from "xstate"
 import { AuthGate } from "../../../components/AuthGate"
 import { BlockMultiBalances } from "../../../components/Block/BlockMultiBalances"
@@ -91,6 +92,10 @@ export function GiftMakerForm({
   renderHostAppLink,
   createGiftIntent,
 }: GiftMakerWidgetProps) {
+  const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const signerCredentials: SignerCredentials | null = useMemo(
     () =>
       userAddress != null && chainType != null
@@ -279,6 +284,50 @@ export function GiftMakerForm({
   const balanceAmount = tokenBalance?.amount ?? 0n
   const disabled = tokenBalance?.amount === 0n
 
+  const onUploadChange = async (files: FileList | null) => {
+    if (!files || files.length === 0) return
+    const apiKey = process.env.NEXT_PUBLIC_LIGHTHOUSE_API_KEY
+    if (!apiKey) {
+      setUploadError("Lighthouse API key not configured")
+      return
+    }
+    setUploading(true)
+    setUploadError(null)
+    setUploadProgress(0)
+    try {
+      const { default: lighthouse } = await import("@lighthouse-web3/sdk")
+      const progressCallback = (progressData: {
+        total: number
+        uploaded: number
+      }) => {
+        try {
+          const pct =
+            100 -
+            Number(
+              (
+                (progressData?.total / progressData?.uploaded) as number
+              ).toFixed(2)
+            )
+          if (!Number.isNaN(pct)) setUploadProgress(pct)
+        } catch {}
+      }
+      const output = await lighthouse.upload(
+        files,
+        apiKey,
+        null,
+        progressCallback
+      )
+      const cid = output?.data?.Hash as string | undefined
+      if (!cid) throw new Error("Upload failed: no CID returned")
+      formValuesRef.trigger.updateImageCid({ value: cid })
+      setUploadProgress(100)
+    } catch (e) {
+      setUploadError(e instanceof Error ? e.message : "Upload failed")
+    } finally {
+      setUploading(false)
+    }
+  }
+
   return (
     <div className="flex flex-col">
       {rootSnapshot.matches("settled") &&
@@ -401,6 +450,46 @@ export function GiftMakerForm({
                 ) : null
               }
             />
+          </div>
+
+          {/* Optional Image Upload */}
+          <div className="w-full mt-4">
+            <label
+              htmlFor="gift-image-upload"
+              className="font-bold text-label text-sm mb-2 inline-block"
+            >
+              Attach a memory photo (optional)
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                id="gift-image-upload"
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={(e) => onUploadChange(e.target.files)}
+                disabled={processing || uploading}
+              />
+            </div>
+            {uploading && (
+              <div className="text-xs text-gray-11 mt-2">
+                Uploading… {uploadProgress != null ? `${uploadProgress}%` : ""}
+              </div>
+            )}
+            {uploadError && (
+              <div className="text-xs text-red-11 mt-2">{uploadError}</div>
+            )}
+            {formValues.imageCid && (
+              <div className="mt-3 text-xs text-gray-11 break-all">
+                Uploaded CID: {formValues.imageCid}
+                <div className="mt-2">
+                  <img
+                    src={`https://gateway.lighthouse.storage/ipfs/${formValues.imageCid}`}
+                    alt="Gift memory preview"
+                    className="max-h-40 rounded"
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

@@ -24,6 +24,7 @@ export type GiftTakerFormProps = {
   signerCredentials: SignerCredentials | null
   giftTakerRootRef: ActorRefFrom<typeof giftTakerRootMachine>
   intentHashes: string[] | null
+  imageUrl?: string
   renderHostAppLink: RenderHostAppLink
 }
 
@@ -32,6 +33,7 @@ export function GiftTakerForm({
   signerCredentials,
   giftTakerRootRef,
   intentHashes,
+  imageUrl,
   renderHostAppLink,
 }: GiftTakerFormProps) {
   const isLoggedIn = signerCredentials != null
@@ -87,6 +89,7 @@ export function GiftTakerForm({
             ? giftInfo.message
             : "You've received a gift! Click to claim it."
         }
+        imageUrl={imageUrl}
       />
 
       {snapshot?.context.error != null &&

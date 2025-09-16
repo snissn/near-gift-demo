@@ -28,7 +28,7 @@ export async function GET(
 
     const { data, error } = await supabase
       .from("gifts")
-      .select("encrypted_payload, p_key")
+      .select("encrypted_payload, p_key, image_cid")
       .eq("gift_id", validatedData)
       .maybeSingle()
 
@@ -58,6 +58,7 @@ export async function GET(
     return NextResponse.json({
       encrypted_payload: data.encrypted_payload,
       p_key: data.p_key,
+      image_cid: data.image_cid ?? null,
     } satisfies GetGiftResponse)
   } catch (error) {
     if (error instanceof SupabaseConfigError) {

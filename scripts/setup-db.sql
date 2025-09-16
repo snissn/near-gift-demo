@@ -3,6 +3,8 @@ create table if not exists public.gifts (
   gift_id uuid primary key,
   encrypted_payload text not null,
   p_key text not null,
+  -- Optional image CID for Lighthouse/IPFS uploads
+  image_cid text null,
   created_at timestamptz not null default now()
 );
 
@@ -23,4 +25,3 @@ create table if not exists public.webauthn_credentials (
 --   updated_at timestamptz not null default now(),
 --   payload jsonb not null default '{}'
 -- );
-

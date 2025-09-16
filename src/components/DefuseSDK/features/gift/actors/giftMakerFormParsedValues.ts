@@ -12,6 +12,7 @@ type State = {
   token: null | BaseTokenInfo | UnifiedTokenInfo
   amount: null | TokenValue
   message: string
+  imageCid: string | null
 }
 
 export const createGiftMakerFormParsedValuesStore = () =>
@@ -20,6 +21,7 @@ export const createGiftMakerFormParsedValuesStore = () =>
       amount: null,
       token: null,
       message: "",
+      imageCid: null,
     } as State,
     emits: {
       valuesParsed: (_: { context: State }) => {},
@@ -35,6 +37,7 @@ export const createGiftMakerFormParsedValuesStore = () =>
           amount: parseTokenValue(formValues.token, formValues.amount),
           token: formValues.token,
           message: formValues.message,
+          imageCid: formValues.imageCid,
         }
         enqueue.emit.valuesParsed({ context: newContext })
         return newContext

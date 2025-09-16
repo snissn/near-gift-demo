@@ -19,6 +19,7 @@ type ShareableGiftImageProps = {
   message: string
   link?: string
   className?: string
+  imageUrl?: string
 }
 
 const GIFT_MESSAGE_DISPLAY_LIMIT = 20
@@ -29,6 +30,7 @@ export function ShareableGiftImage({
   message,
   link,
   className,
+  imageUrl,
 }: ShareableGiftImageProps) {
   return (
     <div
@@ -37,7 +39,7 @@ export function ShareableGiftImage({
         className
       )}
       style={{
-        backgroundImage: 'url("/static/images/gift-blank-card.png")',
+        backgroundImage: `url("${imageUrl ?? "/static/images/gift-blank-card.png"}")`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundBlendMode: "overlay",

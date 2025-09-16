@@ -5,6 +5,7 @@ export type GiftMakerFormValuesState = {
   amount: string
   token: null | BaseTokenInfo | UnifiedTokenInfo
   message: string
+  imageCid: string | null
 }
 
 export const createGiftMakerFormValuesStore = ({
@@ -17,6 +18,7 @@ export const createGiftMakerFormValuesStore = ({
       amount: "",
       token: initialToken,
       message: "",
+      imageCid: null,
     } satisfies GiftMakerFormValuesState,
     emits: {
       changed: (_: { context: GiftMakerFormValuesState }) => {},
@@ -46,6 +48,14 @@ export const createGiftMakerFormValuesStore = ({
         const newContext = {
           ...context,
           message: event.value,
+        }
+        enqueue.emit.changed({ context: newContext })
+        return newContext
+      },
+      updateImageCid: (context, event: { value: string | null }, enqueue) => {
+        const newContext = {
+          ...context,
+          imageCid: event.value,
         }
         enqueue.emit.changed({ context: newContext })
         return newContext

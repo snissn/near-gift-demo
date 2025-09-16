@@ -2,6 +2,7 @@ CREATE TABLE gifts (
     gift_id UUID PRIMARY KEY,
     encrypted_payload TEXT NOT NULL,
     p_key TEXT NOT NULL,
+    image_cid TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
