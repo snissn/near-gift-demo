@@ -69,4 +69,3 @@ export const LIST_TOKENS: TokenWithTags[] =
 export const DEPRECATED_TOKENS: Record<string, boolean> = {
   "nep141:aurora": true,
 }
-

@@ -1,4 +1,4 @@
-import { isBaseToken } from "@src/components/DefuseSDK/utils"
+import { isBaseToken } from "@defuse-protocol/defuse-sdk"
 import type { TokenWithTags } from "@src/constants/tokens"
 import { useSearchParams } from "next/navigation"
 import { useMemo } from "react"

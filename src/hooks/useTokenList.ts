@@ -1,4 +1,4 @@
-import type {} from "@src/components/DefuseSDK/types"
+import type {} from "@defuse-protocol/defuse-sdk"
 import type { TokenWithTags } from "@src/constants/tokens"
 import { useFlatTokenList } from "@src/hooks/useFlatTokenList"
 import { useSearchParams } from "next/navigation"

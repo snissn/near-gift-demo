@@ -26,11 +26,18 @@ export async function GET(
       gift: { gift_id: validatedData },
     })
 
-    const { data, error } = await supabase
+    const { data, error } = (await supabase
       .from("gifts")
       .select("encrypted_payload, p_key, image_cid")
       .eq("gift_id", validatedData)
-      .maybeSingle()
+      .maybeSingle()) as unknown as {
+      data: {
+        encrypted_payload: string
+        p_key: string
+        image_cid?: string
+      } | null
+      error: { message: string; code?: string; details?: string } | null
+    }
 
     if (error) {
       logger.error(error)

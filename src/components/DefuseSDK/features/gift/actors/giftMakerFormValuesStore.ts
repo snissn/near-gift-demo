@@ -18,7 +18,7 @@ export const createGiftMakerFormValuesStore = ({
       amount: "",
       token: initialToken,
       message: "",
-      imageCid: null,
+      imageCid: null as string | null,
     } satisfies GiftMakerFormValuesState,
     emits: {
       changed: (_: { context: GiftMakerFormValuesState }) => {},
